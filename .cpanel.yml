@@ -1,11 +1,7 @@
 ---
 deployment:
   tasks:
-    - export STAGING=/home2/aleampo8/staging.aleamodular.com
-    - export LIVE=/home2/aleampo8/public_html
-    # --- staging (kept in sync) ---
-    - /bin/cp wp-content/themes/theratio-child/functions.php "$STAGING/wp-content/themes/theratio-child/functions.php"
-    - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$STAGING/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
-    # --- live ---
-    - /bin/cp wp-content/themes/theratio-child/functions.php "$LIVE/wp-content/themes/theratio-child/functions.php"
-    - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$LIVE/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
+    # STAGING ONLY — deliberately does NOT touch live (public_html).
+    - export DEPLOYPATH=/home2/aleampo8/staging.aleamodular.com
+    - /bin/cp wp-content/themes/theratio-child/functions.php "$DEPLOYPATH/wp-content/themes/theratio-child/functions.php"
+    - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$DEPLOYPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
