@@ -191,3 +191,69 @@ add_action( 'wp_head', function () {
 </style>
 	<?php
 }, 21 );
+
+/* =========================================================================
+ * 7) PERFORMANCE — de-bloat WordPress + disable unused features
+ * Safe, standard optimizations that complement (don't conflict with) LiteSpeed
+ * cache. Nothing here touches Elementor, forms, or visible content.
+ * ========================================================================= */
+add_action( 'init', function () {
+	// --- Remove the emoji detection script + styles (extra request + inline JS) ---
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+	add_filter( 'tiny_mce_plugins', function ( $p ) {
+		return is_array( $p ) ? array_diff( $p, array( 'wpemoji' ) ) : $p;
+	} );
+	add_filter( 'emoji_svg_url', '__return_false' );
+
+	// --- Trim <head> bloat (no SEO/functional value) ---
+	remove_action( 'wp_head', 'rsd_link' );
+	remove_action( 'wp_head', 'wlwmanifest_link' );
+	remove_action( 'wp_head', 'wp_generator' );
+	remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+	remove_action( 'wp_head', 'rest_output_link_wp_head' );
+	remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+	remove_action( 'wp_head', 'feed_links_extra', 3 );
+}, 20 );
+
+// Disable XML-RPC (perf + closes a common brute-force/DDoS vector; site has no XML-RPC clients).
+add_filter( 'xmlrpc_enabled', '__return_false' );
+
+// Throttle the Heartbeat API to 60s (less admin-ajax load).
+add_filter( 'heartbeat_settings', function ( $s ) {
+	$s['interval'] = 60;
+	return $s;
+} );
+
+// Disable self-pingbacks.
+add_action( 'pre_ping', function ( &$links ) {
+	$home = home_url();
+	foreach ( $links as $i => $l ) {
+		if ( is_string( $l ) && 0 === strpos( $l, $home ) ) {
+			unset( $links[ $i ] );
+		}
+	}
+} );
+
+// Proper preconnects for the third parties we actually use (pairs with the junk-hint removal above).
+add_filter( 'wp_resource_hints', function ( $hints, $relation ) {
+	if ( 'preconnect' === $relation ) {
+		$hints[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' );
+		$hints[] = 'https://www.googletagmanager.com';
+		$hints[] = 'https://connect.facebook.net';
+	}
+	return $hints;
+}, 5, 2 );
+
+// Don't load the dashicons icon font on the front end for logged-out visitors.
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! is_user_logged_in() ) {
+		wp_dequeue_style( 'dashicons' );
+		wp_deregister_style( 'dashicons' );
+	}
+}, 100 );
