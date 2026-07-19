@@ -440,3 +440,176 @@ add_action( 'wp_footer', function () {
 </script>
 	<?php
 }, 101 );
+
+/* =====================================================================
+ * BLOCK 9 — [alea_landing] full redesigned homepage
+ * Renders a complete landing experience and reuses the block-8 components
+ * via do_shortcode(). Namespaced .aleax-* so it can't collide with theme.
+ * ===================================================================== */
+add_action( 'wp_head', function () {
+	?>
+<style id="aleax-css">
+.aleax{--maroon:#92003b;--maroon2:#6d002c;--lime:#b1c900;--lime-deep:#71830a;--ink:#16170f;--ink2:#54564a;--ink3:#87887a;--line:#e3e2d7;--paper:#faf9f6;--stone:#efeee6;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+.aleax *{box-sizing:border-box}
+.aleax img{max-width:100%;height:auto}
+.aleax-in{max-width:1140px;margin:0 auto;padding:0 22px}
+.aleax-bleed{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
+.aleax-sec{padding:72px 22px}
+.aleax h2{font-family:Cambria,Georgia,"Times New Roman",serif;font-weight:600;letter-spacing:-.015em;line-height:1.08;font-size:clamp(1.8rem,3.6vw,2.7rem);margin:0 0 14px;text-wrap:balance}
+.aleax .eb{font:700 .72rem/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--lime-deep);margin:0 0 12px}
+.aleax .lead{color:var(--ink2);font-size:1.08rem;max-width:62ch}
+.aleax .abtn{display:inline-flex;align-items:center;gap:8px;font-weight:650;font-size:1rem;padding:14px 24px;border-radius:9px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.15s}
+.aleax .abtn-primary{background:var(--lime);color:#16170f}
+.aleax .abtn-primary:hover{filter:brightness(.95)}
+.aleax .abtn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.aleax .abtn-ghost:hover{background:rgba(255,255,255,.1)}
+.aleax-head{text-align:center;max-width:700px;margin:0 auto 44px}
+.aleax-head .lead{margin:0 auto}
+/* hero */
+.aleax-hero{background:radial-gradient(120% 120% at 15% 0%,#a30642 0%,var(--maroon2) 42%,#3a0a22 100%);color:#fff}
+.aleax-hero .in{max-width:1140px;margin:0 auto;padding:76px 22px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.aleax-hero h1{font-family:Cambria,Georgia,serif;font-weight:600;font-size:clamp(2.1rem,4.6vw,3.5rem);line-height:1.05;letter-spacing:-.02em;margin:14px 0 0;text-wrap:balance}
+.aleax-hero .sub{color:#f4d9e4;font-size:1.12rem;margin:18px 0 0;max-width:52ch}
+.aleax-hero .eb{color:#e6b3c8}
+.aleax-hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.aleax-hero .fig{border-radius:16px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.14);aspect-ratio:4/3;background:#2a0817 center/cover no-repeat}
+.aleax-hero .trust{display:flex;gap:24px;flex-wrap:wrap;margin-top:30px;padding-top:22px;border-top:1px solid rgba(255,255,255,.16);color:#f0cede;font-size:.9rem}
+.aleax-hero .trust b{color:#fff}
+@media(max-width:860px){.aleax-hero .in{grid-template-columns:1fr;padding:50px 22px;gap:28px}.aleax-hero .fig{order:-1}}
+/* stats */
+.aleax-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:32px 22px;max-width:1140px;margin:0 auto}
+.aleax-stat{text-align:center}
+.aleax-stat b{display:block;font-family:Cambria,Georgia,serif;font-size:2rem;color:var(--maroon)}
+.aleax-stat span{font-size:.8rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:700px){.aleax-stats{grid-template-columns:repeat(2,1fr);gap:22px}}
+/* why */
+.aleax-why{background:var(--ink);color:#eef0e6}
+.aleax-why .in{max-width:1140px;margin:0 auto;padding:72px 22px}
+.aleax-why h2{color:#fff}.aleax-why .eb{color:var(--lime)}
+.aleax-why .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px}
+.aleax-card{background:#20241a;border:1px solid #2f3426;border-radius:14px;padding:24px}
+.aleax-card .ic{width:44px;height:44px;border-radius:11px;background:var(--lime);color:#16170f;display:grid;place-items:center;font-weight:800;font-size:1.2rem;margin-bottom:14px}
+.aleax-card h3{font-family:Cambria,Georgia,serif;font-size:1.15rem;margin:0 0 6px;color:#fff}
+.aleax-card p{color:#b9beac;font-size:.92rem;margin:0}
+@media(max-width:860px){.aleax-why .grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.aleax-why .grid{grid-template-columns:1fr}}
+/* band */
+.aleax-band{background:var(--stone)}
+.aleax-band .in{max-width:1140px;margin:0 auto;padding:72px 22px}
+/* testimonials */
+.aleax-quotes{background:var(--maroon);color:#fff}
+.aleax-quotes .in{max-width:1140px;margin:0 auto;padding:72px 22px}
+.aleax-quotes h2{color:#fff}.aleax-quotes .eb{color:var(--lime)}
+.aleax-quotes .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+.aleax-q{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:24px}
+.aleax-q .st{color:var(--lime);letter-spacing:2px;margin-bottom:10px}
+.aleax-q p{font-size:.98rem;color:#fbe7ef;margin:0 0 14px}
+.aleax-q .who{font-size:.85rem;color:#e9c2d3}.aleax-q .who b{color:#fff;display:block}
+@media(max-width:860px){.aleax-quotes .grid{grid-template-columns:1fr}}
+/* faq */
+.aleax-faq details{border-bottom:1px solid var(--line);padding:18px 0}
+.aleax-faq summary{cursor:pointer;font-weight:650;font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;gap:16px;color:var(--ink)}
+.aleax-faq summary::-webkit-details-marker{display:none}
+.aleax-faq summary::after{content:"+";color:var(--maroon);font-weight:400;font-size:1.5rem;line-height:1}
+.aleax-faq details[open] summary::after{content:"\2013"}
+.aleax-faq p{color:var(--ink2);margin:12px 0 0;max-width:78ch}
+/* final cta */
+.aleax-cta{background:radial-gradient(120% 120% at 85% 0%,#a30642,var(--maroon2) 45%,#2c0819);color:#fff}
+.aleax-cta .in{max-width:900px;margin:0 auto;padding:72px 22px;text-align:center}
+.aleax-cta h2{color:#fff}.aleax-cta .eb{color:var(--lime)}
+.aleax-cta .lead{color:#f4d9e4;margin:0 auto 8px}
+.aleax-cta .formwrap{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:30px;margin-top:26px;text-align:left}
+.aleax-cta .wpcf7 input:not([type=submit]):not([type=checkbox]):not([type=radio]),.aleax-cta .wpcf7 textarea,.aleax-cta .wpcf7 select{width:100%;padding:13px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.95);color:#16170f;font-size:1rem;margin:6px 0}
+.aleax-cta .wpcf7 input[type=submit]{background:var(--lime);color:#16170f;border:0;padding:14px 28px;border-radius:9px;font-weight:700;font-size:1.02rem;cursor:pointer;width:100%;margin-top:6px}
+.aleax-cta .altcta{margin-top:18px;color:#f0cede;font-size:.95rem}.aleax-cta .altcta a{color:#fff;font-weight:700}
+</style>
+	<?php
+}, 23 );
+
+add_shortcode( 'alea_landing', function () {
+	$up = home_url( '/wp-content/uploads' );
+	$hero = $up . '/2026/03/uploaded-image-31.png';
+	$wa   = 'https://wa.me/919554995449?text=Hi%20ALEA%2C%20I%27d%20like%20a%20free%20modular%20kitchen%20estimate.';
+	ob_start(); ?>
+<div class="aleax">
+
+  <section class="aleax-bleed aleax-hero"><div class="in">
+    <div>
+      <p class="eb">Panchkula · Tricity's modular specialists</p>
+      <h1>Kitchens &amp; wardrobes, engineered around your life.</h1>
+      <p class="sub">Factory-made modular interiors with a written 10-year warranty — designed, built and installed by ALEA. Get an instant price, then a free site visit.</p>
+      <div class="cta">
+        <a class="abtn abtn-primary" href="#estimate-tool">Get my instant price →</a>
+        <a class="abtn abtn-ghost" href="<?php echo esc_url( $wa ); ?>">WhatsApp us</a>
+      </div>
+      <div class="trust"><span>★★★★★ <b>4.8</b>/5</span><span><b>2,000+</b> interiors</span><span><b>10-year</b> warranty</span><span><b>95,000 sq ft</b> factory</span></div>
+    </div>
+    <div class="fig" style="background-image:url(<?php echo esc_url( $hero ); ?>)"></div>
+  </div></section>
+
+  <section class="aleax-stats">
+    <div class="aleax-stat"><b>12+</b><span>Years</span></div>
+    <div class="aleax-stat"><b>2,000+</b><span>Projects</span></div>
+    <div class="aleax-stat"><b>10-yr</b><span>Warranty</span></div>
+    <div class="aleax-stat"><b>15 days</b><span>Avg. install</span></div>
+  </section>
+
+  <section id="estimate-tool" class="aleax-sec"><div class="aleax-in">
+    <?php echo do_shortcode( '[alea_estimator]' ); ?>
+  </div></section>
+
+  <section class="aleax-bleed aleax-why"><div class="in">
+    <div class="aleax-head"><p class="eb">Why ALEA</p><h2>Built better, priced honestly, delivered on time.</h2></div>
+    <div class="grid">
+      <div class="aleax-card"><div class="ic">⌂</div><h3>Our own factory</h3><p>95,000 sq ft of in-house manufacturing — no middlemen, no hidden markups, full quality control.</p></div>
+      <div class="aleax-card"><div class="ic">✦</div><h3>European hardware</h3><p>Hettich &amp; Blum soft-close hinges and channels as standard — not a paid upgrade.</p></div>
+      <div class="aleax-card"><div class="ic">✓</div><h3>10-year warranty</h3><p>Written, honoured, and backed by a local after-sales team you can actually reach.</p></div>
+      <div class="aleax-card"><div class="ic">◷</div><h3>On-time install</h3><p>A clear schedule from day one — most kitchens fitted within 15 days of approval.</p></div>
+    </div>
+  </div></section>
+
+  <section class="aleax-sec"><div class="aleax-in">
+    <div class="aleax-head"><p class="eb">See the difference</p><h2>From bare space to a kitchen you'll love.</h2><p class="lead">Drag the slider to reveal an ALEA transformation.</p></div>
+    <?php echo do_shortcode( '[alea_before_after after="' . esc_url( $hero ) . '"]' ); ?>
+  </div></section>
+
+  <section class="aleax-bleed aleax-band"><div class="in">
+    <div class="aleax-head"><p class="eb">Transparent pricing</p><h2>Clear per-running-foot pricing. No surprises.</h2><p class="lead">Indicative ranges — your exact quote comes after a free site measurement.</p></div>
+    <?php echo do_shortcode( '[alea_pricing]' ); ?>
+  </div></section>
+
+  <section class="aleax-sec"><div class="aleax-in">
+    <div class="aleax-head"><p class="eb">How it works</p><h2>From first call to cooking — in clear steps.</h2></div>
+    <?php echo do_shortcode( '[alea_process]' ); ?>
+  </div></section>
+
+  <section class="aleax-bleed aleax-quotes"><div class="in">
+    <div class="aleax-head"><p class="eb">Loved by tricity homeowners</p><h2>What our clients say.</h2></div>
+    <div class="grid">
+      <div class="aleax-q"><div class="st">★★★★★</div><p>"The 3D design was exactly what we got. Installation was clean and finished a day early — the soft-close drawers still feel brand new two years on."</p><div class="who"><b>Ritu &amp; Sameer</b>Sector 20, Panchkula</div></div>
+      <div class="aleax-q"><div class="st">★★★★★</div><p>"Priced clearly per running foot with no last-minute surprises. The team walked us through every material choice patiently."</p><div class="who"><b>Harpreet S.</b>Zirakpur</div></div>
+      <div class="aleax-q"><div class="st">★★★★★</div><p>"We compared four brands. ALEA was the only one that made the whole kitchen in-house — the quality difference in the hardware is obvious."</p><div class="who"><b>Neha K.</b>Sector 9, Chandigarh</div></div>
+    </div>
+  </div></section>
+
+  <section class="aleax-sec aleax-faq"><div class="aleax-in" style="max-width:820px">
+    <div class="aleax-head"><p class="eb">Good to know</p><h2>Questions homeowners ask us.</h2></div>
+    <details open><summary>How much does an ALEA modular kitchen cost?</summary><p>Most kitchens fall between ₹1,150 and ₹2,600 per running foot depending on the carcass, shutter finish and hardware you choose. Use the instant estimator above for a ballpark, then book a free site visit for an exact, itemised quote.</p></details>
+    <details><summary>How long does design and installation take?</summary><p>Design and 3D approval usually take about a week. Manufacturing runs 3–4 weeks in our own factory, and on-site installation is typically 1–2 days — most projects are fully fitted within 15 days of approval.</p></details>
+    <details><summary>What is covered by the 10-year warranty?</summary><p>The carcass, hardware and workmanship are covered in writing for 10 years, supported by a local after-sales team. Exact terms are shared with your quote.</p></details>
+    <details><summary>Which materials and hardware do you use?</summary><p>Moisture- and termite-resistant carcasses, your choice of laminate, acrylic or PU shutters, and European soft-close hardware (Hettich / Blum) as standard across our Premium and Luxury tiers.</p></details>
+    <details><summary>Do you offer EMI or finance options?</summary><p>Yes — EMI is available from roughly ₹3,300/month depending on the project value. Ask our designer for current options during your consultation.</p></details>
+    <details><summary>Which areas do you serve?</summary><p>We design, manufacture and install across the Tricity — Panchkula, Chandigarh, Mohali, Zirakpur and nearby areas.</p></details>
+  </div></section>
+
+  <section id="estimate" class="aleax-bleed aleax-cta"><div class="in">
+    <p class="eb">Free &amp; no-obligation</p>
+    <h2>Book your free design consultation.</h2>
+    <p class="lead">Share your name and number — a senior designer will call within 24 hours with ideas and an estimate.</p>
+    <div class="formwrap"><?php echo do_shortcode( '[contact-form-7 id="7dcf010" title="Home Page form"]' ); ?></div>
+    <p class="altcta">Prefer to talk now? Call <a href="tel:+919554995449">+91 95549 95449</a> or <a href="<?php echo esc_url( $wa ); ?>">WhatsApp us</a>.</p>
+  </div></section>
+
+</div>
+	<?php return ob_get_clean();
+} );
