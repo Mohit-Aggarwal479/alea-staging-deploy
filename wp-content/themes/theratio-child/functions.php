@@ -522,6 +522,28 @@ add_action( 'wp_head', function () {
 .aleax-cta .wpcf7 input:not([type=submit]):not([type=checkbox]):not([type=radio]),.aleax-cta .wpcf7 textarea,.aleax-cta .wpcf7 select{width:100%;padding:13px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.95);color:#16170f;font-size:1rem;margin:6px 0}
 .aleax-cta .wpcf7 input[type=submit]{background:var(--lime);color:#16170f;border:0;padding:14px 28px;border-radius:9px;font-weight:700;font-size:1.02rem;cursor:pointer;width:100%;margin-top:6px}
 .aleax-cta .altcta{margin-top:18px;color:#f0cede;font-size:.95rem}.aleax-cta .altcta a{color:#fff;font-weight:700}
+.aleax-cta .promise{display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:center;margin:22px 0 0;color:#fbe7ef;font-size:.92rem}
+.aleax-cta .promise span::before{content:"\2713";color:var(--lime);font-weight:800;margin-right:7px}
+/* ---- polish ---- */
+:root{scroll-behavior:smooth}
+.aleax .abtn-primary{box-shadow:0 8px 22px rgba(177,201,0,.35)}
+.aleax .abtn:hover{transform:translateY(-1px)}
+.aleax-card{transition:transform .18s ease,border-color .18s}
+.aleax-card:hover{transform:translateY(-4px);border-color:#414a32}
+.aleax-q{transition:transform .18s ease,background .18s}
+.aleax-q:hover{transform:translateY(-4px);background:rgba(255,255,255,.12)}
+.aleax .aleac-pr .t{transition:transform .18s ease,box-shadow .18s}
+.aleax .aleac-pr .t:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(22,23,15,.12)}
+.aleax .aleac-ps .s{transition:transform .18s ease,box-shadow .18s}
+.aleax .aleac-ps .s:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(22,23,15,.1)}
+.aleax a:focus-visible,.aleax button:focus-visible,.aleax input:focus-visible,.aleax summary:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:6px}
+.aleax-hero .fig{position:relative}
+.aleax-hero .fig::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(58,10,34,.5));pointer-events:none}
+.aleax-hero .badge{position:absolute;left:16px;bottom:16px;z-index:2;display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.96);color:#16170f;border-radius:13px;padding:11px 15px;box-shadow:0 12px 26px rgba(0,0,0,.28)}
+.aleax-hero .badge .bmark{width:36px;height:36px;border-radius:10px;background:var(--lime);color:#16170f;display:grid;place-items:center;font-weight:800;font-size:1.15rem;flex:none}
+.aleax-hero .badge b{font-family:Cambria,Georgia,serif;font-size:1.12rem;display:block;line-height:1.05}
+.aleax-hero .badge span{font-size:.74rem;color:#54564a}
+@media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}.aleax *{transition:none!important}}
 </style>
 	<?php
 }, 23 );
@@ -544,7 +566,7 @@ add_shortcode( 'alea_landing', function () {
       </div>
       <div class="trust"><span>★★★★★ <b>4.8</b>/5</span><span><b>2,000+</b> interiors</span><span><b>10-year</b> warranty</span><span><b>95,000 sq ft</b> factory</span></div>
     </div>
-    <div class="fig" style="background-image:url(<?php echo esc_url( $hero ); ?>)"></div>
+    <div class="fig" style="background-image:url(<?php echo esc_url( $hero ); ?>)"><div class="badge"><span class="bmark">✓</span><div><b>10-Year</b><span>Written warranty</span></div></div></div>
   </div></section>
 
   <section class="aleax-stats">
@@ -606,6 +628,7 @@ add_shortcode( 'alea_landing', function () {
     <p class="eb">Free &amp; no-obligation</p>
     <h2>Book your free design consultation.</h2>
     <p class="lead">Share your name and number — a senior designer will call within 24 hours with ideas and an estimate.</p>
+    <div class="promise"><span>Free design &amp; 3D quote</span><span>10-year written warranty</span><span>Made in our own factory</span><span>On-time installation</span></div>
     <div class="formwrap"><?php echo do_shortcode( '[contact-form-7 id="7dcf010" title="Home Page form"]' ); ?></div>
     <p class="altcta">Prefer to talk now? Call <a href="tel:+919554995449">+91 95549 95449</a> or <a href="<?php echo esc_url( $wa ); ?>">WhatsApp us</a>.</p>
   </div></section>
