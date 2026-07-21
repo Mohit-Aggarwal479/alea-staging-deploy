@@ -19,7 +19,7 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	?>
-<script id="alea-cf7-lead-tracking">
+<script id="alea-cf7-lead-tracking" data-no-optimize="1">
 document.addEventListener('wpcf7mailsent', function (e) {
 	try {
 		var formId = e && e.detail ? e.detail.contactFormId : '';
@@ -136,7 +136,7 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	?>
-<script id="alea-whatsapp-prefill">
+<script id="alea-whatsapp-prefill" data-no-optimize="1">
 document.addEventListener('DOMContentLoaded', function () {
 	var text = "Hi ALEA, I'd like a free modular kitchen estimate.";
 	var sel = 'a[href*="wa.me/"],a[href*="api.whatsapp.com/send"],a[href*="web.whatsapp.com/send"]';
@@ -178,7 +178,7 @@ add_shortcode( 'alea_trust_bar', function () {
 
 add_action( 'wp_head', function () {
 	?>
-<style id="alea-trust-bar-css">
+<style id="alea-trust-bar-css" data-no-optimize="1">
 .alea-trust-bar{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 26px;
 	padding:14px 18px;background:#111;border-radius:8px;margin:0 auto;max-width:1100px}
 .alea-trust-item{color:#fff;font-size:14px;font-weight:600;letter-spacing:.2px;white-space:nowrap;
@@ -271,7 +271,7 @@ add_action( 'wp_enqueue_scripts', function () {
 add_action( 'wp_head', function () {
 	if ( is_admin() ) { return; }
 	?>
-<style id="aleac-css">
+<style id="aleac-css" data-no-optimize="1">
 .aleac{--lime:#b1c900;--lime-deep:#71830a;--ink:#16170f;--ink2:#54564a;--ink3:#87887a;--line:#e3e2d7;--surf:#fff;--bg:#f4f4ee;
   font-family:-apple-system,system-ui,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);box-sizing:border-box}
 .aleac *{box-sizing:border-box}
@@ -410,7 +410,7 @@ add_action( 'wp_footer', function () {
 add_action( 'wp_footer', function () {
 	if ( is_admin() ) { return; }
 	?>
-<script id="aleac-js">
+<script id="aleac-js" data-no-optimize="1">
 (function(){
   // estimator
   document.querySelectorAll('.aleac-est').forEach(function(root){
@@ -448,7 +448,7 @@ add_action( 'wp_footer', function () {
  * ===================================================================== */
 add_action( 'wp_head', function () {
 	?>
-<style id="aleax-css">
+<style id="aleax-css" data-no-optimize="1">
 .aleax{--maroon:#92003b;--maroon2:#6d002c;--lime:#b1c900;--lime-deep:#71830a;--ink:#16170f;--ink2:#54564a;--ink3:#87887a;--line:#e3e2d7;--paper:#faf9f6;--stone:#efeee6;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
 .aleax *{box-sizing:border-box}
 .aleax img{max-width:100%;height:auto}
@@ -635,4 +635,96 @@ add_shortcode( 'alea_landing', function () {
 
 </div>
 	<?php return ob_get_clean();
+} );
+
+/* =====================================================================
+ * BLOCK 10 — SITE-WIDE DESIGN SKIN
+ * Restyles the shared furniture of EVERY page (headings, buttons, forms,
+ * links, nav accents, footer accents) in the new brand system:
+ * maroon #92003b + lime #b1c900 + Cambria serif headings.
+ * Selectors verified against the actual staging markup/stylesheets
+ * (theratio theme + Elementor kit-7 + child CSS + CF7). Content colors on
+ * dark contexts (hero/page-title/footer/nav) are deliberately untouched.
+ * ===================================================================== */
+add_action( 'wp_head', function () {
+	if ( is_admin() ) { return; }
+	?>
+<style id="alea-skin-css" data-no-optimize="1">
+/* A) Elementor kit tokens: default blue/green -> brand ink/lime */
+.elementor-kit-7{--e-global-color-primary:#1a1a1a;--e-global-color-accent:#b1c900}
+
+/* B) Headings -> Cambria serif site-wide (font only; colors untouched so
+      white-on-dark heroes, banners and footer headings keep their color) */
+h1,h2,h3,h4,h5,h6,
+.elementor-widget-heading .elementor-heading-title,
+div.elementor-widget-heading .elementor-heading-title,
+.ot-heading h2.main-heading,
+h1.page-title,
+.acc-toggle{font-family:Cambria,Georgia,"Times New Roman",serif!important;letter-spacing:-.01em}
+
+/* C) Section kickers ("[ testimonials ]") -> branded eyebrow style */
+.ot-heading>span{font-family:ui-monospace,Consolas,monospace!important;font-weight:700;letter-spacing:.16em;color:#71830a;text-transform:uppercase}
+.ot-heading.is-dots:before{border-bottom-color:#b1c900}
+
+/* D) Theme buttons (.octf-btn — CTAs + CF7 submits on contact/lead forms) */
+.octf-btn{background:#b1c900!important;color:#16170f!important;border-color:#b1c900!important;border-radius:9px;font-weight:700;transition:background .15s,transform .15s}
+.octf-btn:hover,.octf-btn:focus,.octf-btn:active{background:#9db300!important;color:#16170f!important;transform:translateY(-1px)}
+.octf-btn:not(.no-line):before,.octf-btn:not(.no-line):after{display:none!important}
+
+/* E) Elementor button widgets (blog cards etc.) */
+.elementor-widget-button .elementor-button{background-color:#b1c900;color:#16170f;border-radius:9px;font-weight:650}
+.elementor-widget-button .elementor-button:hover{background-color:#9db300;color:#16170f}
+
+/* F) Contact Form 7 fields — soft card fields replacing bare underlines */
+.wpcf7 input[type=text],.wpcf7 input[type=email],.wpcf7 input[type=tel],.wpcf7 input[type=number],.wpcf7 input[type=date],.wpcf7 textarea,.wpcf7 select{border:1px solid #d9d8cc!important;border-radius:9px!important;background:#fff;padding:12px 14px!important;font-size:15px}
+.wpcf7 input[type=text]:focus,.wpcf7 input[type=email]:focus,.wpcf7 input[type=tel]:focus,.wpcf7 textarea:focus,.wpcf7 select:focus{border-color:#b1c900!important;outline:2px solid rgba(177,201,0,.35);outline-offset:0}
+.wpcf7 input[type=submit],.wpcf7 button[type=submit]{background:#b1c900!important;color:#16170f!important;border:0!important;border-radius:9px!important;font-weight:700}
+.wpcf7 input[type=submit]:hover,.wpcf7 button[type=submit]:hover{background:#9db300!important}
+
+/* G) Body links: generic blue -> brand maroon (nav/buttons/footer exempted) */
+body a{color:#92003b}
+body a:hover{color:#6d002c}
+.main-navigation a,.mobile_mainmenu a,.octf-btn,.elementor-button,.elementor-icon-list-item a,.elementor-social-icon,.aleac a,.aleax a,.e-contact-buttons a,.page-header a{text-decoration:none!important}
+
+/* H) Nav accents: lime hover + lime diamond marker (text stays white) */
+#site-header .main-navigation>ul>li>a:hover{color:#b1c900!important}
+#site-header .main-navigation>ul>li.current-menu-item>a{color:#b1c900!important}
+.main-navigation>ul>li>a:before{background:#b1c900!important}
+#site-header .main-navigation ul li li a:hover{color:#b1c900!important}
+#mmenu-wrapper .mobile_mainmenu li a:hover{color:#b1c900}
+
+/* I) Header top bar -> brand maroon (white text/logo unaffected) */
+#site-header .elementor-element-aa59b40{background-color:#92003b!important}
+
+/* J) Inner-page title banners: black overlay -> deep maroon-ink tint */
+.page-header .dcell{background:rgba(44,8,25,.66)!important}
+
+/* K) Footer micro-accents */
+#site-footer .elementor-social-icon:hover{background-color:#b1c900!important;border-color:#b1c900!important}
+#site-footer .elementor-social-icon:hover i{color:#16170f}
+#site-footer .elementor-icon-list-item a:hover .elementor-icon-list-text{color:#b1c900!important}
+
+/* L) Slider dots + FAQ toggles */
+.swiper-pagination-bullet-active{background:#b1c900!important}
+.acc-toggle i{color:#92003b}
+
+/* M) Micro-UX: selection, keyboard focus, smooth scroll */
+::selection{background:#b1c900;color:#16170f}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[role=button]:focus-visible{outline:2px solid #b1c900;outline-offset:2px}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* N) Mobile: hide theme's old fixed bottom icon bar (our Call/WhatsApp/
+      Estimate bar replaces it) and keep footer clear of the fixed bar */
+@media(max-width:781px){
+	.elementor-3992 .elementor-element-71192a3f{display:none!important}
+	body:not(.elementor-editor-active){padding-bottom:60px}
+}
+</style>
+	<?php
+}, 24 );
+
+/* Belt-and-braces: keep our namespaces out of LiteSpeed UCSS tree-shaking. */
+add_filter( 'litespeed_ucss_whitelist', function ( $list ) {
+	return array_merge( (array) $list, array( '.aleac*', '.aleax*', '.alea-trust*', '.octf-btn*', '.wpcf7*' ) );
 } );
