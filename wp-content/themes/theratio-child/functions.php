@@ -19,7 +19,7 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	?>
-<script id="alea-cf7-lead-tracking" data-no-optimize="1">
+<script id="alea-cf7-lead-tracking" data-no-optimize="1" data-no-defer="1">
 document.addEventListener('wpcf7mailsent', function (e) {
 	try {
 		var formId = e && e.detail ? e.detail.contactFormId : '';
@@ -136,7 +136,7 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	?>
-<script id="alea-whatsapp-prefill" data-no-optimize="1">
+<script id="alea-whatsapp-prefill" data-no-optimize="1" data-no-defer="1">
 document.addEventListener('DOMContentLoaded', function () {
 	var text = "Hi ALEA, I'd like a free modular kitchen estimate.";
 	var sel = 'a[href*="wa.me/"],a[href*="api.whatsapp.com/send"],a[href*="web.whatsapp.com/send"]';
@@ -410,7 +410,7 @@ add_action( 'wp_footer', function () {
 add_action( 'wp_footer', function () {
 	if ( is_admin() ) { return; }
 	?>
-<script id="aleac-js" data-no-optimize="1">
+<script id="aleac-js" data-no-optimize="1" data-no-defer="1">
 (function(){
   // estimator
   document.querySelectorAll('.aleac-est').forEach(function(root){
@@ -661,30 +661,47 @@ div.elementor-widget-heading .elementor-heading-title,
 .ot-heading h2.main-heading,
 h1.page-title,
 .acc-toggle{font-family:Cambria,Georgia,"Times New Roman",serif!important;letter-spacing:-.01em}
+/* old-home hero has a higher-specificity Titillium !important rule — out-specify it */
+section.bannerWrapper2 h1.elementor-heading-title.elementor-size-default{font-family:Cambria,Georgia,"Times New Roman",serif!important;font-weight:600!important}
 
 /* C) Section kickers ("[ testimonials ]") -> branded eyebrow style */
 .ot-heading>span{font-family:ui-monospace,Consolas,monospace!important;font-weight:700;letter-spacing:.16em;color:#71830a;text-transform:uppercase}
-.ot-heading.is-dots:before{border-bottom-color:#b1c900}
+.ot-heading.is-dots:before{border-bottom-color:#b1c900!important}
+/* dark contact panel: olive kicker fails contrast there — use lime */
+.elementor-element-131457d .ot-heading>span{color:#b1c900}
 
 /* D) Theme buttons (.octf-btn — CTAs + CF7 submits on contact/lead forms) */
-.octf-btn{background:#b1c900!important;color:#16170f!important;border-color:#b1c900!important;border-radius:9px;font-weight:700;transition:background .15s,transform .15s}
-.octf-btn:hover,.octf-btn:focus,.octf-btn:active{background:#9db300!important;color:#16170f!important;transform:translateY(-1px)}
+.octf-btn{border-radius:9px;font-weight:700;transition:background .15s,transform .15s}
+.octf-btn:hover{transform:translateY(-1px)}
 .octf-btn:not(.no-line):before,.octf-btn:not(.no-line):after{display:none!important}
+/* primary buttons go lime; -light/-dark variants keep their fills so paired CTAs retain hierarchy */
+.octf-btn:not(.octf-btn-light):not(.octf-btn-dark){background:#b1c900!important;color:#16170f!important;border-color:#b1c900!important}
+.octf-btn:not(.octf-btn-light):not(.octf-btn-dark):hover,.octf-btn:not(.octf-btn-light):not(.octf-btn-dark):focus,.octf-btn:not(.octf-btn-light):not(.octf-btn-dark):active{background:#9db300!important;color:#16170f!important}
+.octf-btn.octf-btn-light,.octf-btn.octf-btn-dark{border-radius:9px}
 
 /* E) Elementor button widgets (blog cards etc.) */
 .elementor-widget-button .elementor-button{background-color:#b1c900;color:#16170f;border-radius:9px;font-weight:650}
 .elementor-widget-button .elementor-button:hover{background-color:#9db300;color:#16170f}
+/* blog loop-card buttons carry per-element styling — match its specificity */
+.elementor-21463 .elementor-element.elementor-element-412f6fb .elementor-button{background-color:#b1c900;color:#16170f}
+.elementor-21463 .elementor-element.elementor-element-412f6fb .elementor-button:hover,.elementor-21463 .elementor-element.elementor-element-412f6fb .elementor-button:focus{background-color:#9db300;color:#16170f}
 
 /* F) Contact Form 7 fields — soft card fields replacing bare underlines */
 .wpcf7 input[type=text],.wpcf7 input[type=email],.wpcf7 input[type=tel],.wpcf7 input[type=number],.wpcf7 input[type=date],.wpcf7 textarea,.wpcf7 select{border:1px solid #d9d8cc!important;border-radius:9px!important;background:#fff;padding:12px 14px!important;font-size:15px}
-.wpcf7 input[type=text]:focus,.wpcf7 input[type=email]:focus,.wpcf7 input[type=tel]:focus,.wpcf7 textarea:focus,.wpcf7 select:focus{border-color:#b1c900!important;outline:2px solid rgba(177,201,0,.35);outline-offset:0}
+.wpcf7 input[type=text]:focus,.wpcf7 input[type=email]:focus,.wpcf7 input[type=tel]:focus,.wpcf7 textarea:focus,.wpcf7 select:focus{border-color:#b1c900!important;outline:2px solid rgba(113,131,10,.55);outline-offset:0}
 .wpcf7 input[type=submit],.wpcf7 button[type=submit]{background:#b1c900!important;color:#16170f!important;border:0!important;border-radius:9px!important;font-weight:700}
 .wpcf7 input[type=submit]:hover,.wpcf7 button[type=submit]:hover{background:#9db300!important}
+/* keep validation states clearly ERROR-red, not brand-colored */
+.wpcf7 input.wpcf7-not-valid,.wpcf7 textarea.wpcf7-not-valid,.wpcf7 select.wpcf7-not-valid{border-color:#dc3232!important}
+.wpcf7 form.invalid .wpcf7-response-output,.wpcf7 form.unaccepted .wpcf7-response-output,.wpcf7 form.payment-required .wpcf7-response-output{border-color:#dc3232!important;color:#1a1a1a!important}
 
 /* G) Body links: generic blue -> brand maroon (nav/buttons/footer exempted) */
 body a{color:#92003b}
 body a:hover{color:#6d002c}
-.main-navigation a,.mobile_mainmenu a,.octf-btn,.elementor-button,.elementor-icon-list-item a,.elementor-social-icon,.aleac a,.aleax a,.e-contact-buttons a,.page-header a{text-decoration:none!important}
+.main-navigation a,.mobile_mainmenu a,.octf-btn,.elementor-button,.elementor-icon-list-item a,.elementor-social-icon,.aleac a,[class*="aleax"] a,.e-contact-buttons a,.page-header a,#site-header .elementor-widget-heading a{text-decoration:none!important}
+/* dark panels (e.g. contact info on #1A1A1A): maroon is unreadable there */
+.contact-info a,.elementor-element-131457d a{color:#d9d8cc}
+.contact-info a:hover,.elementor-element-131457d a:hover{color:#b1c900}
 
 /* H) Nav accents: lime hover + lime diamond marker (text stays white) */
 #site-header .main-navigation>ul>li>a:hover{color:#b1c900!important}
@@ -706,18 +723,25 @@ body a:hover{color:#6d002c}
 
 /* L) Slider dots + FAQ toggles */
 .swiper-pagination-bullet-active{background:#b1c900!important}
-.acc-toggle i{color:#92003b}
+.ot-accordions .acc-item .acc-toggle i{color:#92003b}
 
 /* M) Micro-UX: selection, keyboard focus, smooth scroll */
 ::selection{background:#b1c900;color:#16170f}
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[role=button]:focus-visible{outline:2px solid #b1c900;outline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[role=button]:focus-visible{outline:2px solid #71830a;outline-offset:2px}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-/* N) Mobile: hide theme's old fixed bottom icon bar (our Call/WhatsApp/
-      Estimate bar replaces it) and keep footer clear of the fixed bar */
+/* N) Mobile: the theme's fixed bottom bar contains BOTH the icon shortcuts
+      AND the hamburger menu (site's only mobile nav — never hide it).
+      Hide only the shortcut columns; float the hamburger as a chip just
+      above our Call/WhatsApp/Estimate bar. */
 @media(max-width:781px){
-	.elementor-3992 .elementor-element-71192a3f{display:none!important}
+	.elementor-3992 .elementor-element-71192a3f>.e-con:not(.elementor-element-75db21a4){display:none!important}
+	body .elementor-3992 .elementor-element.elementor-element-71192a3f{bottom:66px!important;top:auto!important;left:auto!important;right:10px!important;width:auto!important;min-width:0!important;background:transparent!important;box-shadow:none!important;padding:0!important}
+	.elementor-3992 .elementor-element-75db21a4{--width:auto}
+	.elementor-3992 .elementor-element-b091a41>.elementor-widget-container{padding:0!important;margin:0!important}
+	.elementor-3992 .elementor-element-553d05d9{display:none!important}
+	.elementor-3992 .mmenu-toggle button{background:#16170f!important;border-radius:10px!important;width:44px!important;height:44px!important;display:grid!important;place-items:center!important;box-shadow:0 4px 14px rgba(0,0,0,.35)!important}
 	body:not(.elementor-editor-active){padding-bottom:60px}
 }
 </style>
