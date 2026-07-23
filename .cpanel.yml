@@ -8,7 +8,6 @@ deployment:
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" option get page_on_front >> "$HOME/front-page-backup.log" && $WPB --path="$DEPLOYPATH" option update show_on_front page && $WPB --path="$DEPLOYPATH" option update page_on_front 22618 ) || echo 'ALEA deploy - front-page switch FAILED'
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" litespeed-purge all || $WPB --path="$DEPLOYPATH" cache flush ) || true
     - export LIVEPATH=/home2/aleampo8/public_html
-    - /bin/cp "$LIVEPATH/wp-content/themes/theratio-child/functions.php" "$HOME/live-functions.php.pre-deploy.bak" 2>/dev/null || true
     - /bin/mkdir -p "$LIVEPATH/wp-content/mu-plugins"
     - /bin/cp live/functions.php "$LIVEPATH/wp-content/themes/theratio-child/functions.php"
     - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$LIVEPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
