@@ -1,14 +1,14 @@
 ---
 deployment:
   tasks:
-    # STAGING ONLY — deliberately does NOT touch live (public_html).
     - export DEPLOYPATH=/home2/aleampo8/staging.aleamodular.com
     - /bin/mkdir -p "$DEPLOYPATH/wp-content/mu-plugins"
     - /bin/cp wp-content/themes/theratio-child/functions.php "$DEPLOYPATH/wp-content/themes/theratio-child/functions.php"
     - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$DEPLOYPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
-    # Switch front page to the redesigned landing (page 22618) — reversible:
-    # previous page_on_front value is appended to ~/front-page-backup.log first
-    # (kept OUTSIDE the web root on purpose).
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" option get page_on_front >> "$HOME/front-page-backup.log" && $WPB --path="$DEPLOYPATH" option update show_on_front page && $WPB --path="$DEPLOYPATH" option update page_on_front 22618 ) || echo 'ALEA deploy - front-page switch FAILED'
-    # Purge LiteSpeed cache so the new design serves immediately.
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" litespeed-purge all || $WPB --path="$DEPLOYPATH" cache flush ) || true
+    - export LIVEPATH=/home2/aleampo8/public_html
+    - /bin/mkdir -p "$LIVEPATH/wp-content/mu-plugins"
+    - /bin/cp live/functions.php "$LIVEPATH/wp-content/themes/theratio-child/functions.php"
+    - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$LIVEPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
+    - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$LIVEPATH" litespeed-purge all || $WPB --path="$LIVEPATH" cache flush ) || true
