@@ -12,3 +12,14 @@ deployment:
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" option get page_on_front >> "$HOME/front-page-backup.log" && $WPB --path="$DEPLOYPATH" option update show_on_front page && $WPB --path="$DEPLOYPATH" option update page_on_front 22618 ) || echo 'ALEA deploy - front-page switch FAILED'
     # Purge LiteSpeed cache so the new design serves immediately.
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" litespeed-purge all || $WPB --path="$DEPLOYPATH" cache flush ) || true
+    # ------------------------------------------------------------------
+    # LIVE — fixes-only layer (owner-approved 2026-07-22): tracking, perf
+    # de-bloat, schema, WhatsApp prefill, warning muter. Deliberately NO
+    # visual components, NO skin, NO front-page change on live.
+    # ------------------------------------------------------------------
+    - export LIVEPATH=/home2/aleampo8/public_html
+    - if [ -f "$LIVEPATH/wp-content/themes/theratio-child/functions.php" ]; then /bin/cp "$LIVEPATH/wp-content/themes/theratio-child/functions.php" "$HOME/live-functions.php.pre-deploy.bak"; fi
+    - /bin/mkdir -p "$LIVEPATH/wp-content/mu-plugins"
+    - /bin/cp live/functions.php "$LIVEPATH/wp-content/themes/theratio-child/functions.php"
+    - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$LIVEPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
+    - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$LIVEPATH" litespeed-purge all || $WPB --path="$LIVEPATH" cache flush ) || true
