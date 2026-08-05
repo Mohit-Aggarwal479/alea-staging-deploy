@@ -750,5 +750,60 @@ html{scroll-behavior:smooth}
 
 /* Belt-and-braces: keep our namespaces out of LiteSpeed UCSS tree-shaking. */
 add_filter( 'litespeed_ucss_whitelist', function ( $list ) {
-	return array_merge( (array) $list, array( '.aleac*', '.aleax*', '.alea-trust*', '.octf-btn*', '.wpcf7*' ) );
+	return array_merge( (array) $list, array( '.aleac*', '.aleax*', '.alea-trust*', '.octf-btn*', '.wpcf7*', '.ax-*', '.alea-*' ) );
 } );
+
+/* =====================================================================
+ * BLOCK 11 — REDESIGN ROUTER  (staging redesign project)
+ * Maps URL paths to self-contained page templates in theratio-child/alea/.
+ * A matched page bypasses Elementor entirely and renders our own markup
+ * inside the theme's header/footer. Unmapped pages are untouched, so the
+ * rollout is page-by-page and instantly reversible (empty the map).
+ * ===================================================================== */
+
+/** Path => template file in alea/. Filled in as pages are built & approved. */
+function alea_redesign_map() {
+	return apply_filters( 'alea_redesign_map', array(
+		// '/modular-kitchen/' => 'page-category.php',
+	) );
+}
+
+/** Current request path, normalised to a leading+trailing slash. */
+function alea_current_path() {
+	$path = wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/', PHP_URL_PATH );
+	$path = is_string( $path ) ? $path : '/';
+	return '/' . trim( $path, '/' ) . ( '/' === $path ? '' : '/' );
+}
+
+add_filter( 'template_include', function ( $template ) {
+	if ( is_admin() || is_feed() || is_embed() ) {
+		return $template;
+	}
+	// Never hijack the Elementor editor / preview.
+	if ( isset( $_GET['elementor-preview'] ) || isset( $_GET['preview'] ) ) {
+		return $template;
+	}
+	$map  = alea_redesign_map();
+	$path = alea_current_path();
+	if ( empty( $map[ $path ] ) ) {
+		return $template;
+	}
+	$file = get_stylesheet_directory() . '/alea/' . basename( $map[ $path ] );
+	if ( ! file_exists( $file ) ) {
+		return $template; // fail safe: keep the existing page
+	}
+	$GLOBALS['alea_page_file'] = $file;
+	$shell                     = get_stylesheet_directory() . '/alea/shell.php';
+	return file_exists( $shell ) ? $shell : $template;
+}, 999 );
+
+/** Design-system CSS — inlined (LiteSpeed strips our external/inline CSS without this opt-out). */
+add_action( 'wp_head', function () {
+	if ( empty( $GLOBALS['alea_page_file'] ) ) {
+		return; // only on redesigned pages
+	}
+	$css = get_stylesheet_directory() . '/alea/design-system.css';
+	if ( file_exists( $css ) ) {
+		echo "\n<style id=\"alea-ds\" data-no-optimize=\"1\">" . file_get_contents( $css ) . "</style>\n"; // phpcs:ignore
+	}
+}, 25 );
