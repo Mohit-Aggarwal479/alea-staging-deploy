@@ -850,6 +850,7 @@ add_filter( 'template_include', function ( $template ) {
 		return $template;
 	}
 	$GLOBALS['alea_page_file'] = $e['abs'];
+	$GLOBALS['alea_page_args'] = isset( $e['args'] ) && is_array( $e['args'] ) ? $e['args'] : array();
 	$shell                     = get_stylesheet_directory() . '/alea/shell.php';
 	return file_exists( $shell ) ? $shell : $template;
 }, 999 );
