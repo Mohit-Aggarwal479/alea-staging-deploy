@@ -767,7 +767,26 @@ add_filter( 'litespeed_ucss_whitelist', function ( $list ) {
  */
 function alea_redesign_map() {
 	return apply_filters( 'alea_redesign_map', array(
-		// '/modular-kitchen/' => array( 'file' => 'page-category.php', 'title' => '...', 'desc' => '...' ),
+		'/'                        => array(
+			'file'  => 'page-home.php',
+			'title' => 'Modular Kitchens Made in Our Own Factory | ALEA Modular, Panchkula',
+			'desc'  => 'Modular kitchens manufactured in our own 95,000 sq ft unit near Panchkula. Hettich & Blum hardware, 10-year written warranty, installed in about 15 days. Prices published.',
+		),
+		'/kitchen-cost-calculator/' => array(
+			'file'  => 'page-calculator.php',
+			'title' => 'Kitchen Cost Calculator — Real Tricity Prices | ALEA Modular',
+			'desc'  => 'Get a real modular kitchen price in 60 seconds. Shape, size and collection — priced from the factory rate card, ₹1,150–2,600 per running foot.',
+		),
+		'/modular-kitchen-price/'  => array(
+			'file'  => 'page-pricing.php',
+			'title' => 'Modular Kitchen Prices — Published by the Factory | ALEA Modular',
+			'desc'  => 'The Tricity\'s only factory-published kitchen price list: ₹1,150–2,600 per running foot by collection, with what\'s included and honest exclusions.',
+		),
+		'/our-factory/'            => array(
+			'file'  => 'page-factory.php',
+			'title' => 'Inside Our 95,000 sq ft Factory | ALEA Modular, Raipur Rani',
+			'desc'  => 'Every ALEA kitchen is made in our own 95,000 sq ft manufacturing unit at Raipur Rani, Panchkula district — CNC machining, Hettich & Blum hardware, 10-year written warranty.',
+		),
 	) );
 }
 
