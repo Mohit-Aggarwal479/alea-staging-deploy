@@ -78,6 +78,12 @@ function alea_facts() {
 			'staff_count'      => null, // "315+ people"
 			'quality_checks'   => null, // "38-point check"
 			'on_time_pct'      => null, // "99.9% on-time"
+			'working_hours'    => null, // the hours we actually answer the phone, e.g.
+			                            // "10am–7pm, Mon–Sat". Pages currently promise
+			                            // only a call back "within working hours" and
+			                            // print no hours at all, because none are
+			                            // confirmed. Once the owner confirms them, set
+			                            // this and the promise can be made concrete.
 		),
 	);
 

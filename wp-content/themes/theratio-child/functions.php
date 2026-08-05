@@ -828,20 +828,131 @@ function alea_redesign_map() {
 			'title' => 'Atelier Collection | Our Finest Modular Kitchens | ALEA Modular',
 			'desc'  => 'The Atelier collection: our finest finishes and bespoke elements, ₹1,950–2,600 per sq ft of cabinetry, made in our own factory with a 10-year written warranty.',
 		),
+		/* The six kitchen-layout pages are served by ONE template; the variant
+		   arrives in 'args' and is whitelisted inside page-layout.php against its
+		   own $alea_layouts table (falling back to l-shape). These paths are the
+		   singular /modular-kitchen/{slug}/ form that template builds its sibling
+		   grid from ($lay_base) and that page-kitchens.php links to, so a link and
+		   its route cannot drift. Running-foot figures are general planning
+		   guidance for each shape, never an ALEA measurement — the descriptions
+		   below say so, as the page itself does. */
+		'/modular-kitchen/l-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'l-shape' ),
+			'title' => 'L-Shaped Modular Kitchens | When the Layout Works | ALEA Modular',
+			'desc'  => 'L-shaped kitchens: two runs meeting at a corner, typically 8–12 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
+		'/modular-kitchen/u-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'u-shape' ),
+			'title' => 'U-Shaped Modular Kitchens | When the Layout Works | ALEA Modular',
+			'desc'  => 'U-shaped kitchens: three walls of cabinetry, typically 12–18 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
+		'/modular-kitchen/g-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'g-shape' ),
+			'title' => 'G-Shaped Modular Kitchens | When the Layout Works | ALEA Modular',
+			'desc'  => 'G-shaped kitchens: a U-shape with a peninsula return, typically 14–20 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
+		'/modular-kitchen/straight-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'straight-shape' ),
+			'title' => 'Straight-Line Modular Kitchens | When the Layout Works | ALEA Modular',
+			'desc'  => 'Straight-line kitchens: everything along a single wall, typically 6–10 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
+		'/modular-kitchen/parallel-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'parallel-shape' ),
+			'title' => 'Parallel Modular Kitchens | When the Galley Layout Works | ALEA Modular',
+			'desc'  => 'Parallel (galley) kitchens: two facing runs with a walkway between, typically 10–16 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
+		'/modular-kitchen/island-shape/' => array(
+			'file'  => 'page-layout.php',
+			'args'  => array( 'layout' => 'island-shape' ),
+			'title' => 'Island Modular Kitchens | When the Layout Works | ALEA Modular',
+			'desc'  => 'Island kitchens: a free-standing counter with clear floor on every side, typically 12–20 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
+		),
 		'/wardrobe/'               => array(
 			'file'  => 'page-wardrobes.php',
 			'title' => 'Modular Wardrobes | Sliding, Hinged & Walk-In | ALEA Modular',
 			'desc'  => 'Sliding, hinged and walk-in wardrobes built on the same factory line as our kitchens, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement.',
+		),
+		/* The three wardrobe type pages are served by ONE template; the variant
+		   arrives in 'args' and is whitelisted inside page-wardrobe-type.php.
+		   Paths are built from $type_base in that template and are the same ones
+		   page-wardrobes.php links to. No rupee figure appears on these pages —
+		   wardrobe rates are not verified, so they are priced after measurement. */
+		'/wardrobe/sliding/'       => array(
+			'file'  => 'page-wardrobe-type.php',
+			'args'  => array( 'type' => 'sliding' ),
+			'title' => 'Sliding Wardrobes | Doors That Run Across the Front | ALEA Modular',
+			'desc'  => 'Sliding wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
+		),
+		'/wardrobe/hinged/'        => array(
+			'file'  => 'page-wardrobe-type.php',
+			'args'  => array( 'type' => 'hinged' ),
+			'title' => 'Hinged Wardrobes | Doors That Swing Fully Open | ALEA Modular',
+			'desc'  => 'Hinged wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
+		),
+		'/wardrobe/walk-in/'       => array(
+			'file'  => 'page-wardrobe-type.php',
+			'args'  => array( 'type' => 'walk-in' ),
+			'title' => 'Walk-In Wardrobes | A Room Given Over to Storage | ALEA Modular',
+			'desc'  => 'Walk-in wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
 		),
 		'/warranty/'               => array(
 			'file'  => 'page-warranty.php',
 			'title' => 'Our 10-Year Written Warranty | ALEA Modular',
 			'desc'  => 'Every ALEA kitchen and wardrobe comes with a 10-year warranty, in writing, handed over with your installation. Made in our own factory with named-brand hardware.',
 		),
+		'/about/'                  => array(
+			'file'  => 'page-about.php',
+			'title' => 'About ALEA | Making Modular Kitchens in Our Own Factory Since 2009',
+			'desc'  => 'ALEA has made modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani, Panchkula district since 2009; the furniture business we grew out of dates from 1998. Two dates, one factory, and an open door.',
+		),
 		'/book-a-free-design-visit/' => array(
 			'file'  => 'page-book-visit.php',
 			'title' => 'Book a Free Design Visit or Factory Visit | ALEA Modular',
 			'desc'  => 'Book a free measurement at your home, or visit our factory at Raipur Rani and watch kitchens being built. Free, no obligation, across Panchkula, Chandigarh, Mohali and Zirakpur.',
+		),
+		/* No street address, opening hours or map embed on this page: none of the
+		   three is verified, so the template says so plainly instead of inventing
+		   them. Keep the description in step with that. */
+		'/contact/'                => array(
+			'file'  => 'page-contact.php',
+			'title' => 'Contact ALEA | Call, WhatsApp or Send Us a Message',
+			'desc'  => 'Talk to the company that makes the kitchens: one number for calls and WhatsApp, or leave your details and we will call you back. Factory at Raipur Rani, Panchkula district; we design and install across Panchkula, Chandigarh, Mohali and Zirakpur.',
+		),
+
+		/* The four city pages are served by ONE template; the variant arrives in
+		   'args' and is whitelisted inside page-city.php against facts.php
+		   'service_area'. These paths are the /locations/{slug}/ form that
+		   template builds its sibling links from ($city_base), so a link and its
+		   route cannot drift. Slugs must stay lowercase-hyphenated versions of
+		   the service_area names — that is how the template matches them. */
+		'/locations/panchkula/' => array(
+			'file'  => 'page-city.php',
+			'args'  => array( 'city' => 'panchkula' ),
+			'title' => 'Modular Kitchens in Panchkula — Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Modular kitchens for Panchkula homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+		),
+		'/locations/chandigarh/' => array(
+			'file'  => 'page-city.php',
+			'args'  => array( 'city' => 'chandigarh' ),
+			'title' => 'Modular Kitchens in Chandigarh — Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Modular kitchens for Chandigarh homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+		),
+		'/locations/mohali/' => array(
+			'file'  => 'page-city.php',
+			'args'  => array( 'city' => 'mohali' ),
+			'title' => 'Modular Kitchens in Mohali — Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Modular kitchens for Mohali homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+		),
+		'/locations/zirakpur/' => array(
+			'file'  => 'page-city.php',
+			'args'  => array( 'city' => 'zirakpur' ),
+			'title' => 'Modular Kitchens in Zirakpur — Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Modular kitchens for Zirakpur homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
 		),
 	) );
 }

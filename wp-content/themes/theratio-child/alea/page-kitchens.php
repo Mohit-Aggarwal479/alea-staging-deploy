@@ -91,7 +91,10 @@ $layouts = array(
 		'rft'  => '12–18 running feet',
 	),
 	array(
-		'name' => 'Straight',
+		/* Label must stay identical to the 'name' this layout carries in
+		   page-layout.php ('Straight-line'), so the card and the H1 it leads to
+		   read the same. */
+		'name' => 'Straight-line',
 		'url'  => '/modular-kitchen/straight-shape/',
 		'svg'  => '<path d="M3 18h18"/>',
 		'when' => 'Everything along one wall. The sensible answer in a compact flat, or in an open-plan corner where the kitchen should stay quiet.',
