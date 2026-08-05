@@ -12,8 +12,8 @@ require_once __DIR__ . '/facts.php';
 
 $f           = alea_facts();
 $collections = $f['collections'];
-$hw_std      = $f['hardware_brands'][0]; // Hettich — standard
-$hw_up       = $f['hardware_brands'][1]; // Blum — upgrade
+$hw_std      = $f['hardware_brands'][0]; // first named brand
+$hw_up       = $f['hardware_brands'][1]; // second named brand
 
 /* ---- Shapes. The per-shape running-feet DEFAULT is a page assumption
         (a prefilled starting point, stated in visible text and fully
@@ -45,11 +45,16 @@ $shape_aliases = array(
 $shape_param = isset( $_GET['shape'] ) ? sanitize_key( wp_unslash( $_GET['shape'] ) ) : '';
 $sel_shape   = isset( $shape_aliases[ $shape_param ] ) ? $shape_aliases[ $shape_param ] : 'l';
 
-/* Defaults: shape (URL or L), that shape's prefilled feet, Signature tier
-   (the collection facts.php marks featured), standard hardware. */
-$sel_tier = 'signature';
+/* Honour ?collection= (the collection pages' CTAs link here pre-set, e.g.
+   /kitchen-cost-calculator/?collection=essential). Whitelisted against
+   facts.php; anything unknown falls back to the featured collection. */
+$tier_param = isset( $_GET['collection'] ) ? sanitize_key( wp_unslash( $_GET['collection'] ) ) : '';
+
+/* Defaults: shape (URL or L), that shape's prefilled feet, collection from the
+   URL or Signature (the collection facts.php marks featured), standard hardware. */
+$sel_tier = isset( $collections[ $tier_param ] ) ? $tier_param : 'signature';
 $sel_feet = $shapes[ $sel_shape ]['feet'];
-$sel_hw   = $hw_std;
+$sel_hw   = 'No preference';
 
 $feet_min     = 4;   // UI clamp only
 $feet_max     = 40;  // UI clamp only
@@ -227,20 +232,23 @@ foreach ( $faqs as $fq ) {
 
 						<!-- 04 · HARDWARE -->
 						<div class="ax-estimator__group">
-							<p class="ax-estimator__q"><span>Hardware</span><span class="ax-estimator__q-index">04 / 04</span></p>
+							<p class="ax-estimator__q"><span>Hardware preference</span><span class="ax-estimator__q-index">04 / 04</span></p>
 							<div class="ax-chips" id="axp-hw-chips">
 								<label class="ax-chip" data-selected="true">
-									<input class="ax-chip__input" type="radio" name="axp-hw" value="<?php echo esc_attr( $hw_std ); ?>" checked>
+									<input class="ax-chip__input" type="radio" name="axp-hw" value="No preference" checked>
+									<span>No preference</span>
+									<span class="ax-chip__delta">We advise</span>
+								</label>
+								<label class="ax-chip">
+									<input class="ax-chip__input" type="radio" name="axp-hw" value="<?php echo esc_attr( $hw_std ); ?>">
 									<span><?php echo esc_html( $hw_std ); ?></span>
-									<span class="ax-chip__delta">Standard</span>
 								</label>
 								<label class="ax-chip">
 									<input class="ax-chip__input" type="radio" name="axp-hw" value="<?php echo esc_attr( $hw_up ); ?>">
 									<span><?php echo esc_html( $hw_up ); ?></span>
-									<span class="ax-chip__delta">Upgrade</span>
 								</label>
 							</div>
-							<p class="ax-help">The range shown assumes <?php echo esc_html( $hw_std ); ?> as standard. The <?php echo esc_html( $hw_up ); ?> upgrade is priced line by line on your itemised estimate.</p>
+							<p class="ax-help">We fit <?php echo esc_html( $hw_std ); ?> and <?php echo esc_html( $hw_up ); ?> hinges, runners and soft-close systems. Tell us if you prefer one and we will note it &mdash; the exact hardware for your kitchen is specified line by line in your quotation.</p>
 						</div>
 
 					</div>

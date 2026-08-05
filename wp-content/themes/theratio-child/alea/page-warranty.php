@@ -6,9 +6,12 @@
  * The claim on this page is exactly one: a 10-year warranty, in writing —
  * both read from facts.php. Coverage DETAILS beyond "panels and hardware
  * against manufacturing defects" are NOT verified, so this page never
- * renders a covered/not-covered table and never characterises competitors'
- * warranties. It describes coverage in honest general terms and sends
- * people to read the full written document on a free visit.
+ * renders a covered/not-covered table, never presents itself as a summary
+ * of the terms, and never characterises competitors' warranties. It also
+ * makes no after-sales service commitment (who installs, who answers, how
+ * a claim is routed) — none of that is in facts.php. It describes coverage
+ * in honest general terms and sends people to read the written document on
+ * a free visit.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -44,7 +47,7 @@ $faq = array(
 	array(
 		'q' => 'How do I make a warranty claim?',
 		'a' => sprintf(
-			'Call or WhatsApp us on %1$s and keep your written warranty document at hand — it is the record of your kitchen. Every ALEA kitchen is built in our own factory at %2$s and installed by our own team, so the people who made your kitchen are the same people who look after it.',
+			'Call or WhatsApp us on %1$s and keep your written warranty document at hand — it is the record of your kitchen, and it sets out the terms we agreed. Every ALEA kitchen is built in our own factory at %2$s.',
 			$phone_disp,
 			$f['factory_place']
 		),
@@ -70,10 +73,16 @@ foreach ( $faq as $item ) {
 <div class="ax-root">
 
 	<style data-no-optimize="1">
-	/* Page-specific: the warranty record card only. */
+	/* Page-specific: the "what we can tell you now" summary card only. Hairline
+	   head rule, not a heavy ruled banner — it must not read as the document. */
 	.axp-doc{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:var(--sp-5);--ax-ground:var(--sheet);--ax-rule:var(--rule)}
-	.axp-doc__head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3);padding-bottom:var(--sp-3);border-bottom:2px solid var(--ink);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--graphite)}
+	.axp-doc__head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3);padding-bottom:var(--sp-3);border-bottom:1px solid var(--rule);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--graphite)}
 	.axp-doc__foot{margin-top:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.6;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--graphite)}
+	/* The design system's responsive .ax-hero rules (min-width:768/1024) come
+	   AFTER .ax-hero--short at equal specificity, so the modifier is lost above
+	   768px. Restate it here at higher specificity to keep this hero short. */
+	@media(min-width:768px){.ax-hero.ax-hero--short{min-height:56vh}}
+	@media(min-width:1024px){.ax-hero.ax-hero--short{min-height:60vh;align-items:flex-end}}
 	</style>
 
 	<!-- ============ 1. HERO ============ -->
@@ -169,16 +178,19 @@ foreach ( $faq as $item ) {
 						<li class="ax-proof">
 							<span class="ax-proof__tick" aria-hidden="true"></span>
 							<div class="ax-proof__text">
-								You call us directly — the factory that built your kitchen, not a middleman who ordered it in.
-								<span class="ax-proof__never">Never an anonymous claims queue</span>
+								Made in our own <?php echo esc_html( $f['factory_sqft'] ); ?> sq ft factory at <?php echo esc_html( $f['factory_place'] ); ?> — we warrant work we did ourselves.
+								<span class="ax-proof__never">Never outsourced</span>
 							</div>
 						</li>
 					</ul>
 				</div>
 				<div class="ax-reveal">
+					<?php /* Deliberately NOT titled or laid out as the warranty document itself:
+					         the formal terms are not published, so this card must read as a
+					         plain summary of what is verified, never as the record. */ ?>
 					<div class="axp-doc">
 						<div class="axp-doc__head">
-							<span>ALEA / Warranty record</span>
+							<span>What we can tell you now</span>
 							<span><?php echo (int) $wty; ?> YRS</span>
 						</div>
 						<div class="ax-spectable--rows">
@@ -195,16 +207,13 @@ foreach ( $faq as $item ) {
 								<span class="ax-spectable__val">With your kitchen, at handover</span>
 							</div>
 							<div class="ax-spectable__row">
-								<span class="ax-spectable__key">Covers</span>
-								<span class="ax-spectable__val">Panels &amp; hardware, mfg. defects</span>
-							</div>
-							<div class="ax-spectable__row">
 								<span class="ax-spectable__key">Full terms</span>
 								<span class="ax-spectable__val">In the document — read on a free visit</span>
 							</div>
 						</div>
 						<p class="axp-doc__foot">
-							Ask to read the full terms on your free site visit or factory visit.
+							Summary only. The written document you receive is the binding version —
+							ask to read the full terms on your free site visit or factory visit.
 						</p>
 					</div>
 				</div>
@@ -254,8 +263,10 @@ foreach ( $faq as $item ) {
 	</section>
 
 	<!-- ============ 5. HOW TO CLAIM ============ -->
-	<!-- No invented SLAs: the steps name the channel and the document, never a
-	     response time or turnaround we have not verified. -->
+	<!-- No invented SLAs and no service commitments: the steps name only the
+	     channel and the document. facts.php carries nothing about who installs,
+	     who answers the phone or how a claim is routed, so none of that is
+	     asserted here, and no competitor's process is characterised. -->
 	<section class="ax-section ax-section--ruled">
 		<div class="ax-wrap">
 			<div class="ax-head ax-reveal">
@@ -266,7 +277,7 @@ foreach ( $faq as $item ) {
 				<li class="ax-step">
 					<div class="ax-step__body">
 						<h3 class="ax-step__title">Call or WhatsApp us</h3>
-						<p class="ax-step__text">On <?php echo esc_html( $phone_disp ); ?> — our local number, answered by us.</p>
+						<p class="ax-step__text">On <?php echo esc_html( $phone_disp ); ?> — the number on this page.</p>
 					</div>
 				</li>
 				<li class="ax-step">
@@ -277,8 +288,8 @@ foreach ( $faq as $item ) {
 				</li>
 				<li class="ax-step">
 					<div class="ax-step__body">
-						<h3 class="ax-step__title">The factory takes it from there</h3>
-						<p class="ax-step__text">Your kitchen was built on our own floor and installed by our own team — the people who made it are the people who look after it.</p>
+						<h3 class="ax-step__title">We work from the written terms</h3>
+						<p class="ax-step__text">Your kitchen was built on our own floor at <?php echo esc_html( $f['factory_place'] ); ?>, and the document you hold sets out what happens next.</p>
 					</div>
 				</li>
 			</ol>
@@ -304,16 +315,25 @@ foreach ( $faq as $item ) {
 				</details>
 				<?php endforeach; ?>
 			</div>
-			<p class="ax-btn-note">
-				Planning a new kitchen? <a class="ax-link" href="<?php echo esc_url( $calc_url ); ?>">See your price band first</a> &mdash; free, no sign-up.
-			</p>
+			<?php /* Real 48px tap target, not an 11px mono caption link: this is the
+			         page's only route into the estimator. */ ?>
+			<div class="ax-btnrow ax-mt-5">
+				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $calc_url ); ?>">See your price band</a>
+			</div>
+			<p class="ax-btn-note">Planning a new kitchen? The estimator is free &middot; no sign-up</p>
 		</div>
 	</section>
-	<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?></script>
+	<?php /* JSON_HEX_TAG (and no JSON_UNESCAPED_SLASHES) so a "</script>" inside any
+	         future FAQ string can never terminate this block. */ ?>
+	<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ); ?></script>
 
 	<!-- ============ 7. FINAL CTA BAND ============ -->
+	<!-- id="estimate": landing anchor for the theme's site-wide sticky mobile
+	     bar (.aleac-mbar "Free Estimate" button in functions.php). It sits on
+	     the inner wrap because the section already carries id="alea-book",
+	     the target of this page's own "book a free visit" CTAs. -->
 	<section class="ax-section ax-section--ruled" id="alea-book">
-		<div class="ax-wrap">
+		<div class="ax-wrap" id="estimate">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
 					<p class="ax-eyebrow">Read it yourself</p>

@@ -12,6 +12,17 @@
  * - Every photograph in the approved pool is experience-centre / display
  *   photography. Alt text and captions therefore never claim a delivered
  *   project, a client home, or a factory floor.
+ * - FLAGGED POOL LIMITATION: the approved pool contains exactly TWO frames
+ *   that show a wardrobe (2022/03/w2.jpg and 2022/03/w3.jpg). w3 is the hero;
+ *   w2 carries the experience-centre strip. The strip is deliberately short
+ *   rather than padded out with lounge and reception photographs, which would
+ *   make a wardrobes page whose visual evidence is mostly not wardrobes.
+ *   Wardrobe display photography is pending from the owner.
+ * - ROUTING (outside this file, flagged not fixed): alea_redesign_map() in
+ *   functions.php has no '/wardrobe/' entry yet, so this template is not
+ *   routed and its CSS inliner will not fire. The build contract scopes this
+ *   deliverable to one PHP file in alea/, so the map entry is left to the
+ *   theme-level change that lands the other new templates too.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -56,27 +67,23 @@ $types = array(
 	),
 );
 
-/* Experience-centre plates. Captioned as exactly what they are. */
+/* Experience-centre plates. Captioned as exactly what they are.
+   Deliberately TWO plates, not four: the approved pool holds only two
+   wardrobe frames (w3 is the hero, w2 is here), and the second plate is the
+   internal-fittings display this page's pricing section actually talks about.
+   The lounge and reception photographs used on the homepage are left off —
+   on a wardrobes page they would be three quarters of the visual evidence
+   showing something other than a wardrobe. */
 $plates = array(
 	array(
 		'src' => '/wp-content/uploads/2022/03/w2.jpg',
-		'alt' => 'Wardrobe display at the ALEA experience centre',
-		'cap' => 'Wardrobe display / ALEA experience centre',
+		'alt' => 'Wardrobe interior and hanging space on display at the ALEA experience centre',
+		'cap' => 'Wardrobe interior / ALEA experience centre',
 	),
 	array(
 		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg',
-		'alt' => 'Open shelving and accessories display at the ALEA experience centre',
-		'cap' => 'Accessories display / ALEA experience centre',
-	),
-	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-7.jpg',
-		'alt' => 'Client lounge seating at the ALEA experience centre',
-		'cap' => 'Client lounge / ALEA experience centre',
-	),
-	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-2.jpg',
-		'alt' => 'Sculpted timber reception desk at the ALEA experience centre',
-		'cap' => 'Reception / ALEA experience centre',
+		'alt' => 'Open shelving and internal fittings on display at the ALEA experience centre',
+		'cap' => 'Shelving and internal fittings / ALEA experience centre',
 	),
 );
 
@@ -90,7 +97,7 @@ $faq = array(
 	array(
 		'q' => 'Are wardrobes built to the same standard as your kitchens?',
 		'a' => sprintf(
-			'Yes. The same %1$s sq ft factory at %2$s, the same %3$s hardware as standard, and the same installation team. We have been making furniture since %4$s and modular kitchens since %5$s.',
+			'Yes. The same %1$s sq ft factory at %2$s, the same %3$s hardware as standard, and the same written warranty. We have been making furniture since %4$s and modular kitchens since %5$s.',
 			$sqft,
 			$place,
 			$brands,
@@ -123,24 +130,31 @@ foreach ( $faq as $faq_item ) {
 	);
 }
 ?>
+<?php /* ax-has-stickybar reserves bottom space for a sticky bar. This page does
+         NOT render .ax-stickybar itself — the class is here because the THEME
+         injects its own site-wide bar (.aleac-mbar) below 781px and that bar
+         occupies exactly this space. Do not remove it, and do not read it as a
+         promise that this file builds a bar. */ ?>
 <div class="ax-root ax-has-stickybar">
 
 	<style data-no-optimize="1">
 	/* Page-specific only. Type cards are text cards; the link sits on the
 	   card's baseline so three cards of unequal copy still line up. */
-	.axp-type{min-height:100%}
 	.axp-type .axp-more{margin-top:auto;padding-top:var(--sp-5)}
 	.axp-when{margin-top:var(--sp-2)}
 	.axp-note{max-width:60ch}
 	.axp-hero-note{margin-top:var(--sp-4);font-size:.9375rem;color:#E4E1DC}
-	.axp-hero-note a{color:inherit}
+	/* The design system drops the sticky-bar reserve at 768px, but the THEME's
+	   .aleac-mbar stays visible to 781px — so the bar would cover the bottom of
+	   the page on an iPad in portrait. Re-reserve across that 14px band. */
+	@media(min-width:768px) and (max-width:781px){.ax-root.ax-has-stickybar{padding-bottom:64px}}
 	</style>
 
 	<!-- ==================== 1. HERO ==================== -->
 	<section class="ax-hero">
 		<img class="ax-hero__img"
 			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/03/w3.jpg' ) ); ?>"
-			alt="Wardrobe display at the ALEA experience centre"
+			alt="Sliding wardrobe display at the ALEA experience centre"
 			loading="eager" fetchpriority="high">
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Wardrobes &mdash; <?php echo esc_html( $place ); ?></p>
@@ -151,11 +165,11 @@ foreach ( $faq as $faq_item ) {
 				<?php echo esc_html( $wty ); ?>-year written warranty.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#book">Book a free measurement</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free measurement</a>
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $tel_href ); ?>">Call <span class="ax-btn__note"><?php echo esc_html( $phone_disp ); ?></span></a>
 			</div>
 			<p class="axp-hero-note">Free, at your home, no obligation &mdash; measurements are yours to keep either way.</p>
-			<p class="ax-hero__credit">Photograph: wardrobe display at our experience centre</p>
+			<p class="ax-hero__credit">Photograph: sliding wardrobe display at our experience centre</p>
 		</div>
 	</section>
 
@@ -175,14 +189,17 @@ foreach ( $faq as $faq_item ) {
 					<span class="ax-specstrip__label">Written warranty</span>
 					<span class="ax-specstrip__value"><?php echo esc_html( $wty ); ?><span class="ax-specstrip__unit">years</span></span>
 				</div>
+				<?php /* install_days is an OWNER fact evidenced for KITCHENS. It is
+				         labelled as such here rather than silently transferred to
+				         wardrobes, which have no verified fitting time. */ ?>
 				<div class="ax-specstrip__item">
-					<span class="ax-specstrip__label">Installation</span>
+					<span class="ax-specstrip__label">Kitchen installation</span>
 					<span class="ax-specstrip__value"><?php echo esc_html( $days ); ?><span class="ax-specstrip__unit">days</span></span>
 				</div>
 			</div>
 		</div>
 		<div class="ax-wrap">
-			<p class="ax-mono--label ax-mt-3">The same floor, the same hardware and the same written warranty as every ALEA kitchen</p>
+			<p class="ax-mono--label ax-mt-3 ax-pb-5">The same floor, the same hardware and the same written warranty as every ALEA kitchen &mdash; the <?php echo esc_html( $days ); ?>-day figure is our kitchen installation time; wardrobe fitting time is confirmed on the free measurement</p>
 		</div>
 	</section>
 
@@ -257,7 +274,10 @@ foreach ( $faq as $faq_item ) {
 						<li class="ax-proof">
 							<span class="ax-proof__tick" aria-hidden="true"></span>
 							<div class="ax-proof__text">
-								<?php echo esc_html( $brands ); ?> hinges, runners and sliding gear as standard.
+								<?php /* Site-wide wording, sourced from facts.php hardware_brands.
+								         Do NOT extend this to sliding-door gear or any other
+								         component category: only the brand names are verified. */ ?>
+								<?php echo esc_html( $brands ); ?> hinges, runners and soft-close systems as standard.
 								<span class="ax-proof__never">Never generic hardware</span>
 							</div>
 						</li>
@@ -306,7 +326,7 @@ foreach ( $faq as $faq_item ) {
 						</ul>
 					</div>
 					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--primary" href="#book">Book a free measurement</a>
+						<a class="ax-btn ax-btn--primary" href="#alea-book">Book a free measurement</a>
 						<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $calc_url ); ?>">Price a kitchen instead</a>
 					</div>
 					<p class="ax-btn-note">The online estimator prices kitchens only &mdash; wardrobes are quoted after the measurement</p>
@@ -320,14 +340,17 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap">
 			<div class="ax-head ax-reveal">
 				<p class="ax-eyebrow">The experience centre</p>
-				<h2 class="ax-h2">Open the doors before you order any.</h2>
+				<h2 class="ax-h2">Two photographs. The rest you have to come and open.</h2>
 				<p class="ax-lead">
-					Photographs of our own display centre, captioned as exactly what they show.
-					Come and slide a door, pull a drawer out to full extension, and see the
-					<?php echo esc_html( $brands_amp ); ?> gear working before you decide anything.
+					Two photographs of our own display centre, captioned as exactly what they
+					show. Only two, because we would rather show you the wardrobes than fill
+					the page with pictures of our reception. There is a good deal more on the
+					floor: come and open a door, pull a drawer out to full extension, and see
+					the <?php echo esc_html( $brands_amp ); ?> hinges and runners working
+					before you decide anything.
 				</p>
 			</div>
-			<div class="ax-grid ax-grid--4">
+			<div class="ax-grid ax-grid--2">
 				<?php foreach ( $plates as $plate_i => $plate ) : ?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
@@ -341,7 +364,7 @@ foreach ( $faq as $faq_item ) {
 				<?php endforeach; ?>
 			</div>
 			<div class="ax-btnrow ax-mt-6">
-				<a class="ax-btn ax-btn--ghost" href="#book">Book a free measurement &mdash; or just come and look</a>
+				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement &mdash; or just come and look</a>
 			</div>
 		</div>
 	</section>
@@ -366,8 +389,14 @@ foreach ( $faq as $faq_item ) {
 	<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?></script>
 
 	<!-- ==================== 8. CTA BAND + FORM ==================== -->
-	<section class="ax-section ax-section--ruled" id="book">
-		<div class="ax-wrap">
+	<!-- TWO ids on purpose, both landing on the measurement form:
+	     id="estimate" is the target of the theme's site-wide sticky mobile bar
+	       (.aleac-mbar "Free Estimate" button, functions.php) — without it that
+	       button is a dead link on the whole mobile experience;
+	     id="alea-book" is the house convention used by every other ALEA
+	       template, so cross-page links written as /wardrobe/#alea-book work. -->
+	<section class="ax-section ax-section--ruled" id="estimate">
+		<div class="ax-wrap" id="alea-book">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
 					<p class="ax-eyebrow">Book a free measurement</p>
@@ -396,7 +425,9 @@ foreach ( $faq as $faq_item ) {
 		</div>
 	</section>
 
-	<!-- Sticky mobile bar: provided site-wide by the theme (.aleac-mbar). Not rebuilt here. -->
+	<!-- Sticky mobile bar: provided site-wide by the theme (.aleac-mbar). Not
+	     rebuilt here. Its "Free Estimate" button targets #estimate, which is the
+	     CTA band above. Its Call and WhatsApp buttons are the theme's own. -->
 
 	<script data-no-optimize="1" data-no-defer="1">
 	(function () {

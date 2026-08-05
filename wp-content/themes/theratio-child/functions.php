@@ -776,10 +776,72 @@ function alea_redesign_map() {
 			'title' => 'Modular Kitchen Prices — Published by the Factory | ALEA Modular',
 			'desc'  => 'The Tricity\'s only factory-published kitchen price list: ₹1,150–2,600 per sq ft by collection, with what\'s included and honest exclusions.',
 		),
+		/* The three collection pages are served by ONE template; the variant
+		   arrives in 'args' and is whitelisted inside page-collection.php.
+		   Paths are the plural /modular-kitchens/ form used in the approved
+		   brief and built from $col_base in that template. */
+		'/modular-kitchens/essential/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'essential' ),
+			'title' => 'Essential Modular Kitchens — Guide Price Published | ALEA Modular',
+			'desc'  => 'ALEA Essential kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
+		),
+		'/modular-kitchens/signature/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'signature' ),
+			'title' => 'Signature Modular Kitchens — Guide Price Published | ALEA Modular',
+			'desc'  => 'ALEA Signature kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
+		),
+		'/modular-kitchens/atelier/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'atelier' ),
+			'title' => 'Atelier Modular Kitchens — Guide Price Published | ALEA Modular',
+			'desc'  => 'ALEA Atelier kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
+		),
 		'/our-factory/'            => array(
 			'file'  => 'page-factory.php',
 			'title' => 'Inside Our 95,000 sq ft Factory | ALEA Modular, Raipur Rani',
 			'desc'  => 'Every ALEA kitchen is made in our own 95,000 sq ft manufacturing unit at Raipur Rani, Panchkula district — CNC machining, Hettich & Blum hardware, 10-year written warranty.',
+		),
+
+		/* ---- wave 2 ---- */
+		'/modular-kitchen/'        => array(
+			'file'  => 'page-kitchens.php',
+			'title' => 'Modular Kitchens | Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Modular kitchens in three collections, priced in public from ₹1,150 per sq ft of cabinetry. Made in our own factory, Hettich & Blum hardware, 10-year written warranty.',
+		),
+		'/modular-kitchen/essential/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'essential' ),
+			'title' => 'Essential Collection | Modular Kitchens from ₹1,150 / sq ft | ALEA',
+			'desc'  => 'The Essential collection: practical, factory-built modular kitchens from ₹1,150 per sq ft of cabinetry, with the same hardware and 10-year written warranty as every ALEA kitchen.',
+		),
+		'/modular-kitchen/signature/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'signature' ),
+			'title' => 'Signature Collection | Our Most-Chosen Kitchen | ALEA Modular',
+			'desc'  => 'The Signature collection: our most-chosen modular kitchen, ₹1,450–1,950 per sq ft of cabinetry, built in our own factory with a 10-year written warranty.',
+		),
+		'/modular-kitchen/atelier/' => array(
+			'file'  => 'page-collection.php',
+			'args'  => array( 'collection' => 'atelier' ),
+			'title' => 'Atelier Collection | Our Finest Modular Kitchens | ALEA Modular',
+			'desc'  => 'The Atelier collection: our finest finishes and bespoke elements, ₹1,950–2,600 per sq ft of cabinetry, made in our own factory with a 10-year written warranty.',
+		),
+		'/wardrobe/'               => array(
+			'file'  => 'page-wardrobes.php',
+			'title' => 'Modular Wardrobes | Sliding, Hinged & Walk-In | ALEA Modular',
+			'desc'  => 'Sliding, hinged and walk-in wardrobes built on the same factory line as our kitchens, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement.',
+		),
+		'/warranty/'               => array(
+			'file'  => 'page-warranty.php',
+			'title' => 'Our 10-Year Written Warranty | ALEA Modular',
+			'desc'  => 'Every ALEA kitchen and wardrobe comes with a 10-year warranty, in writing, handed over with your installation. Made in our own factory with named-brand hardware.',
+		),
+		'/book-a-free-design-visit/' => array(
+			'file'  => 'page-book-visit.php',
+			'title' => 'Book a Free Design Visit or Factory Visit | ALEA Modular',
+			'desc'  => 'Book a free measurement at your home, or visit our factory at Raipur Rani and watch kitchens being built. Free, no obligation, across Panchkula, Chandigarh, Mohali and Zirakpur.',
 		),
 	) );
 }

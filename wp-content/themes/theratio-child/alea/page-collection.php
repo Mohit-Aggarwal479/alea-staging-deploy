@@ -35,15 +35,27 @@ $article   = in_array( strtoupper( substr( $col_name, 0, 1 ) ), array( 'A', 'E',
 $col_index = (int) array_search( $slug, $alea_valid_collections, true ) + 1;
 $band      = alea_price_band( $slug );
 
+/* Base path for the three collection URLs. MUST stay identical to the paths
+   registered in alea_redesign_map() (functions.php) — sibling links are built
+   from this one string so a route and a link can never disagree again. */
+$col_base = '/modular-kitchens/';
+
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
+/* page-calculator.php reads ?collection= and opens on that tier (whitelisted
+   against facts.php there, falling back to Signature). */
 $calc_pre   = $calc_url . '?collection=' . rawurlencode( $slug );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( sprintf( "Hi ALEA, I'd like a free estimate for %s %s kitchen.", $article, $col_name ) );
 $phone_disp = alea_fact( 'phone_display' );
 $sqft_rft   = (int) alea_fact( 'sqft_per_rft' );
 
-/* ---- Per-collection presentation. Copy is deliberately general and honest:
-   no carcass/material tables are invented — the quotation itemises the spec.
+/* ---- Per-collection presentation. Copy is deliberately general and honest.
+   HONESTY NOTE: facts.php holds NO cross-collection equivalence fact — it holds
+   per-collection name/from/to/character plus company-wide keys (warranty_years,
+   install_days, factory_sqft, factory_place). So this copy may say what is
+   company-wide ONLY where those keys back it, and must never claim the
+   construction, machines or hardware are identical across tiers. Materials and
+   carcass specs are not invented anywhere: the quotation itemises them.
    Images are experience-centre display photography (the only real pool);
    alts say "display", never "delivered project" or "client home". ---- */
 $presentation = array(
@@ -52,10 +64,12 @@ $presentation = array(
 		'alt'  => 'ALEA modular kitchen display with breakfast table at the experience centre',
 		'desc' => array(
 			sprintf(
-				'Essential is the practical ALEA kitchen: laminate finishes, straightforward layouts, and every rupee going where you can see it. It is built on the same factory line as every other ALEA kitchen — the same machines, the same %s hardware, the same written warranty.',
-				implode( ' and ', $f['hardware_brands'] )
+				'Essential is the practical ALEA kitchen: laminate finishes, straightforward layouts, and every rupee going where you can see it. It is made in our own %1$s sq ft factory at %2$s and carries the same %3$d-year written warranty as every ALEA kitchen.',
+				$f['factory_sqft'],
+				$f['factory_place'],
+				(int) $f['warranty_years']
 			),
-			'Choose it when you want a solid, honest kitchen at the published rate, and would rather spend the difference elsewhere in the house. Nothing about how it is made is entry-level — only the finish menu is shorter.',
+			'Choose it when you want a straightforward kitchen at the published rate, and would rather spend the difference elsewhere in the house. What you actually receive — carcass, shutters, finish and every fitting — is itemised in your quotation rather than guessed at here.',
 		),
 	),
 	'signature' => array(
@@ -63,15 +77,25 @@ $presentation = array(
 		'alt'  => 'ALEA modular kitchen display with island at the experience centre',
 		'desc' => array(
 			'Signature is our most-chosen kitchen. The finish options are richer and more considered than Essential’s — this is the tier where the kitchen starts to feel designed for your home rather than picked from a list.',
-			'It sits in the middle of our published range on purpose. The step up from Essential is in the finish menu — more options, and better ones. How the kitchen is made, the hardware fitted to it and the written warranty behind it do not change.',
+			sprintf(
+				'It sits in the middle of our published range on purpose. Like every ALEA kitchen it is made in our own factory at %1$s, installed at your home in %2$d days, and carries a %3$d-year written warranty. What that buys you at Signature — panel by panel, fitting by fitting — is set out in your quotation.',
+				$f['factory_place'],
+				(int) $f['install_days'],
+				(int) $f['warranty_years']
+			),
 		),
 	),
 	'atelier'   => array(
 		'img'  => '/wp-content/uploads/2022/04/aleaabout.jpg',
 		'alt'  => 'ALEA modular kitchen and dining display at the experience centre',
 		'desc' => array(
-			'Atelier is the top of our range: our top-tier finishes and bespoke elements, made without compromise, for the kitchen you intend to keep for twenty years.',
-			'It is still built on the same factory line, with the same hardware and the same written warranty as every ALEA kitchen — Atelier changes what the kitchen is finished in and how far we will go to make it yours, not how honestly it is made.',
+			'Atelier is the top of our published range: our top-tier finishes and bespoke elements, made without compromise, for the kitchen you intend to keep for twenty years.',
+			sprintf(
+				'Like every ALEA kitchen it is made in our own %1$s sq ft factory at %2$s and carries a %3$d-year written warranty. What goes furthest at this level is the finish and the bespoke work — and all of it, fitting by fitting, is itemised in your quotation.',
+				$f['factory_sqft'],
+				$f['factory_place'],
+				(int) $f['warranty_years']
+			),
 		),
 	),
 );
@@ -106,14 +130,14 @@ $faq = array(
 		),
 	),
 	array(
-		'q' => sprintf( 'What comes as standard on %s %s kitchen?', $article, $col_name ),
+		'q' => sprintf( 'What comes with %s %s kitchen?', $article, $col_name ),
 		'a' => sprintf(
-			'The same standards as every ALEA collection: %1$s hardware, a %2$d-year warranty in writing — covering panels and hardware against manufacturing defects, with the full terms in the written document you receive — and installation at your home in %3$d days. Every kitchen is built in our own %4$s sq ft factory at %5$s.',
-			implode( ' and ', $f['hardware_brands'] ),
+			'A %1$d-year warranty in writing — covering panels and hardware against manufacturing defects, with the full terms in the written document you receive — and installation at your home in %2$d days. Every ALEA kitchen is built in our own %3$s sq ft factory at %4$s. We fit hardware from %5$s; exactly which fittings your kitchen gets is itemised in your quotation, so ask us to read it through with you on the free visit.',
 			(int) $f['warranty_years'],
 			(int) $f['install_days'],
 			$f['factory_sqft'],
-			$f['factory_place']
+			$f['factory_place'],
+			implode( ' and ', $f['hardware_brands'] )
 		),
 	),
 	array(
@@ -149,6 +173,11 @@ foreach ( $faq as $item ) {
 	.axp-band__label{display:block;margin-bottom:var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}
 	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(1.375rem,4.5vw,2rem);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
 	.axp-band__note{margin-top:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.6;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg-muted)}
+	/* Sibling-collection rows: the whole row is the tap target, not the label. */
+	.axp-sibrow{min-height:var(--tap-lg,56px);align-items:center}
+	.axp-sibrow--link{text-decoration:none;color:inherit}
+	.axp-sibrow--link .ax-spectable__key{color:var(--ax-fg);text-decoration:underline;text-decoration-color:var(--ax-rule);text-underline-offset:.22em}
+	.axp-sibrow--link:hover .ax-spectable__key{text-decoration-color:var(--ax-fg)}
 	</style>
 
 	<!-- ============ 1. HERO ============ -->
@@ -169,7 +198,7 @@ foreach ( $faq as $item ) {
 			<p class="ax-hero__credit">
 				GUIDE PRICE <?php echo esc_html( $band ); ?>
 				/ <?php echo (int) $f['warranty_years']; ?>-YEAR WRITTEN WARRANTY
-				/ <?php echo esc_html( implode( ' & ', $f['hardware_brands'] ) ); ?> HARDWARE
+				/ <?php echo (int) $f['install_days']; ?>-DAY INSTALLATION
 			</p>
 		</div>
 	</section>
@@ -202,7 +231,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap ax-wrap--narrow">
 			<div class="ax-head ax-reveal">
 				<p class="ax-eyebrow">What <?php echo esc_html( $col_name ); ?> is</p>
-				<h2 class="ax-h2">One factory standard. This level of finish.</h2>
+				<h2 class="ax-h2">Made in our own factory. Specified in your quotation.</h2>
 			</div>
 			<div class="ax-prose ax-reveal">
 				<?php foreach ( $pres['desc'] as $para ) : ?>
@@ -295,7 +324,7 @@ foreach ( $faq as $item ) {
 					<li class="ax-proof">
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
-							<?php echo esc_html( implode( ' and ', $f['hardware_brands'] ) ); ?> hardware as standard — hinges, runners and soft-close systems from the named brands.
+							Hardware from <?php echo esc_html( implode( ' and ', $f['hardware_brands'] ) ); ?> — hinges, runners and soft-close systems from named brands, specified line by line in your quotation.
 							<span class="ax-proof__never">Never generic hardware</span>
 						</div>
 					</li>
@@ -309,8 +338,9 @@ foreach ( $faq as $item ) {
 					<li class="ax-proof">
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
-							Installation at your home in <?php echo (int) $f['install_days']; ?> days, by our own team.
-							<span class="ax-proof__never">Never subcontracted fitters</span>
+							<?php /* facts.php holds install_days only — it holds nothing about
+							         who installs, so no installer-ownership claim is made here. */ ?>
+							Installation at your home in <?php echo (int) $f['install_days']; ?> days.
 						</div>
 					</li>
 					<li class="ax-proof">
@@ -334,8 +364,9 @@ foreach ( $faq as $item ) {
 				<p class="ax-eyebrow">60-second estimate</p>
 				<h2 class="ax-h2">See your <?php echo esc_html( $col_name ); ?> number before we ask for yours.</h2>
 				<p class="ax-lead ax-mt-4">
-					The online estimator lets you pick the <?php echo esc_html( $col_name ); ?> collection,
-					set your kitchen length, and see a live price band — before we ask for your phone number.
+					The online estimator opens with <?php echo esc_html( $col_name ); ?> already selected.
+					Set your kitchen length and see a live price band — before we ask for your phone number.
+					You can switch collection there too, and watch the band move.
 				</p>
 				<div class="ax-btnrow ax-mt-5">
 					<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_pre ); ?>">Get my <?php echo esc_html( $col_name ); ?> price</a>
@@ -353,17 +384,26 @@ foreach ( $faq as $item ) {
 				<h2 class="ax-h2">Compare the three bands.</h2>
 			</div>
 			<div class="ax-spectable--rows ax-reveal">
-				<?php foreach ( $alea_valid_collections as $r_slug ) : ?>
-				<div class="ax-spectable__row">
-					<span class="ax-spectable__key">
-						<?php if ( $r_slug === $slug ) : ?>
-							<?php echo esc_html( $f['collections'][ $r_slug ]['name'] ); ?> &mdash; this page
-						<?php else : ?>
-							<a class="ax-link" href="<?php echo esc_url( home_url( '/modular-kitchen/' . $r_slug . '/' ) ); ?>"><?php echo esc_html( $f['collections'][ $r_slug ]['name'] ); ?></a>
-						<?php endif; ?>
-					</span>
-					<span class="ax-spectable__val"><?php echo esc_html( alea_price_band( $r_slug ) ); ?></span>
+				<?php
+				/* Sibling rows are whole-row links, not an 11px inline text link:
+				   the row itself is the tap target. Hrefs are built from $col_base
+				   — the same path string registered in alea_redesign_map() — so a
+				   link and its route cannot drift apart. */
+				foreach ( $alea_valid_collections as $r_slug ) :
+					$r_name = $f['collections'][ $r_slug ]['name'];
+					$r_band = alea_price_band( $r_slug );
+					if ( $r_slug === $slug ) :
+					?>
+				<div class="ax-spectable__row axp-sibrow">
+					<span class="ax-spectable__key"><?php echo esc_html( $r_name ); ?> &mdash; this page</span>
+					<span class="ax-spectable__val"><?php echo esc_html( $r_band ); ?></span>
 				</div>
+					<?php else : ?>
+				<a class="ax-spectable__row axp-sibrow axp-sibrow--link" href="<?php echo esc_url( home_url( $col_base . $r_slug . '/' ) ); ?>">
+					<span class="ax-spectable__key"><?php echo esc_html( $r_name ); ?> &mdash; see this collection</span>
+					<span class="ax-spectable__val"><?php echo esc_html( $r_band ); ?></span>
+				</a>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
 		</div>

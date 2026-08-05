@@ -9,11 +9,18 @@
  * - No response-time SLA is promised anywhere: the page says only that we
  *   call back within working hours, which is what the business actually does.
  * - No whole-kitchen rupee estimate is rendered here, so no sqft-per-rft
- *   assumption needs stating; the only figures shown are the published
- *   per-sq-ft rate band, derived straight from the collection bands.
+ *   assumption needs stating; the only figures shown are the published rate
+ *   band, always named as "per sq ft of cabinetry" and derived by min/max
+ *   over the collection bands in facts.php.
+ * - Warranty: the page says you can ASK to read the written terms on the
+ *   visit. It never promises them as a handout, and never describes coverage.
+ * - Two visit types, two different promises: measurement happens at your
+ *   home. Nothing on the page claims we measure your kitchen at the factory.
  * - The photograph is experience-centre display photography (approved pool).
  *   Its alt text claims only what is visible — never a customer home, never
- *   a delivered project, never the factory floor.
+ *   a delivered project, never the factory floor. Kept deliberately general:
+ *   the uploads directory is not in this repo, so no detail inside the frame
+ *   can be verified from the tree.
  * - This page IS the CTA, so it deliberately ends on the FAQ. No second
  *   CTA band.
  */
@@ -30,9 +37,11 @@ $wa_href    = alea_wa_link( "Hi ALEA, I'd like to book a free design visit." );
 $areas      = $f['service_area'];
 
 /* Published per-sq-ft rate band, derived from the collection bands in
-   facts.php — a rate, not a kitchen total, so it needs no assumption note. */
-$band_low  = (int) $f['collections']['essential']['from'];
-$band_high = (int) $f['collections']['atelier']['to'];
+   facts.php — a rate, not a kitchen total, so it needs no assumption note.
+   Computed from the array (min/max), never by naming a collection, so adding
+   or reordering a tier in facts.php can never publish a wrong band here. */
+$band_low  = (int) min( array_column( $f['collections'], 'from' ) );
+$band_high = (int) max( array_column( $f['collections'], 'to' ) );
 
 /* The two visit types. Rendered from one array so the cards and the copy
    below them can never drift apart. */
@@ -50,11 +59,11 @@ $visits = array(
 	array(
 		'kicker' => 'Option B',
 		'title'  => 'At our factory',
-		'lead'   => 'Watch kitchens being made. See the panels, the edge banding and the ' . implode( ' and ', $f['hardware_brands'] ) . ' hardware first-hand — open and close the drawers yourself before you order anything.',
+		'lead'   => 'Watch kitchens being made. See the panels, the edge banding and the ' . implode( ' and ', $f['hardware_brands'] ) . ' hardware first-hand — open and close the drawers yourself before you order anything. Your kitchen is measured at your home afterwards, once you decide to go ahead.',
 		'rows'   => array(
-			'Where'    => $f['factory_place'],
-			'You see'  => 'Materials and hardware, in the flesh',
-			'You get'  => 'The written warranty terms to read',
+			'Where'           => $f['factory_place'],
+			'You see'         => 'Materials and hardware, in the flesh',
+			'You can ask for' => 'The written warranty terms, to read on the spot',
 		),
 	),
 );
@@ -96,18 +105,16 @@ foreach ( $faq as $item ) {
 	);
 }
 ?>
-<div class="ax-root">
+<div class="ax-root ax-has-stickybar">
 
 	<style data-no-optimize="1">
-	/* Page-specific: hero alt-action line, visit-type card kicker, talk block. */
+	/* Page-specific only. Anything design-system.css already does (card padding,
+	   .ax-btnrow stacking, the mono label) is NOT restated here. */
 	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
-	.axp-hero-alt a{color:inherit}
-	.axp-kicker{margin-bottom:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--graphite)}
+	/* tel: link in the hero — a real 44px tap target, not a 25px inline box. */
+	.axp-hero-alt a{color:inherit;display:inline-flex;align-items:center;min-height:var(--tap);vertical-align:middle}
 	.axp-visit{gap:var(--sp-4)}
-	.axp-visit .ax-card{padding:var(--sp-5)}
 	.axp-talk{text-align:left}
-	.axp-talk .ax-btn{width:100%}
-	@media(min-width:480px){.axp-talk .ax-btn{width:auto}}
 	</style>
 
 	<!-- ============ 1. HERO — the reassurance ============ -->
@@ -117,23 +124,24 @@ foreach ( $faq as $item ) {
 		<img
 			class="ax-hero__img"
 			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg' ) ); ?>"
-			alt="Modular kitchen display with breakfast table at the ALEA experience centre"
+			alt="Modular kitchen display at the ALEA experience centre"
 			loading="eager"
 			fetchpriority="high">
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Book a free design visit</p>
-			<h1 class="ax-hero__title">A free visit. <em>About an hour.</em> No obligation.</h1>
+			<h1 class="ax-hero__title">A free visit. <em>At your home or our factory.</em> No obligation.</h1>
 			<p class="ax-hero__sub">
-				We measure your kitchen, talk through layout, finishes and hardware, and you
-				leave with a ballpark price — whether or not you ever order from us.
+				At your home we measure the kitchen; at our factory you see how it is made.
+				Either way you talk through layout, finishes and hardware, and leave with a
+				ballpark price — whether or not you ever order from us.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book my free visit</a>
 			</div>
 			<p class="axp-hero-alt">or <a href="<?php echo esc_url( $tel_href ); ?>">call <?php echo esc_html( $phone_disp ); ?></a> if you would rather just talk</p>
 			<p class="ax-hero__credit">
-				FREE / NO OBLIGATION
-				/ AT YOUR HOME OR AT OUR FACTORY
+				FREE / NO DEPOSIT
+				/ NOTHING TO SIGN ON THE DAY
 			</p>
 		</div>
 	</section>
@@ -154,9 +162,11 @@ foreach ( $faq as $item ) {
 					<span class="ax-specstrip__label">Visit at</span>
 					<span class="ax-specstrip__value">Home<span class="ax-specstrip__unit">or our factory</span></span>
 				</div>
+				<?php /* A single fact, not a list: the strip is a mono band of short
+				         values. The four areas are named once, in the FAQ below. */ ?>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">We design &amp; install in</span>
-					<span class="ax-specstrip__value"><?php echo esc_html( implode( ' · ', $areas ) ); ?></span>
+					<span class="ax-specstrip__value"><?php echo (int) count( $areas ); ?><span class="ax-specstrip__unit">areas &mdash; see FAQ</span></span>
 				</div>
 			</div>
 		</div>
@@ -170,16 +180,17 @@ foreach ( $faq as $item ) {
 					<p class="ax-eyebrow">What happens</p>
 					<h2 class="ax-h2">Three things, and then you decide.</h2>
 					<p class="ax-lead ax-mt-4">
-						It usually takes about an hour. Nobody asks you for a deposit, and
-						nothing is signed on the day.
+						A visit at your home usually takes about an hour. Whichever visit you
+						choose, nobody asks you for a deposit and nothing is signed on the day.
 					</p>
 				</div>
 				<ul class="ax-prooflist ax-reveal">
 					<li class="ax-proof">
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
-							We measure the kitchen properly — the room, the openings, and where the
-							water, gas and power already are.
+							At your home we measure the kitchen properly — the room, the openings,
+							and where the water, gas and power already are. If you come to the
+							factory first, that measurement happens at your home afterwards.
 							<span class="ax-proof__never">Never a guess from a photograph</span>
 						</div>
 					</li>
@@ -196,7 +207,7 @@ foreach ( $faq as $item ) {
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
 							You leave with a ballpark, priced off our published rates of
-							<span class="ax-mono ax-ink">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> per sq ft</span>.
+							<span class="ax-mono ax-ink">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> per sq ft of cabinetry</span>.
 							<span class="ax-proof__never">Never a number invented at the door</span>
 						</div>
 					</li>
@@ -218,14 +229,14 @@ foreach ( $faq as $item ) {
 				<p class="ax-eyebrow">Choose your visit</p>
 				<h2 class="ax-h2">Come to us, or we come to you.</h2>
 				<p class="ax-lead">
-					Both are free. Plenty of people do both — measure at home first, then walk the
-					factory floor before they commit.
+					Both are free, and you can do both — measure at home first, then come and
+					see the materials before you commit.
 				</p>
 			</div>
 			<div class="ax-grid ax-grid--2 axp-visit">
 				<?php foreach ( $visits as $v ) : ?>
 				<article class="ax-card ax-reveal">
-					<p class="axp-kicker"><?php echo esc_html( $v['kicker'] ); ?></p>
+					<p class="ax-mono--label ax-mb-3"><?php echo esc_html( $v['kicker'] ); ?></p>
 					<h3 class="ax-card__title"><?php echo esc_html( $v['title'] ); ?></h3>
 					<p class="ax-card__body"><?php echo esc_html( $v['lead'] ); ?></p>
 					<div class="ax-spectable--rows ax-mt-5">
@@ -244,6 +255,11 @@ foreach ( $faq as $item ) {
 	</section>
 
 	<!-- ============ 5. THE FORM ============ -->
+	<!-- id="estimate": landing anchor for the theme's site-wide sticky mobile
+	     bar (.aleac-mbar "Free Estimate" button in functions.php). The section
+	     itself already carries id="alea-book" for this page's own hero link,
+	     and an element can only hold one id, so the bar gets its own marker. -->
+	<span id="estimate" class="ax-sr-only"></span>
 	<section class="ax-section ax-section--ruled" id="alea-book">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
@@ -273,7 +289,7 @@ foreach ( $faq as $item ) {
 				</div>
 				<div class="ax-form ax-form--card ax-reveal">
 					<h3 class="ax-form__title">Book your free visit</h3>
-					<p class="ax-form__note">Free / no obligation / <?php echo esc_html( implode( ' · ', $areas ) ); ?></p>
+					<p class="ax-form__note">Free / no obligation / at your home or our factory</p>
 					<?php echo do_shortcode( '[contact-form-7 id="7dcf010" title="Home Page form"]' ); ?>
 					<p class="ax-form__fineprint ax-mt-4">
 						We use your details only to arrange your visit and estimate.
@@ -310,8 +326,8 @@ foreach ( $faq as $item ) {
 				<li class="ax-step">
 					<div class="ax-step__body">
 						<h3 class="ax-step__title">The visit itself</h3>
-						<p class="ax-step__text">We measure, talk layout and finishes, and leave you with a ballpark. No deposit, nothing to sign, and you keep the measurements either way.</p>
-						<span class="ax-step__time">About an hour</span>
+						<p class="ax-step__text">At your home we measure, talk layout and finishes, and leave you with a ballpark. At the factory we walk you through the materials and hardware instead, and measure at your home afterwards. Either way: no deposit, nothing to sign.</p>
+						<span class="ax-step__time">About an hour at your home</span>
 					</div>
 				</li>
 			</ol>
@@ -362,7 +378,9 @@ foreach ( $faq as $item ) {
 	<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?></script>
 
 	<!-- No second CTA band: this page IS the CTA. The form above is the only
-	     conversion surface, and the sticky mobile bar is site-wide (.aleac-mbar). -->
+	     conversion surface. The sticky mobile bar is site-wide (.aleac-mbar);
+	     its "Free Estimate" button lands on the #estimate marker above, and
+	     .ax-has-stickybar on .ax-root reserves the space it occupies. -->
 
 	<script data-no-optimize="1" data-no-defer="1">
 	(function () {
