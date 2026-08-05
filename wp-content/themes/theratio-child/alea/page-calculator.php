@@ -56,10 +56,9 @@ $feet_max     = 40;  // UI clamp only
 $feet_presets = array( 6, 8, 10, 12, 14, 16, 18, 20 );
 
 /* Initial estimate, server-rendered so a no-JS visitor still sees a price:
-   estimate = running feet x the collection's per-running-foot band. */
-$init_low  = $sel_feet * $collections[ $sel_tier ]['from'];
-$init_high = $sel_feet * $collections[ $sel_tier ]['to'];
-$init_sub  = strtoupper( $shapes[ $sel_shape ]['label'] . ' / ' . $sel_feet . ' RFT / ' . $collections[ $sel_tier ]['name'] . ' / ' . $sel_hw );
+   running feet -> sq ft of cabinetry (x sqft_per_rft) -> x per-sq-ft band. */
+list( $init_low, $init_high, $init_sqft ) = alea_kitchen_total( $sel_feet, $sel_tier );
+$init_sub = strtoupper( $shapes[ $sel_shape ]['label'] . ' / ' . $sel_feet . ' RFT ≈ ' . $init_sqft . ' SQ FT / ' . $collections[ $sel_tier ]['name'] . ' / ' . $sel_hw );
 
 /* The whole market's band, for copy that must trace to facts.php. */
 $band_min = $collections['essential']['from'];
@@ -67,7 +66,7 @@ $band_max = $collections['atelier']['to'];
 
 /* Initial WhatsApp message mirrors what the JS rebuilds on every change. */
 $init_wa_msg = 'Hi ALEA, I configured a kitchen on your cost calculator: '
-	. $shapes[ $sel_shape ]['label'] . ', ' . $sel_feet . ' running feet, '
+	. $shapes[ $sel_shape ]['label'] . ', ' . $sel_feet . ' running feet (about ' . $init_sqft . ' sq ft of cabinetry), '
 	. $collections[ $sel_tier ]['name'] . ' collection, ' . $sel_hw . ' hardware. '
 	. 'Estimate shown: ₹' . alea_inr( $init_low ) . '–₹' . alea_inr( $init_high ) . '. '
 	. 'Please send me the itemised estimate.';
@@ -77,6 +76,7 @@ $axp_cfg = array(
 	'shapes'   => array(),
 	'tiers'    => array(),
 	'hw'       => array( 'std' => $hw_std, 'up' => $hw_up ),
+	'sqftPerRft' => $f['sqft_per_rft'],
 	'feetMin'  => $feet_min,
 	'feetMax'  => $feet_max,
 	'wa'       => $f['whatsapp'],
@@ -109,11 +109,11 @@ $shape_icons = array(
 $faqs = array(
 	array(
 		'q' => 'How accurate is this estimate?',
-		'a' => 'It is a guide range, not a quotation. We multiply your running feet by the per-running-foot rate band of the collection you choose — ₹' . alea_inr( $band_min ) . ' to ₹' . alea_inr( $band_max ) . ' depending on collection. The exact figure inside the band depends on your finishes and internal fittings, and is confirmed after a free site measurement at your home.',
+		'a' => 'It is a guide range, not a quotation. We first convert your running feet into square feet of cabinetry — this assumes standard base + wall units, about ' . alea_fact( 'sqft_per_rft' ) . ' sq ft of cabinetry per running foot — and then multiply by the per-sq-ft rate band of the collection you choose: ₹' . alea_inr( $band_min ) . ' to ₹' . alea_inr( $band_max ) . ' per sq ft depending on collection. The exact figure inside the band depends on your finishes and internal fittings, and is confirmed after a free site measurement at your home.',
 	),
 	array(
 		'q' => 'Why do I see a range instead of one price?',
-		'a' => 'Within each collection the per-running-foot rate moves with the shutter finish, the internal fittings, and how many drawers you choose over shelves. The bottom of the range is the simplest build of that collection; the top is the fullest. Your itemised estimate narrows the range to a single figure.',
+		'a' => 'Within each collection the per-sq-ft rate moves with the shutter finish, the internal fittings, and how many drawers you choose over shelves. The bottom of the range is the simplest build of that collection; the top is the fullest. Your itemised estimate narrows the range to a single figure.',
 	),
 	array(
 		'q' => 'Will the final quote be higher than this range?',
@@ -159,7 +159,7 @@ foreach ( $faqs as $fq ) {
 			<div class="ax-head ax-mb-4">
 				<p class="ax-eyebrow">Kitchen cost calculator</p>
 				<h1 class="ax-h2">Your kitchen, priced before anyone asks your name.</h1>
-				<p class="ax-lead">A live guide range built from the same per-running-foot rates our factory quotes on paper. Adjust it; the price follows.</p>
+				<p class="ax-lead">A live guide range built from the same per-sq-ft rates our factory quotes on paper. Adjust it; the price follows.</p>
 			</div>
 		</div>
 	</section>
@@ -219,7 +219,7 @@ foreach ( $faqs as $fq ) {
 									<input class="ax-chip__input" type="radio" name="axp-tier" value="<?php echo esc_attr( $slug ); ?>"<?php checked( $slug, $sel_tier ); ?>>
 									<span><?php echo esc_html( $c['name'] ); ?></span>
 									<span class="axp-char"><?php echo esc_html( $c['character'] ); ?></span>
-									<span class="ax-chip__delta">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / rft</span>
+									<span class="ax-chip__delta">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / sq ft</span>
 								</label>
 								<?php endforeach; ?>
 							</div>
@@ -245,7 +245,7 @@ foreach ( $faqs as $fq ) {
 
 					</div>
 					<div class="ax-estimator__foot">
-						Guide estimate — not a quotation. Confirmed after a free site measurement at your home. Rates set at our factory in <?php echo esc_html( $f['factory_place'] ); ?>.
+						Guide estimate — not a quotation. Assumes standard base + wall units — about <?php echo esc_html( alea_fact( 'sqft_per_rft' ) ); ?> sq ft of cabinetry per running foot. Confirmed after a free site measurement at your home. Rates set at our factory in <?php echo esc_html( $f['factory_place'] ); ?>.
 					</div>
 				</div>
 
@@ -301,15 +301,17 @@ foreach ( $faqs as $fq ) {
 
 			<div class="ax-mt-6">
 				<p class="ax-mono--label ax-mb-3">How we calculate this</p>
-				<p class="ax-prose">Your estimate is your running feet multiplied by the per-running-foot band of the collection you chose. The bands are the factory's own rates:</p>
+				<p class="ax-prose">Your estimate is your running feet converted into square feet of cabinetry, then multiplied by the per-sq-ft band of the collection you chose. The conversion assumes standard base + wall units — about <?php echo esc_html( alea_fact( 'sqft_per_rft' ) ); ?> sq ft of cabinetry per running foot. The bands are the factory's own rates:</p>
 				<div class="ax-spectable--rows ax-mt-4" style="max-width:32rem">
 					<?php foreach ( $collections as $slug => $c ) : ?>
 					<div class="ax-spectable__row">
 						<span class="ax-spectable__key"><?php echo esc_html( $c['name'] ); ?></span>
-						<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / running foot</span>
+						<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / sq ft</span>
 					</div>
 					<?php endforeach; ?>
 				</div>
+				<?php list( $eg_low, $eg_high, $eg_sqft ) = alea_kitchen_total( 12, 'signature' ); ?>
+				<p class="ax-help ax-mt-3">Worked example: 12 running feet &times; <?php echo esc_html( alea_fact( 'sqft_per_rft' ) ); ?> = <?php echo esc_html( $eg_sqft ); ?> sq ft of cabinetry &times; ₹<?php echo esc_html( alea_inr( $collections['signature']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $collections['signature']['to'] ) ); ?> per sq ft (<?php echo esc_html( $collections['signature']['name'] ); ?>) = ₹<?php echo esc_html( alea_inr( $eg_low ) ); ?> – ₹<?php echo esc_html( alea_inr( $eg_high ) ); ?>.</p>
 			</div>
 		</div>
 	</section>
@@ -368,7 +370,7 @@ foreach ( $faqs as $fq ) {
 			var cfgEl = document.getElementById('axp-cfg');
 			if (!cfgEl) { return; }
 			var cfg = JSON.parse(cfgEl.textContent || '{}');
-			if (!cfg || !cfg.tiers || !cfg.shapes) { return; }
+			if (!cfg || !cfg.tiers || !cfg.shapes || !cfg.sqftPerRft) { return; }
 
 			var state = {
 				shape: cfg.initial.shape,
@@ -443,16 +445,18 @@ foreach ( $faqs as $fq ) {
 				var tier = cfg.tiers[state.tier];
 				var shape = cfg.shapes[state.shape];
 				if (!tier || !shape) { return; }
-				var low = state.feet * tier.from;
-				var high = state.feet * tier.to;
+				/* running feet -> sq ft of cabinetry -> ₹ range (per-sq-ft rates) */
+				var sqft = Math.round(state.feet * cfg.sqftPerRft);
+				var low = sqft * tier.from;
+				var high = sqft * tier.to;
 				if (animate) { animateTo(low, high); } else { shown.low = low; shown.high = high; render(low, high); }
 				if (sub) {
-					sub.textContent = (shape.label + ' / ' + state.feet + ' RFT / ' + tier.name + ' / ' + state.hw).toUpperCase();
+					sub.textContent = (shape.label + ' / ' + state.feet + ' RFT ≈ ' + sqft + ' SQ FT / ' + tier.name + ' / ' + state.hw).toUpperCase();
 				}
 				if (feetVal) { feetVal.textContent = state.feet + ' ft'; }
 				if (waBtn) {
 					var msg = 'Hi ALEA, I configured a kitchen on your cost calculator: '
-						+ shape.label + ', ' + state.feet + ' running feet, '
+						+ shape.label + ', ' + state.feet + ' running feet (about ' + sqft + ' sq ft of cabinetry), '
 						+ tier.name + ' collection, ' + state.hw + ' hardware. '
 						+ 'Estimate shown: ₹' + inr(low) + '–₹' + inr(high) + '. '
 						+ 'Please send me the itemised estimate.';

@@ -41,7 +41,14 @@ function alea_facts() {
 		'install_days'      => 15,
 		'hardware_brands'   => array( 'Hettich', 'Blum' ),
 
-		/* ---------- pricing, per running foot ---------- [OWNER] */
+		/* ---------- pricing, per SQUARE FOOT of cabinetry ---------- [OWNER 2026-07-25]
+		 * Owner corrected the unit: rates are per sq ft of cabinet surface,
+		 * NOT per running foot (per-rft totals were ~10x below market).   */
+		'price_unit'   => 'per sq ft',
+		/* Estimation assumption (shown to users, not a business fact):
+		 * standard base + wall units ≈ this many sq ft of cabinetry
+		 * per running foot of kitchen. */
+		'sqft_per_rft' => 8,
 		'collections' => array(
 			'essential' => array(
 				'name'      => 'Essential',
@@ -96,13 +103,28 @@ function alea_inr( $n ) {
 	return $rest . ',' . $last3;
 }
 
-/** Guide-price band for a collection, e.g. "₹1,450–1,950 per running foot". */
+/** Guide-price band for a collection, e.g. "₹1,450–1,950 per sq ft". */
 function alea_price_band( $slug ) {
-	$c = alea_facts()['collections'];
+	$f = alea_facts();
+	$c = $f['collections'];
 	if ( empty( $c[ $slug ] ) ) {
 		return '';
 	}
-	return '₹' . alea_inr( $c[ $slug ]['from'] ) . '–' . alea_inr( $c[ $slug ]['to'] ) . ' per running foot';
+	return '₹' . alea_inr( $c[ $slug ]['from'] ) . '–' . alea_inr( $c[ $slug ]['to'] ) . ' ' . $f['price_unit'];
+}
+
+/**
+ * Estimated total range for a kitchen, from running feet + collection.
+ * Model: running feet x sqft_per_rft x per-sq-ft band. Returns array(low, high, sqft).
+ */
+function alea_kitchen_total( $rft, $slug ) {
+	$f = alea_facts();
+	$c = $f['collections'];
+	if ( empty( $c[ $slug ] ) || $rft <= 0 ) {
+		return array( 0, 0, 0 );
+	}
+	$sqft = (int) round( $rft * $f['sqft_per_rft'] );
+	return array( $sqft * $c[ $slug ]['from'], $sqft * $c[ $slug ]['to'], $sqft );
 }
 
 /** Prefilled WhatsApp link. */

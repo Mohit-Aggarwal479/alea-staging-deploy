@@ -162,11 +162,10 @@ document.addEventListener('DOMContentLoaded', function () {
  * ========================================================================= */
 add_shortcode( 'alea_trust_bar', function () {
 	$items = array(
-		'4.6★ Rated',
 		'Since 1998',
 		'95,000 sq ft own factory',
 		'100% termite &amp; water-proof',
-		'99.9% on-time delivery',
+		'Installed in ~15 days',
 	);
 	$html  = '<div class="alea-trust-bar" role="list">';
 	foreach ( $items as $it ) {
@@ -370,9 +369,9 @@ add_shortcode( 'alea_before_after', function ( $atts ) {
 add_shortcode( 'alea_pricing', function () {
 	ob_start(); ?>
 <div class="aleac aleac-pr">
-  <div class="t"><span class="nm">Essential</span><div class="amt">₹1,150<small>/ running ft</small></div><ul><li>Moisture-resistant ply carcass</li><li>Laminate shutters</li><li>Soft-close hinges</li><li>2-year warranty</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
-  <div class="t feat"><span class="nm">Premium · Most chosen</span><div class="amt">₹1,750<small>/ running ft</small></div><ul><li>100% termite &amp; water-proof carcass</li><li>Acrylic / PU shutters</li><li>European soft-close hardware</li><li>10-year warranty</li></ul><a class="abtn abtn-primary" href="#estimate">Get estimate</a></div>
-  <div class="t"><span class="nm">Luxury</span><div class="amt">₹2,600<small>/ running ft</small></div><ul><li>Premium finishes &amp; glass</li><li>Motorised &amp; automation options</li><li>Bespoke island &amp; tall units</li><li>10-yr warranty + priority service</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
+  <div class="t"><span class="nm">Essential</span><div class="amt">₹1,150<small>/ sq ft</small></div><ul><li>Moisture-resistant ply carcass</li><li>Laminate shutters</li><li>Soft-close hinges</li><li>10-year written warranty</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
+  <div class="t feat"><span class="nm">Premium · Most chosen</span><div class="amt">₹1,750<small>/ sq ft</small></div><ul><li>100% termite &amp; water-proof carcass</li><li>Acrylic / PU shutters</li><li>European soft-close hardware</li><li>10-year warranty</li></ul><a class="abtn abtn-primary" href="#estimate">Get estimate</a></div>
+  <div class="t"><span class="nm">Luxury</span><div class="amt">₹2,600<small>/ sq ft</small></div><ul><li>Premium finishes &amp; glass</li><li>Motorised &amp; automation options</li><li>Bespoke island &amp; tall units</li><li>10-year written warranty</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
 </div>
 	<?php return ob_get_clean();
 } );
@@ -605,18 +604,13 @@ add_shortcode( 'alea_landing', function () {
     <?php echo do_shortcode( '[alea_process]' ); ?>
   </div></section>
 
-  <section class="aleax-bleed aleax-quotes"><div class="in">
-    <div class="aleax-head"><p class="eb">Loved by tricity homeowners</p><h2>What our clients say.</h2></div>
-    <div class="grid">
-      <div class="aleax-q"><div class="st">★★★★★</div><p>"The 3D design was exactly what we got. Installation was clean and finished a day early — the soft-close drawers still feel brand new two years on."</p><div class="who"><b>Ritu &amp; Sameer</b>Sector 20, Panchkula</div></div>
-      <div class="aleax-q"><div class="st">★★★★★</div><p>"Priced clearly per running foot with no last-minute surprises. The team walked us through every material choice patiently."</p><div class="who"><b>Harpreet S.</b>Zirakpur</div></div>
-      <div class="aleax-q"><div class="st">★★★★★</div><p>"We compared four brands. ALEA was the only one that made the whole kitchen in-house — the quality difference in the hardware is obvious."</p><div class="who"><b>Neha K.</b>Sector 9, Chandigarh</div></div>
-    </div>
-  </div></section>
+  <?php /* Testimonials removed 2026-07-25: the previous three quotes were
+           placeholder content, not real customer reviews. Reinstate only
+           with verified Google reviews. */ ?>
 
   <section class="aleax-sec aleax-faq"><div class="aleax-in" style="max-width:820px">
     <div class="aleax-head"><p class="eb">Good to know</p><h2>Questions homeowners ask us.</h2></div>
-    <details open><summary>How much does an ALEA modular kitchen cost?</summary><p>Most kitchens fall between ₹1,150 and ₹2,600 per running foot depending on the carcass, shutter finish and hardware you choose. Use the instant estimator above for a ballpark, then book a free site visit for an exact, itemised quote.</p></details>
+    <details open><summary>How much does an ALEA modular kitchen cost?</summary><p>Our rates run from ₹1,150 to ₹2,600 per square foot of cabinetry depending on the carcass, shutter finish and hardware you choose — most full kitchens land between ₹1 and ₹3 lakh. Use the instant estimator above for a ballpark, then book a free site visit for an exact, itemised quote.</p></details>
     <details><summary>How long does design and installation take?</summary><p>Design and 3D approval usually take about a week. Manufacturing runs 3–4 weeks in our own factory, and on-site installation is typically 1–2 days — most projects are fully fitted within 15 days of approval.</p></details>
     <details><summary>What is covered by the 10-year warranty?</summary><p>The carcass, hardware and workmanship are covered in writing for 10 years, supported by a local after-sales team. Exact terms are shared with your quote.</p></details>
     <details><summary>Which materials and hardware do you use?</summary><p>Moisture- and termite-resistant carcasses, your choice of laminate, acrylic or PU shutters, and European soft-close hardware (Hettich / Blum) as standard across our Premium and Luxury tiers.</p></details>
@@ -775,12 +769,12 @@ function alea_redesign_map() {
 		'/kitchen-cost-calculator/' => array(
 			'file'  => 'page-calculator.php',
 			'title' => 'Kitchen Cost Calculator — Real Tricity Prices | ALEA Modular',
-			'desc'  => 'Get a real modular kitchen price in 60 seconds. Shape, size and collection — priced from the factory rate card, ₹1,150–2,600 per running foot.',
+			'desc'  => 'Get a real modular kitchen price in 60 seconds. Shape, size and collection — priced from the factory rate card, ₹1,150–2,600 per sq ft.',
 		),
 		'/modular-kitchen-price/'  => array(
 			'file'  => 'page-pricing.php',
 			'title' => 'Modular Kitchen Prices — Published by the Factory | ALEA Modular',
-			'desc'  => 'The Tricity\'s only factory-published kitchen price list: ₹1,150–2,600 per running foot by collection, with what\'s included and honest exclusions.',
+			'desc'  => 'The Tricity\'s only factory-published kitchen price list: ₹1,150–2,600 per sq ft by collection, with what\'s included and honest exclusions.',
 		),
 		'/our-factory/'            => array(
 			'file'  => 'page-factory.php',

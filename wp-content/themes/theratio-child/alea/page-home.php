@@ -23,18 +23,23 @@ $band_low  = (int) $f['collections']['essential']['from'];
 $band_high = (int) $f['collections']['atelier']['to'];
 
 /* Per-month worked examples — one per collection, computed from the published
-   bands. Assumptions (mid-band rate, running feet, tenure) are stated in the
-   visible text below. */
-$emi_rft    = 15; // assumed running feet
+   per-sq-ft bands via alea_kitchen_total(). Assumptions (kitchen length in
+   running feet, sq ft of cabinetry per running foot, tenure) are stated in
+   the visible text below. */
+$emi_rft    = 15; // assumed kitchen length, running feet
 $emi_months = 36; // assumed tenure
+$emi_sqft   = 0;  // filled from alea_kitchen_total() below
 $emi_rows   = array();
 foreach ( $f['collections'] as $emi_slug => $emi_col ) {
-	$emi_rate              = (int) round( ( (int) $emi_col['from'] + (int) $emi_col['to'] ) / 2 ); // mid-band ₹/rft
+	list( $emi_low, $emi_high, $emi_sqft ) = alea_kitchen_total( $emi_rft, $emi_slug );
+	$emi_mid               = (int) round( ( $emi_low + $emi_high ) / 2 ); // mid of the estimated range
 	$emi_rows[ $emi_slug ] = array(
 		'name'  => $emi_col['name'],
-		'rate'  => $emi_rate,
-		'total' => $emi_rate * $emi_rft,
-		'month' => (int) ceil( ( $emi_rate * $emi_rft ) / $emi_months ),
+		'rate'  => (int) round( ( (int) $emi_col['from'] + (int) $emi_col['to'] ) / 2 ), // mid-band ₹/sq ft
+		'low'   => (int) $emi_low,
+		'high'  => (int) $emi_high,
+		'total' => $emi_mid,
+		'month' => (int) ceil( $emi_mid / $emi_months ),
 	);
 }
 
@@ -199,7 +204,7 @@ foreach ( $faq as $item ) {
 			<h1 class="ax-hero__title">Made in our own factory. Installed in <?php echo (int) $f['install_days']; ?> days.</h1>
 			<p class="ax-hero__sub">
 				Kitchens and wardrobes built in our <?php echo esc_html( $f['factory_sqft'] ); ?>&nbsp;sq&nbsp;ft factory —
-				from <span class="ax-mono">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per running foot, priced in public.
+				from <span class="ax-mono">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per sq ft, priced in public.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
@@ -231,7 +236,7 @@ foreach ( $faq as $item ) {
 				</div>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Public price band</span>
-					<span class="ax-specstrip__value">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?><span class="ax-specstrip__unit">per rft</span></span>
+					<span class="ax-specstrip__value">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?><span class="ax-specstrip__unit">per sq ft</span></span>
 				</div>
 			</div>
 		</div>
@@ -247,7 +252,7 @@ foreach ( $faq as $item ) {
 				<h2 class="ax-h2">What shape is your kitchen?</h2>
 				<p class="ax-lead">
 					Tap your layout and see a live price band —
-					from <span class="ax-mono ax-ink">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per running foot.
+					from <span class="ax-mono ax-ink">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per sq ft.
 					We show the number first; the phone number is yours to give later.
 				</p>
 			</div>
@@ -259,7 +264,7 @@ foreach ( $faq as $item ) {
 				</a>
 				<?php endforeach; ?>
 			</div>
-			<p class="ax-btn-note">Free &middot; no sign-up &middot; priced off our published per-running-foot rates</p>
+			<p class="ax-btn-note">Free &middot; no sign-up &middot; priced off our published per-sq-ft rates</p>
 		</div>
 	</section>
 
@@ -289,7 +294,7 @@ foreach ( $faq as $item ) {
 					</div>
 					<div class="ax-card__price">
 						<span class="ax-card__price-label">Guide price</span>
-						<span class="ax-card__price-value">&#8377;<?php echo esc_html( alea_inr( $col['from'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $col['to'] ) ); ?> / rft</span>
+						<span class="ax-card__price-value">&#8377;<?php echo esc_html( alea_inr( $col['from'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $col['to'] ) ); ?> / sq ft</span>
 					</div>
 				</article>
 				<?php endforeach; ?>
@@ -431,7 +436,7 @@ foreach ( $faq as $item ) {
 				<li class="ax-step">
 					<div class="ax-step__body">
 						<h3 class="ax-step__title">Design and itemised quote</h3>
-						<p class="ax-step__text">Your layout, finishes and hardware — priced per running foot against our published bands, item by item.</p>
+						<p class="ax-step__text">Your layout, finishes and hardware — priced per sq ft against our published bands, item by item.</p>
 						<span class="ax-step__time">Priced in writing</span>
 					</div>
 				</li>
@@ -498,17 +503,22 @@ foreach ( $faq as $item ) {
 					<div class="ax-spectable--rows">
 						<?php foreach ( $emi_rows as $row ) : ?>
 						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo esc_html( $row['name'] ); ?> &middot; &#8377;<?php echo esc_html( alea_inr( $row['rate'] ) ); ?> / rft</span>
+							<span class="ax-spectable__key"><?php echo esc_html( $row['name'] ); ?> &middot; &#8377;<?php echo esc_html( alea_inr( $row['rate'] ) ); ?> / sq ft</span>
 							<span class="ax-spectable__val ax-ox">&#8377;<?php echo esc_html( alea_inr( $row['month'] ) ); ?> / month</span>
 						</div>
 						<?php endforeach; ?>
 					</div>
 					<p class="ax-spectable__note">
-						Worked examples only: a <?php echo (int) $emi_rft; ?>-running-foot kitchen at the midpoint of each
-						collection&rsquo;s published band, divided equally over <?php echo (int) $emi_months; ?> months.
-						Signature, for instance: &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['rate'] ) ); ?> &times;
-						<?php echo (int) $emi_rft; ?> rft = &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['total'] ) ); ?>,
-						or &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['month'] ) ); ?> a month.
+						Worked examples only, for a <?php echo (int) $emi_rft; ?>-running-foot kitchen &mdash;
+						assumes standard base + wall units &mdash; about <?php echo (int) alea_fact( 'sqft_per_rft' ); ?> sq ft
+						of cabinetry per running foot &mdash; so <?php echo (int) $emi_rft; ?> rft &asymp;
+						<?php echo (int) $emi_sqft; ?> sq ft.
+						Signature, for instance: <?php echo (int) $emi_sqft; ?> sq ft &times;
+						&#8377;<?php echo esc_html( alea_inr( $f['collections']['signature']['from'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $f['collections']['signature']['to'] ) ); ?> per sq ft
+						= &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['low'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $emi_rows['signature']['high'] ) ); ?>.
+						The monthly figure is the midpoint of that range
+						(&#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['total'] ) ); ?>) divided equally over
+						<?php echo (int) $emi_months; ?> months = &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['month'] ) ); ?> a month.
 						Bank interest, fees and your final specification will change these figures.
 					</p>
 					<div class="ax-btnrow ax-mt-5">

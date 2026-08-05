@@ -36,7 +36,9 @@ foreach ( $ax_cols as $ax_c ) {
 }
 $ax_band_all = '₹' . alea_inr( $ax_min ) . '–' . alea_inr( $ax_max );
 
-/* Worked examples — pure arithmetic from the published bands. */
+/* Worked examples — running feet -> sq ft -> ₹, via alea_kitchen_total().
+   The rft-to-sqft assumption comes from facts.php (sqft_per_rft). */
+$ax_sqft_rft = (int) alea_fact( 'sqft_per_rft' );
 $ax_ex_defs  = array(
 	array( 'essential', 10 ),
 	array( 'signature', 12 ),
@@ -44,16 +46,18 @@ $ax_ex_defs  = array(
 );
 $ax_examples = array();
 foreach ( $ax_ex_defs as $ax_i => $ax_d ) {
-	$ax_c          = $ax_cols[ $ax_d[0] ];
-	$ax_rft        = (int) $ax_d[1];
+	$ax_c   = $ax_cols[ $ax_d[0] ];
+	$ax_rft = (int) $ax_d[1];
+	list( $ax_ex_lo, $ax_ex_hi, $ax_ex_sq ) = alea_kitchen_total( $ax_rft, $ax_d[0] );
 	$ax_examples[] = array(
 		'num'  => sprintf( '%02d', $ax_i + 1 ),
 		'name' => $ax_c['name'],
 		'rft'  => $ax_rft,
+		'sqft' => $ax_ex_sq,
 		'from' => (int) $ax_c['from'],
 		'to'   => (int) $ax_c['to'],
-		'low'  => $ax_rft * (int) $ax_c['from'],
-		'high' => $ax_rft * (int) $ax_c['to'],
+		'low'  => $ax_ex_lo,
+		'high' => $ax_ex_hi,
 	);
 }
 
@@ -76,15 +80,15 @@ $ax_bands_txt = implode( ', ', $ax_bands_txt );
    wrapper below cannot touch an HTML entity. */
 $ax_faqs = array(
 	array(
-		'q' => 'What does a price per running foot mean?',
-		'a' => 'A running foot is one foot measured along the length of the cabinetry run in your kitchen. Multiply the running feet of your layout by the band of the collection you choose — ' . $ax_bands_txt . ' per running foot — and you have a working range for the cabinetry. The exact figure follows a free site measurement at your home.',
+		'q' => 'What does a price per square foot mean?',
+		'a' => 'The band prices one square foot of finished cabinetry — carcass, shutter, hardware and installation together — at ' . $ax_bands_txt . ' per sq ft. To estimate a whole kitchen from its length, multiply its running feet by ' . $ax_sqft_rft . ' to get the cabinetry area, then multiply that area by the band of the collection you choose. The conversion assumes standard base + wall units — about ' . $ax_sqft_rft . ' sq ft of cabinetry per running foot. The exact figure follows a free site measurement at your home.',
 	),
 	array(
 		'q' => 'Why is the price a band and not one number?',
 		'a' => 'Within each collection, the finish, colour and internal fittings you choose move the figure inside the band. The floor and the ceiling of each band are fixed by the factory, so the range you calculate from this page is the same range your quotation is built from.',
 	),
 	array(
-		'q' => 'Is the running-foot price the final price of my kitchen?',
+		'q' => 'Is the per-sq-ft price the final price of my kitchen?',
 		'a' => 'It covers the cabinetry: carcasses, shutters, factory edge banding, ' . $ax_brands . ' soft-close hardware, delivery, installation by our own team, and the ' . $ax_wyrs . '-year written warranty. The countertop, chimney, hob, sink, faucet and appliances are not included — they are itemised separately on the same quotation, so nothing appears later. Ask for the written warranty terms on your free site visit.',
 	),
 	array(
@@ -132,7 +136,7 @@ foreach ( $ax_faqs as $ax_q ) {
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Factory price list</p>
 			<h1 class="ax-hero__title">A kitchen price list published by the factory that makes them.</h1>
-			<p class="ax-hero__sub">Every ALEA kitchen is built in our own <span class="ax-mono"><?php echo esc_html( $ax_sqft ); ?></span> sq ft factory at <?php echo esc_html( $ax_place ); ?> — and priced in public, from <span class="ax-mono"><?php echo esc_html( $ax_band_all ); ?></span> per running foot.</p>
+			<p class="ax-hero__sub">Every ALEA kitchen is built in our own <span class="ax-mono"><?php echo esc_html( $ax_sqft ); ?></span> sq ft factory at <?php echo esc_html( $ax_place ); ?> — and priced in public, from <span class="ax-mono"><?php echo esc_html( $ax_band_all ); ?></span> per sq ft of cabinetry.</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $ax_calc ); ?>">Get my price in 60 seconds</a>
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $ax_visit ); ?>">Book a free site visit</a>
@@ -159,7 +163,7 @@ foreach ( $ax_faqs as $ax_q ) {
 				</div>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Kitchens</span>
-					<span class="ax-specstrip__value"><?php echo esc_html( $ax_band_all ); ?><span class="ax-specstrip__unit">/ rft</span></span>
+					<span class="ax-specstrip__value"><?php echo esc_html( $ax_band_all ); ?><span class="ax-specstrip__unit">/ sq ft</span></span>
 				</div>
 			</div>
 		</div>
@@ -169,18 +173,18 @@ foreach ( $ax_faqs as $ax_q ) {
 	<section class="ax-section">
 		<div class="ax-wrap">
 			<header class="ax-head ax-reveal">
-				<p class="ax-eyebrow">Per running foot</p>
+				<p class="ax-eyebrow">Per square foot</p>
 				<h2 class="ax-h2">The price list.</h2>
-				<p class="ax-lead">Three collections, one factory standard. Multiply the running feet of your kitchen by the band of the collection you choose.</p>
+				<p class="ax-lead">Three collections, one factory standard. Multiply the square feet of cabinetry in your kitchen by the band of the collection you choose.</p>
 			</header>
 			<div class="ax-scroll-x">
 				<table class="ax-spectable">
-					<caption>Guide price per running foot, by collection</caption>
+					<caption>Guide price per square foot of cabinetry, by collection</caption>
 					<thead>
 						<tr>
 							<th scope="col">Collection</th>
 							<th scope="col">Character</th>
-							<th scope="col" class="ax-spectable__num">₹ / running foot</th>
+							<th scope="col" class="ax-spectable__num">₹ / sq ft</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -227,7 +231,7 @@ foreach ( $ax_faqs as $ax_q ) {
 					</div>
 					<div class="ax-card__price">
 						<span class="ax-card__price-label">Guide price</span>
-						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['essential']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['essential']['to'] ) ); ?> / rft</span>
+						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['essential']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['essential']['to'] ) ); ?> / sq ft</span>
 					</div>
 				</article>
 
@@ -250,7 +254,7 @@ foreach ( $ax_faqs as $ax_q ) {
 					</div>
 					<div class="ax-card__price">
 						<span class="ax-card__price-label">Guide price</span>
-						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['signature']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['signature']['to'] ) ); ?> / rft</span>
+						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['signature']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['signature']['to'] ) ); ?> / sq ft</span>
 					</div>
 				</article>
 
@@ -273,7 +277,7 @@ foreach ( $ax_faqs as $ax_q ) {
 					</div>
 					<div class="ax-card__price">
 						<span class="ax-card__price-label">Guide price</span>
-						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['atelier']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['atelier']['to'] ) ); ?> / rft</span>
+						<span class="ax-card__price-value">₹<?php echo esc_html( alea_inr( $ax_cols['atelier']['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_cols['atelier']['to'] ) ); ?> / sq ft</span>
 					</div>
 				</article>
 
@@ -292,7 +296,7 @@ foreach ( $ax_faqs as $ax_q ) {
 			</header>
 			<div class="ax-included">
 				<div class="ax-included__col ax-included--in">
-					<h3 class="ax-included__title">Included in the running-foot price</h3>
+					<h3 class="ax-included__title">Included in the per-sq-ft price</h3>
 					<ul class="ax-included__list">
 						<li>Cabinet carcasses and shutters, factory-built</li>
 						<li>Machine edge banding on every panel</li>
@@ -322,7 +326,7 @@ foreach ( $ax_faqs as $ax_q ) {
 			<header class="ax-head ax-reveal">
 				<p class="ax-eyebrow">Worked examples</p>
 				<h2 class="ax-h2">The arithmetic, in the open.</h2>
-				<p class="ax-lead">Three illustrative examples computed from the published bands — not real delivered projects. Your own range takes sixty seconds in the calculator.</p>
+				<p class="ax-lead">Three illustrative examples computed from the published bands — not real delivered projects. Each assumes standard base + wall units — about <span class="ax-mono"><?php echo esc_html( $ax_sqft_rft ); ?></span> sq ft of cabinetry per running foot. Your own range takes sixty seconds in the calculator.</p>
 			</header>
 			<div class="ax-grid ax-grid--3">
 				<?php foreach ( $ax_examples as $ax_ei => $ax_ex ) : ?>
@@ -332,14 +336,18 @@ foreach ( $ax_faqs as $ax_q ) {
 					<div class="ax-spectable ax-spectable--rows ax-mt-4">
 						<div class="ax-spectable__row">
 							<span class="ax-spectable__key">Band</span>
-							<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $ax_ex['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_ex['to'] ) ); ?> / rft</span>
+							<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $ax_ex['from'] ) ); ?>–<?php echo esc_html( alea_inr( $ax_ex['to'] ) ); ?> / sq ft</span>
 						</div>
 						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo esc_html( $ax_ex['rft'] ); ?> × ₹<?php echo esc_html( alea_inr( $ax_ex['from'] ) ); ?></span>
+							<span class="ax-spectable__key"><?php echo esc_html( $ax_ex['rft'] ); ?> rft × <?php echo esc_html( $ax_sqft_rft ); ?></span>
+							<span class="ax-spectable__val"><?php echo esc_html( $ax_ex['sqft'] ); ?> sq ft</span>
+						</div>
+						<div class="ax-spectable__row">
+							<span class="ax-spectable__key"><?php echo esc_html( $ax_ex['sqft'] ); ?> × ₹<?php echo esc_html( alea_inr( $ax_ex['from'] ) ); ?></span>
 							<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $ax_ex['low'] ) ); ?></span>
 						</div>
 						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo esc_html( $ax_ex['rft'] ); ?> × ₹<?php echo esc_html( alea_inr( $ax_ex['to'] ) ); ?></span>
+							<span class="ax-spectable__key"><?php echo esc_html( $ax_ex['sqft'] ); ?> × ₹<?php echo esc_html( alea_inr( $ax_ex['to'] ) ); ?></span>
 							<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $ax_ex['high'] ) ); ?></span>
 						</div>
 						<div class="ax-spectable__row">
@@ -350,7 +358,7 @@ foreach ( $ax_faqs as $ax_q ) {
 				</article>
 				<?php endforeach; ?>
 			</div>
-			<p class="ax-mono--label ax-mt-5">Illustrative only / published band × length / cabinetry, before the not-included items above</p>
+			<p class="ax-mono--label ax-mt-5">Illustrative only / length × <?php echo esc_html( $ax_sqft_rft ); ?> sq ft per running foot × published band / cabinetry, before the not-included items above</p>
 		</div>
 	</section>
 
@@ -395,7 +403,7 @@ foreach ( $ax_faqs as $ax_q ) {
 					<p class="ax-eyebrow">Why we publish prices</p>
 					<h2 class="ax-h2">Most kitchen prices are a negotiation. Ours is a list.</h2>
 					<p>We have made kitchens since <span class="ax-mono"><?php echo esc_html( $ax_since ); ?></span>, in a family firm that has made furniture since <span class="ax-mono"><?php echo esc_html( $ax_est ); ?></span>. When you own the factory, you know your costs — and when you know your costs, you can put the number in public and stand behind it.</p>
-					<p>A published price does two useful things. It lets you rule us in or out before anyone visits anyone. And it turns the final quotation into an itemisation rather than a revelation: the same bands on this page, multiplied by your measured running feet, with everything excluded listed by name.</p>
+					<p>A published price does two useful things. It lets you rule us in or out before anyone visits anyone. And it turns the final quotation into an itemisation rather than a revelation: the same per-sq-ft bands on this page, multiplied by the measured square feet of your cabinetry, with everything excluded listed by name.</p>
 					<p>If a number on this page ever disagrees with a number on your quotation, the page is wrong and the factory will correct it. That is what a price list is for.</p>
 				</div>
 			</div>
@@ -443,7 +451,7 @@ foreach ( $ax_faqs as $ax_q ) {
 	<!-- ================================================== MOBILE FURNITURE -->
 	<div class="ax-pricestrip">
 		<span class="ax-pricestrip__label">Kitchens from</span>
-		<span class="ax-pricestrip__value"><?php echo esc_html( $ax_band_all ); ?> / rft</span>
+		<span class="ax-pricestrip__value"><?php echo esc_html( $ax_band_all ); ?> / sq ft</span>
 		<a class="ax-pricestrip__cta" href="<?php echo esc_url( $ax_calc ); ?>">Get my price</a>
 	</div>
 	<div class="ax-stickybar">
