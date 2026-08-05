@@ -441,10 +441,33 @@ foreach ( $ax_faqs as $ax_q ) {
 			</header>
 			<div class="ax-btnrow">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $ax_calc ); ?>">Get my price in 60 seconds</a>
-				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $ax_visit ); ?>">Book a free site visit</a>
 				<a class="ax-btn ax-btn--wa ax-btn--lg" href="<?php echo esc_url( $ax_wa ); ?>">WhatsApp us</a>
 			</div>
 			<p class="ax-btn-note">Free / no obligation / or call <a class="ax-link" href="<?php echo esc_url( $ax_tel ); ?>"><span class="ax-mono"><?php echo esc_html( $ax_phone ); ?></span></a></p>
+		</div>
+	</section>
+
+	<!-- Inline booking form: every page terminates in a form, never a link away. -->
+	<section class="ax-section ax-section--ruled" id="alea-book">
+		<div class="ax-wrap">
+			<div class="ax-grid ax-grid--split">
+				<div class="ax-reveal">
+					<p class="ax-eyebrow">Book a free visit</p>
+					<h2 class="ax-h2">Have us measure it, and the range becomes a quotation.</h2>
+					<p class="ax-lead ax-mt-4">
+						The bands above price the cabinetry. A free measurement at your home turns them into an
+						itemised figure &mdash; or visit the factory at <?php echo esc_html( alea_fact( 'factory_place' ) ); ?>
+						and see how the kitchens are built before you decide.
+					</p>
+					<p class="ax-btn-note ax-mt-5">Free / no obligation / <?php echo esc_html( implode( ' &middot; ', (array) alea_fact( 'service_area', array() ) ) ); ?></p>
+				</div>
+				<div class="ax-form ax-form--card ax-reveal">
+					<h3 class="ax-form__title">Book your free measurement</h3>
+					<p class="ax-form__note">Tell us your area and a good time to call.</p>
+					<?php echo do_shortcode( '[contact-form-7 id="7dcf010" title="Home Page form"]' ); ?>
+					<p class="ax-form__fineprint ax-mt-4">We use your details only to arrange your visit and estimate.</p>
+				</div>
+			</div>
 		</div>
 	</section>
 
