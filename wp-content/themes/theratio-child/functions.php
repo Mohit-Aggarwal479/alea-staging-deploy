@@ -884,7 +884,15 @@ function alea_redesign_entry() {
 /* Mapped paths always answer 200 — even brand-new URLs with no WP page behind them. */
 add_action( 'template_redirect', function () {
 	$e = alea_redesign_entry();
-	if ( $e && is_404() ) {
+	if ( ! $e ) {
+		return;
+	}
+	// WP's canonical redirect will bounce a mapped URL to a same-slug page
+	// elsewhere in the tree (e.g. /modular-kitchen/signature/ -> /signature/).
+	// Our map is authoritative for the paths it owns.
+	remove_action( 'template_redirect', 'redirect_canonical' );
+	add_filter( 'redirect_canonical', '__return_false', 99 );
+	if ( is_404() ) {
 		global $wp_query;
 		$wp_query->is_404 = false;
 		status_header( 200 );
