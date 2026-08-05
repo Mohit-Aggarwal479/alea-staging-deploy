@@ -8,16 +8,18 @@
  *
  * HONESTY NOTE: everything on this page is either (a) a business fact read from
  * facts.php, (b) arithmetic computed from facts.php with the assumption stated in
- * visible text, or (c) GENERAL kitchen-planning guidance, framed as guidance in
- * the visible copy — never as an ALEA measurement of anyone's home. The
- * running-foot ranges are typical industry ranges for each shape, labelled as
- * such everywhere they appear. No project counts, testimonials, materials lists,
- * machine lists or local landmarks are invented anywhere.
+ * visible text, (c) GENERAL kitchen-planning guidance, framed as guidance in
+ * the visible copy — never as an ALEA measurement of anyone's home, or (d) an
+ * image drawn from the verified catalogue in images.php, which also owns its alt
+ * text. The running-foot ranges are typical industry ranges for each shape,
+ * labelled as such everywhere they appear. No project counts, testimonials,
+ * materials lists, machine lists or local landmarks are invented anywhere.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -35,14 +37,22 @@ $f = alea_facts();
  * 'svg' reuses the line-drawn icon vocabulary from page-calculator.php verbatim,
  * so a shape drawn in the estimator and the same shape drawn here always match.
  *
- * 'img_claims_layout' gates whether the hero alt may name the shape. THREE plates
- * have a verified subject and may claim a layout: the L-shape plate, the parallel
- * plate and the island plate. The other three are false and fall back at render
- * to a neutral display alt ($lay_hero_alt below), so a plate can never be
- * captioned as a shape nobody has verified it shows. Nothing here is ever
- * captioned as a delivered project, a client home or a factory floor. The three
- * false entries therefore store the neutral alt themselves, so the data reads the
- * same way it renders. ---- */
+ * 'img' is a KEY into the verified catalogue in images.php — never a file path.
+ * The alt travels with the file there, so no page can describe a picture as
+ * something it is not. Only two plates in the library are both real photography
+ * and portrait enough to survive a full-bleed hero crop: 'kitchen-tall' and
+ * 'kitchen-island'. ('kitchen-wide' is a 1920x500 letterbox banner — it is real,
+ * but a tall hero crop would throw most of it away, so it is not used here.)
+ * 'kitchen-island' is reserved for the island page, because its verified subject
+ * actually contains an island; every other layout takes the neutral
+ * 'kitchen-tall' display plate. NO plate claims a layout, a delivered project, a
+ * client's home or a factory floor — the inline SVG diagram carries the shape.
+ *
+ * 'fig' is an OPTIONAL second image: a layout diagram or a CGI design
+ * visualisation, shown in the planning-notes section and captioned in visible
+ * text as exactly that. Only four layouts have one, because the library holds
+ * only one diagram and three renders; the other two show none rather than
+ * borrowing a picture of a different shape. ---- */
 $alea_layouts = array(
 
 	'l-shape' => array(
@@ -79,9 +89,14 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'What can I do with the corner in an L-shaped kitchen?',
 		'faq_a'  => 'The inside corner is the one cabinet position that has to be decided deliberately. In general kitchen planning it gets one of three answers: a corner unit with a carousel or pull-out mechanism, a plain deep cabinet reached from one side, or a filler panel with the run simply starting past it. Each costs a different amount and each changes the cabinet schedule, so we settle it on the free design visit rather than on installation day.',
-		'img'    => '/wp-content/uploads/2022/02/L-Shape-Kitchen-01.jpg',
-		'img_alt'=> 'L-shaped modular kitchen display at the ALEA experience centre',
-		'img_claims_layout' => true,
+		'img'    => 'kitchen-tall',
+		/* The one true L-shape asset in the library is a line diagram, not a
+		   photograph, so it appears below as a diagram and never as the hero. */
+		'fig'    => array(
+			'key' => 'diagram-l',
+			'tag' => 'Diagram',
+			'cap' => 'Layout diagram &mdash; an L-shaped plan drawn as line art. Not a photograph, and not a drawing of your kitchen.',
+		),
 	),
 
 	'u-shape' => array(
@@ -118,9 +133,12 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'How wide does a room need to be for a U-shaped kitchen?',
 		'faq_a'  => 'It is decided by the clear floor left between the two facing runs once the cabinets are in, not by the room width on paper. General planning guidance is about three and a half to four feet of clear floor so two people can pass and drawers open fully. Below that a U-shape starts to feel tight and a parallel or L-shaped plan usually serves the room better. We measure the room free of charge on the site visit and tell you plainly which layouts it will take.',
-		'img'    => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-2.jpg',
-		'img_alt'=> 'Modular kitchen display at the ALEA experience centre',
-		'img_claims_layout' => false,
+		'img'    => 'kitchen-tall',
+		'fig'    => array(
+			'key' => 'render-u',
+			'tag' => 'Design render',
+			'cap' => 'Design visualisation of a U-shaped kitchen &mdash; a CGI render, not a photograph of an installed kitchen.',
+		),
 	),
 
 	'g-shape' => array(
@@ -157,9 +175,10 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'Is a G-shaped kitchen the same as a peninsula kitchen?',
 		'faq_a'  => 'They overlap. A G-shape is a U-shape with a fourth partial run returning from one end, and that return is what most people call a peninsula. The distinction that matters when planning is not the name but whether the return is attached to a full U of cabinetry, because that is what sets the storage, the number of inside corners and the size of the opening left to walk through. We work that out on the measured drawing.',
-		'img'    => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-4.jpg',
-		'img_alt'=> 'Modular kitchen display at the ALEA experience centre',
-		'img_claims_layout' => false,
+		'img'    => 'kitchen-tall',
+		/* No G-shape diagram and no G-shape render exist in the library, so this
+		   layout shows none rather than borrowing a picture of another shape. */
+		'fig'    => null,
 	),
 
 	'straight-shape' => array(
@@ -196,9 +215,12 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'Is a straight-line kitchen too small for a family?',
 		'faq_a'  => 'Not necessarily — it depends on the length of the run and on how the storage is planned rather than on the shape itself. As general guidance, a single run of six to ten running feet with full-height tall units at one end and wall units above holds a surprising amount, and it is the standard plan in compact flats everywhere. What it does not do is let two people work side by side comfortably. We measure the room free of charge on the visit, say plainly which layouts it will take, and you leave with a ballpark price.',
-		'img'    => '/wp-content/uploads/2022/02/k1.jpg',
-		'img_alt'=> 'Modular kitchen display at the ALEA experience centre',
-		'img_claims_layout' => false,
+		'img'    => 'kitchen-tall',
+		'fig'    => array(
+			'key' => 'render-compact',
+			'tag' => 'Design render',
+			'cap' => 'Design visualisation of a compact single-run kitchen with a laundry appliance &mdash; a CGI render, not a photograph of an installed kitchen.',
+		),
 	),
 
 	'parallel-shape' => array(
@@ -235,9 +257,12 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'How much gap should I leave between two parallel runs?',
 		'faq_a'  => 'As general kitchen-planning guidance, about three and a half to four feet of clear floor between the finished fronts of the two runs. That is enough for one person to pass another and for a drawer, dishwasher or oven door to open fully without hitting the cabinets opposite. Less than that and the kitchen works for one person but not two. It is measured from the finished cabinet fronts, not the bare walls, which is why we measure the room ourselves before drawing anything.',
-		'img'    => '/wp-content/uploads/2022/03/par.jpg',
-		'img_alt'=> 'Parallel-layout modular kitchen display at the ALEA experience centre',
-		'img_claims_layout' => true,
+		'img'    => 'kitchen-tall',
+		'fig'    => array(
+			'key' => 'render-parallel',
+			'tag' => 'Design render',
+			'cap' => 'Design visualisation of a parallel-layout kitchen &mdash; a CGI render, not a photograph of an installed kitchen.',
+		),
 	),
 
 	'island-shape' => array(
@@ -274,9 +299,10 @@ $alea_layouts = array(
 		),
 		'faq_q'  => 'Can I put the sink or hob on the island?',
 		'faq_a'  => 'Yes, but it is a civil-work decision rather than a cabinet one. A sink needs water and drainage run under the floor to the middle of the room, and a hob needs a gas line plus an extraction route with no wall behind it — usually a ceiling-mounted or downdraft extractor. Both are straightforward if they are decided before tiling and false ceiling work, and awkward afterwards. If the island is to stay a plain worktop with storage under it, none of this applies.',
-		'img'    => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg',
-		'img_alt'=> 'ALEA modular kitchen display with an island at the experience centre',
-		'img_claims_layout' => true,
+		/* The only plate in the library whose verified subject contains an island. */
+		'img'    => 'kitchen-island',
+		/* No island render or island diagram exists in the library. */
+		'fig'    => null,
 	),
 );
 
@@ -311,12 +337,13 @@ if ( preg_match( '/^[A-Za-z][-\s]/', $lay_name ) ) {
 	$lay_article = in_array( $lay_initial, array( 'A', 'E', 'I', 'O', 'U' ), true ) ? 'an' : 'a';
 }
 
-/* Hero alt honesty gate: the alt may name the shape ONLY where the plate's
-   subject is verified. Everything else falls back to what every plate in the
-   approved pool verifiably is — a display at our own experience centre. */
-$lay_hero_alt = ! empty( $lay['img_claims_layout'] )
-	? $lay['img_alt']
-	: 'Modular kitchen display at the ALEA experience centre';
+/* Hero and the optional diagram/render figure, both taken from the catalogue in
+   images.php. The alt text belongs to the file there, so nothing on this page can
+   describe a picture as something it is not, and an unusable image returns '' —
+   which is why the figure block below is only printed when there is one. */
+$lay_hero_img = alea_img( $lay['img'], array( 'class' => 'ax-hero__img', 'eager' => true ) );
+$lay_fig      = ( ! empty( $lay['fig'] ) && is_array( $lay['fig'] ) ) ? $lay['fig'] : null;
+$lay_fig_img  = $lay_fig ? alea_img( $lay_fig['key'], array( 'class' => 'axp-fig__img' ) ) : '';
 
 /* Base path for the six layout URLs. MUST stay identical to the paths registered
    in alea_redesign_map() (functions.php) — sibling links are built from this one
@@ -430,21 +457,19 @@ $svg_allowed = array(
 	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(1.375rem,4.5vw,2rem);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
 	.axp-band__note{margin-top:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.6;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg-muted)}
 	.axp-nav__cta{margin-top:auto;padding-top:var(--sp-4)}
+	/* Diagram / design-render figure: shown whole, never cropped, so a line
+	   diagram keeps its edges and a render is not mistaken for a photograph. */
+	.axp-fig{max-width:480px;margin:var(--sp-7) 0 0}
+	.axp-fig__img{display:block;width:100%;height:auto;border-radius:var(--radius);background:var(--rule)}
 	</style>
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero ax-hero--short">
-		<?php /* Experience-centre display photography — the only verified pool. The
-		         alt is $lay_hero_alt, which names the layout ONLY where the plate's
-		         subject is verified ($lay['img_claims_layout']) and otherwise falls
-		         back to a neutral display alt. Never a delivered project, client home
-		         or factory floor. The diagram, not the photograph, carries the layout. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( $lay['img'] ) ); ?>"
-			alt="<?php echo esc_attr( $lay_hero_alt ); ?>"
-			loading="eager"
-			fetchpriority="high">
+		<?php /* Experience-centre display photography from the images.php catalogue,
+		         which owns the alt. It describes a display at our own centre — never
+		         a delivered project, a client's home or a factory floor — and it does
+		         not name this page's layout. The inline SVG below carries the shape. */ ?>
+		<?php echo $lay_hero_img; // phpcs:ignore WordPress.Security.EscapeOutput — built by alea_img(), which escapes ?>
 		<div class="ax-hero__inner">
 			<svg class="axp-dia" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><?php echo wp_kses( $lay['svg'], $svg_allowed ); ?></svg>
 			<p class="ax-eyebrow">Kitchen layouts &mdash; <?php echo (int) ( array_search( $slug, $alea_valid_layouts, true ) + 1 ); ?> of <?php echo (int) count( $alea_valid_layouts ); ?></p>
@@ -560,6 +585,20 @@ $svg_allowed = array(
 				</div>
 				<?php endforeach; ?>
 			</div>
+			<?php
+			/* Optional second image: a layout DIAGRAM or a CGI design visualisation,
+			   never presented as photography. The visible caption says which it is.
+			   Printed only when the catalogue actually holds one for this shape. */
+			if ( $lay_fig_img ) :
+				?>
+			<figure class="axp-fig ax-reveal">
+				<?php echo $lay_fig_img; // phpcs:ignore WordPress.Security.EscapeOutput — built by alea_img(), which escapes ?>
+				<figcaption class="ax-media__caption">
+					<b><?php echo esc_html( $lay_fig['tag'] ); ?></b> &mdash;
+					<?php echo wp_kses( $lay_fig['cap'], array() ); ?>
+				</figcaption>
+			</figure>
+			<?php endif; ?>
 		</div>
 	</section>
 
@@ -701,9 +740,10 @@ $svg_allowed = array(
 	</section>
 
 	<!-- ================================================== 8. EXPERIENCE CENTRE -->
-	<!-- One plate, captioned as exactly what it shows: our own display centre. The
-	     approved pool holds no verified customer-home or factory-floor photography,
-	     so none is claimed, and this plate makes no layout claim at all. -->
+	<!-- One plate, captioned as exactly what it shows: shelving and accessories on
+	     display at our own centre. The images.php catalogue holds no verified
+	     customer-home or factory-floor photography, so none is claimed here, and
+	     this plate makes no layout claim at all. -->
 	<section class="ax-section ax-section--sheet ax-section--ruled">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
@@ -726,10 +766,7 @@ $svg_allowed = array(
 				</div>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img
-							src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg' ) ); ?>"
-							alt="Open shelving and accessories on display at the ALEA experience centre"
-							loading="lazy">
+						<?php echo alea_img( 'accessories' ); // phpcs:ignore WordPress.Security.EscapeOutput — built by alea_img(), which escapes ?>
 						<span class="ax-media__tag">Display</span>
 					</span>
 					<figcaption class="ax-media__caption">

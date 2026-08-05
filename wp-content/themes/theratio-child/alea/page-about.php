@@ -42,10 +42,15 @@
  *   cannot offer — none of that is in facts.php or checkable by a reader. The
  *   seller/maker distinction is stated as general industry guidance, and every
  *   claim attached to ALEA is first-person and verifiable on a free visit.
- * - Photography: the approved pool is experience-centre / display photography.
- *   No image is captioned as a delivered project, a client home or a factory
- *   floor, because none of that is verified. Alt text is differentiated per
- *   frame so no two photographs describe themselves identically.
+ * - Photography: every picture comes from images.php, the catalogue built by
+ *   VIEWING each file rather than trusting its filename. Alt text is never
+ *   written here — it travels with the file, so two pages cannot describe the
+ *   same frame differently. No image is captioned as a delivered project, a
+ *   client home or a factory floor, because none of that is verified, and the
+ *   catalogue refuses to return the two unverified stock frames at all.
+ * - The library holds NO wardrobe photography. This page therefore shows no
+ *   wardrobe picture and captions nothing as a wardrobe; the wardrobe claims in
+ *   the copy are statements about what we make, never about a frame on screen.
  * - Warranty is "10 years, in writing" and nothing more specific; the terms
  *   live in the written document the customer receives.
  */
@@ -53,6 +58,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -113,26 +119,28 @@ $milestones = array(
 	),
 );
 
-/* ---- Experience-centre plates. Captioned as exactly what they show: our own
-   display centre. The approved pool contains no verified customer-home or
-   shop-floor photography, so none is claimed. ---- */
+/* ---- Experience-centre plates. Each caption states what is actually in the
+   frame, per the images.php catalogue: a stone counter, a client seating area
+   and a shelving display — NOT a kitchen apiece, and not a wardrobe. The third
+   plate used to be the file now catalogued as 'render-compact', captioned
+   "wardrobe display"; it is in fact a CGI render of a compact kitchen, and the
+   library holds no wardrobe photograph at all, so a verified experience-centre
+   frame stands there instead.
+   Alt text is deliberately absent: alea_img() supplies the verified alt. ---- */
 $gallery = array(
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-4.jpg',
-		'alt' => 'Modular kitchen cabinetry on display at the ALEA experience centre',
-		'cap' => 'Kitchen display / ALEA experience centre',
+		'key' => 'stone-desk',
+		'cap' => 'Sculpted stone counter / ALEA experience centre',
 		'no'  => '01',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-7.jpg',
-		'alt' => 'Modular kitchen storage and shutters on display at the ALEA experience centre',
-		'cap' => 'Storage display / ALEA experience centre',
+		'key' => 'lounge',
+		'cap' => 'Seating area for clients / ALEA experience centre',
 		'no'  => '02',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/03/w3.jpg',
-		'alt' => 'Wardrobe display at the ALEA experience centre',
-		'cap' => 'Wardrobe display / ALEA experience centre',
+		'key' => 'accessories',
+		'cap' => 'Shelving and accessories display / ALEA experience centre',
 		'no'  => '03',
 	),
 );
@@ -198,15 +206,11 @@ foreach ( $faq as $item ) {
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero">
-		<?php /* aleaabout.jpg — experience-centre display photography. The alt
-		         claims a display, never a delivered project, a client home or a
-		         factory floor, because the approved pool verifies none of those. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/04/aleaabout.jpg' ) ); ?>"
-			alt="ALEA modular kitchen and dining display at the experience centre"
-			loading="eager"
-			fetchpriority="high">
+		<?php /* 'kitchen-wide' — a verified experience-centre photograph, letterbox
+		         proportions and catalogued as banner grade. The alt comes from
+		         images.php, so it claims a display and never a delivered project,
+		         a client home or a factory floor. */ ?>
+		<?php echo alea_img( 'kitchen-wide', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">About ALEA</p>
 			<h1 class="ax-hero__title">A furniture business since <?php echo esc_html( $since_parent ); ?>. A kitchen factory since <?php echo esc_html( $since_alea ); ?>.</h1>
@@ -336,16 +340,16 @@ foreach ( $faq as $item ) {
 						<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $factory_url ); ?>">See inside the factory</a>
 					</div>
 				</div>
-				<?php /* Alt differs from every other frame on the page (gallery plate 01
-				         carries the general cabinetry description) so no two photographs
-				         describe themselves identically to a screen reader or a crawler.
-				         The "on display" qualifier stays: this is not a factory floor. */ ?>
+				<?php /* This frame previously ran Alea-Modular-Kitchen-Wardrobes-2.jpg under
+				         the alt "Base and wall units on display". That file is a photograph
+				         of the RECEPTION DESK beneath the ALEA sign — no cabinetry in it at
+				         all. It is replaced by 'kitchen-island', a catalogued kitchen
+				         display, and the alt now comes from images.php.
+				         The "display" qualifier stays: this is not a factory floor, and the
+				         library holds no shop-floor photography to put here. */ ?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img
-							src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-2.jpg' ) ); ?>"
-							alt="Base and wall units on display at the ALEA experience centre"
-							loading="lazy">
+						<?php echo alea_img( 'kitchen-island' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="ax-media__tag">Display</span>
 					</span>
 					<figcaption class="ax-media__caption">
@@ -471,15 +475,17 @@ foreach ( $faq as $item ) {
 	<!-- ================================================== 7. EXPERIENCE CENTRE -->
 	<!-- Honest labels: photographs of our own display centre. The approved pool
 	     holds no verified customer-home or shop-floor photography, so none is
-	     claimed here. -->
+	     claimed here — and no wardrobe photography either, so nothing here is
+	     captioned as a wardrobe. -->
+	<!-- wardrobe photography pending: library has none -->
 	<section class="ax-section">
 		<div class="ax-wrap">
 			<header class="ax-head ax-reveal">
 				<p class="ax-eyebrow">The experience centre</p>
 				<h2 class="ax-h2">Handle it before you decide.</h2>
 				<p class="ax-lead">
-					Kitchen and wardrobe displays standing in our own experience centre, captioned as exactly what they
-					show. Open the drawers, work the <?php echo esc_html( $brands_txt ); ?> hardware yourself, then drive
+					Three corners of our own experience centre, captioned as exactly what each one shows. Open the
+					drawers, work the <?php echo esc_html( $brands_txt ); ?> hardware yourself, then drive
 					out to <?php echo esc_html( $place ); ?> and see the factory behind them.
 				</p>
 			</header>
@@ -487,10 +493,7 @@ foreach ( $faq as $item ) {
 				<?php foreach ( $gallery as $p ) : ?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img
-							src="<?php echo esc_url( home_url( $p['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $p['alt'] ); ?>"
-							loading="lazy">
+						<?php echo alea_img( $p['key'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="ax-media__tag">PLATE <?php echo esc_html( $p['no'] ); ?></span>
 					</span>
 					<figcaption class="ax-media__caption"><?php echo esc_html( $p['cap'] ); ?></figcaption>

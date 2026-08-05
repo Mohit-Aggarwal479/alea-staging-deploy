@@ -9,6 +9,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f           = alea_facts();
 $collections = $f['collections'];
@@ -99,7 +100,10 @@ foreach ( $collections as $slug => $c ) {
 	$axp_cfg['tiers'][ $slug ] = array( 'name' => $c['name'], 'from' => $c['from'], 'to' => $c['to'] );
 }
 
-/* Line-drawn shape icons (constants, stroke inherits chip text colour). */
+/* Line-drawn shape icons: inline SVG constants authored here, stroke inherits
+   the chip text colour. These are NOT media-library images — do not swap in a
+   catalogue picture. images.php holds no shape iconography, and its one
+   'diagram-l' entry is a layout diagram, not a chip icon. */
 $shape_icons = array(
 	'straight' => '<path d="M3 18h18"/>',
 	'l'        => '<path d="M4 5v13h16"/>',

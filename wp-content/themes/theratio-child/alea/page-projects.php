@@ -23,6 +23,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -45,121 +46,80 @@ $ex_name = isset( $f['collections'][ $ex_slug ]['name'] ) ? (string) $f['collect
 list( $ex_low, $ex_high, $ex_sqft ) = alea_kitchen_total( $ex_rft, $ex_slug );
 
 /* ---- The plates.
-   Every image below was opened and read against the bitmap before use, and the
-   alt says only what is visible in the frame. All seven were shot in one
-   location — our own experience centre, identifiable by the ALEA sign in plate
-   06 — so "experience centre" is a description, not a claim.
+   No path and no alt text is typed here. Each plate is a KEY into the shared
+   image catalogue (images.php), which holds the one verified description of
+   what is actually in each frame; alea_img() renders the picture with that
+   description as its alt, so this page cannot contradict another. All seven
+   keys below are of kind 'photo-alea' — real photography of our own experience
+   centre, identifiable by the ALEA sign in plate 06 — so "experience centre"
+   is a description, not a claim.
 
-   Six files in the wider media library are deliberately not used on this page.
-   Each was opened and checked (2026-08-05); what the bitmap actually contains:
-     2022/02/L-Shape-Kitchen-01.jpg  white line art on a black ground — a
-                                     layout diagram, not a photograph
-     2022/02/k1.jpg                  blue-painted kitchen, bare winter woodland
-                                     through the windows
-     2022/03/par.jpg                 CGI render, parallel kitchen
-     2022/03/w2.jpg                  CGI render, U-shaped KITCHEN (not a
-                                     wardrobe, despite the filename)
-     2022/03/w3.jpg                  CGI render, kitchenette with a washing
-                                     machine (not a wardrobe either)
-     2022/03/project.jpg             an unidentified kitchen; the filename is
-                                     not evidence, and nothing else ties it to
-                                     ALEA
-   The pool therefore holds no verified wardrobe photograph and no verified
-   customer home, so this page publishes neither rather than captioning a render
-   as a display. This list is a record of what was checked, not a rule: restore
-   a file the moment a verified photograph replaces it. */
+   The catalogue's other entries are deliberately not used on this page:
+   the three CGI renders (they are design visualisations, not photographs of
+   anything standing anywhere), the L-shape layout DIAGRAM (line art, not a
+   photograph), and the two unverified stock kitchens (nothing ties them to
+   ALEA — alea_img() refuses to return them at all). The catalogue holds no
+   wardrobe photography whatsoever and no verified customer home, so this page
+   publishes neither rather than captioning a render as a display. Restore a
+   picture here the moment a verified photograph enters the catalogue. */
 $plates = array(
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg',
-		'alt' => 'Island kitchen display with a dining extension, tall units and built-in ovens at the ALEA experience centre',
+		'key' => 'kitchen-island',
 		'cap' => 'Island kitchen with a dining extension, tall units and built-in ovens',
 		'no'  => '01',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg',
-		'alt' => 'Kitchen display with a high table, extractor and tall units at the ALEA experience centre',
-		'cap' => 'Kitchen display with a high table, extractor and tall units',
+		'key' => 'kitchen-tall',
+		'cap' => 'Kitchen display with a high dining table and tall units',
 		'no'  => '02',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg',
-		'alt' => 'Open shelving display holding crockery and accessories at the ALEA experience centre',
+		'key' => 'accessories',
 		'cap' => 'Open shelving holding crockery and accessories',
 		'no'  => '03',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-1.jpg',
-		'alt' => 'Sculpted timber slat panel at the ALEA experience centre',
-		'cap' => 'Sculpted timber slat panel, joinery rather than a kitchen',
+		'key' => 'timber-feature',
+		'cap' => 'Sculpted timber slat feature wall, joinery rather than a kitchen',
 		'no'  => '04',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-4.jpg',
-		'alt' => 'Curved counter with a stone top and shaped timber ribs beneath it at the ALEA experience centre',
-		'cap' => 'Curved counter, stone top over shaped timber ribs',
+		'key' => 'stone-desk',
+		'cap' => 'Sculpted stone counter under pendant lighting',
 		'no'  => '05',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-2.jpg',
-		'alt' => 'Reception counter with a slatted timber front below the ALEA sign at the experience centre',
-		'cap' => 'Reception counter below the ALEA sign',
+		'key' => 'reception',
+		'cap' => 'Reception desk below the ALEA sign',
 		'no'  => '06',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-7.jpg',
-		'alt' => 'Seating area with a leather sofa against a stone-clad wall at the ALEA experience centre',
-		'cap' => 'Seating area, where the drawings get read',
+		'key' => 'lounge',
+		'cap' => 'Seating area where clients sit with the drawings',
 		'no'  => '07',
 	),
 );
 
-/* The hero is itself an experience-centre photograph, so it is held here rather
-   than typed into the markup — and it is COUNTED. On a page whose premise is
-   that every picture can be checked, the published figure has to survive being
-   counted off the screen: it is the plates plus this one, never count($plates)
-   on its own. */
-$hero = array(
-	'src' => '/wp-content/uploads/2022/04/aleaabout.jpg',
-	'alt' => 'Kitchen display with a dining table, built-in ovens and tall units at the ALEA experience centre',
+/* A plate only stays on the page if the catalogue will actually render it —
+   alea_img() returns '' for anything unverified — so the gallery cannot leave
+   an empty frame behind, and the published count below cannot describe a
+   picture that is not on the screen. */
+$plates = array_values(
+	array_filter(
+		$plates,
+		function ( $p ) {
+			return '' !== alea_img( $p['key'] );
+		}
+	)
 );
-$photo_total = count( $plates ) + 1;
 
-/* Responsive delivery. The plate originals are 700x962 and the hero is 1920x500,
-   all of it landing in boxes a third that width on a phone. Where WordPress
-   knows the file, hand rendering to wp_get_attachment_image() and inherit
-   srcset/sizes/width/height from the media library; where it does not, fall back
-   to a plain <img> carrying explicit width/height so the layout still cannot
-   shift. Guarded because a template can legitimately be included twice. */
-if ( ! function_exists( 'alea_projects_img' ) ) {
-	function alea_projects_img( $path, $alt, $w, $h, $eager = false, $class = '' ) {
-		$url  = home_url( $path );
-		$attr = array(
-			'alt'      => (string) $alt,
-			'loading'  => $eager ? 'eager' : 'lazy',
-			'decoding' => 'async',
-		);
-		if ( $eager ) {
-			$attr['fetchpriority'] = 'high';
-		}
-		if ( '' !== $class ) {
-			$attr['class'] = $class;
-		}
-		$id = function_exists( 'attachment_url_to_postid' ) ? (int) attachment_url_to_postid( $url ) : 0;
-		if ( $id ) {
-			$html = wp_get_attachment_image( $id, 'full', false, $attr );
-			if ( $html ) {
-				return $html;
-			}
-		}
-		$attr['width']  = (int) $w;
-		$attr['height'] = (int) $h;
-		$out = '<img src="' . esc_url( $url ) . '"';
-		foreach ( $attr as $k => $v ) {
-			$out .= ' ' . $k . '="' . esc_attr( $v ) . '"';
-		}
-		return $out . '>';
-	}
-}
+/* The hero is itself an experience-centre photograph, so it is rendered from
+   the catalogue like every other picture — and it is COUNTED. On a page whose
+   premise is that every picture can be checked, the published figure has to
+   survive being counted off the screen: it is the plates plus this one, never
+   count($plates) on its own. */
+$hero_img    = alea_img( 'kitchen-wide', array( 'class' => 'ax-hero__img', 'eager' => true ) );
+$photo_total = count( $plates ) + ( '' !== $hero_img ? 1 : 0 );
 
 /* FAQ — the visible answers and the JSON-LD are rendered from this ONE array,
    so the schema can never drift from the text on the page. */
@@ -216,11 +176,11 @@ foreach ( $faq as $item ) {
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero ax-hero--short">
 		<?php
-		/* aleaabout.jpg — a wide view of a kitchen display in our own experience
-		   centre (same room as plate 02). Experience-centre photography: the alt
+		/* 'kitchen-wide' — a wide view of a kitchen and dining display in our own
+		   experience centre. Experience-centre photography: the catalogue's alt
 		   claims a display, never a delivered project, a client home or a factory
 		   floor. Counted in $photo_total, because it is a photograph on this page. */
-		echo alea_projects_img( $hero['src'], $hero['alt'], 1920, 500, true, 'ax-hero__img' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped in helper.
+		echo $hero_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped in alea_img().
 		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Our work</p>
@@ -348,7 +308,7 @@ foreach ( $faq as $item ) {
 				<?php foreach ( $plates as $p ) : ?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<?php echo alea_projects_img( $p['src'], $p['alt'], 700, 962 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped in helper. ?>
+						<?php echo alea_img( $p['key'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped in alea_img(). ?>
 						<span class="ax-media__tag">Plate <?php echo esc_html( $p['no'] ); ?> / display</span>
 					</span>
 					<figcaption class="ax-media__caption">

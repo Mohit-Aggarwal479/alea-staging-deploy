@@ -18,10 +18,14 @@
  *   framed as a paid upgrade and no price difference between them is implied.
  *   The brands are NOT attributed to sliding-door gear or any other component
  *   category — only the brand names themselves are verified.
- * - FLAGGED POOL LIMITATION: the approved photo pool holds exactly two wardrobe
- *   frames (2022/03/w2.jpg, 2022/03/w3.jpg) and neither is verified to show a
- *   hinged or a walk-in wardrobe. Those two pages therefore carry a visible note
- *   saying so rather than captioning a frame as something it may not be.
+ * - IMAGERY: every picture comes from images.php via alea_img() — never a
+ *   hard-coded path, never hand-written alt text.
+ * - FLAGGED POOL LIMITATION: the media library contains NO wardrobe photography
+ *   at all. The two frames this page once used as wardrobes were opened and
+ *   catalogued in images.php: both are CGI KITCHEN renders — not wardrobes, and
+ *   not photographs. No wardrobe image is therefore shown anywhere on this page;
+ *   all three types carry a visible note saying so. The one photograph on the
+ *   page is the experience-centre reception desk, captioned as exactly that.
  *   Wardrobe display photography is pending from the owner.
  * - ROUTING: alea_redesign_map() in functions.php registers '/wardrobe/sliding/',
  *   '/wardrobe/hinged/' and '/wardrobe/walk-in/' against this file, each passing
@@ -33,6 +37,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -71,17 +76,17 @@ $phone_disp = alea_fact( 'phone_display' );
    'nav' and 'sub' are: a walk-in has NO doors, so a heading written around doors
    would contradict this page's own hero copy on /wardrobe/walk-in/. Every H2 on
    the page is either type-neutral or read from this array.
-   'hero_note' is the one-line form of 'note', printed beside the hero credit so
-   the photography disclosure travels with the photograph it is about instead of
-   sitting six sections below it.
-   Photography: w3.jpg is the frame page-wardrobes.php
-   already labels a sliding-door display, so it heroes the sliding page only;
-   w2.jpg (a wardrobe interior) heroes the other two, which additionally print a
-   visible note that the approved pool holds no frame verified to show their
-   type. Nothing here is captioned as a delivered project, a client home or a
-   factory floor. ------------------------------------------------------------ */
-$w2 = '/wp-content/uploads/2022/03/w2.jpg';
-$w3 = '/wp-content/uploads/2022/03/w3.jpg';
+   PHOTOGRAPHY: there is none. The media library holds no wardrobe photograph of
+   any kind — the two frames previously heroed here turned out to be CGI kitchen
+   renders. No image key is carried per type any more; the disclosure below is
+   printed on all three variants, beside the hero and again in section 8.
+   ------------------------------------------------------------------------- */
+
+/* The single photography disclosure, printed on every variant. The short form
+   sits in the hero (a visitor who reads the hero and leaves must still see it);
+   the long form is repeated in section 8. */
+$photo_hero_note = 'To be straight with you: we have no photograph of a wardrobe we can honestly show you, so this page shows none rather than passing off a picture of something else.';
+$photo_note      = 'We have no wardrobe photography we can stand behind yet, so we are not going to show you a picture of something else and call it a wardrobe. There is a good deal on the floor at the experience centre — come and open a door. Real wardrobe photographs go up here as soon as we have them.';
 
 $presentation = array(
 	'sliding'  => array(
@@ -92,18 +97,6 @@ $presentation = array(
 		'sub'       => 'Doors that run across the front of the wardrobe instead of swinging into the room. The usual answer where there is no floor space to spare — and you reach half the opening at a time.',
 		'h_inside'  => 'The doors are the smaller half of the decision.',
 		'h_centre'  => 'Open a door before you decide anything.',
-		'hero'      => array(
-			'src' => $w3,
-			'alt' => 'Sliding-door wardrobe display at the ALEA experience centre',
-			'cap' => 'Photograph: sliding-door wardrobe display at our experience centre',
-		),
-		'plate'     => array(
-			'src' => $w2,
-			'alt' => 'Wardrobe interior and hanging space on display at the ALEA experience centre',
-			'cap' => 'Wardrobe interior / ALEA experience centre',
-		),
-		'note'      => '',
-		'hero_note' => '',
 		'choose'    => array(
 			'There is no clear floor in front of the wardrobe — a bed, a passage or a corner sits right against it.',
 			'The room is narrow, and a swinging door would take space the room cannot spare.',
@@ -125,18 +118,6 @@ $presentation = array(
 		'sub'       => 'Doors that swing open, so the whole interior is in front of you at once. The simpler mechanism of the two — it only asks for room to open.',
 		'h_inside'  => 'The doors are the smaller half of the decision.',
 		'h_centre'  => 'Open a door before you decide anything.',
-		'hero'      => array(
-			'src' => $w2,
-			'alt' => 'Wardrobe interior and hanging space on display at the ALEA experience centre',
-			'cap' => 'Photograph: wardrobe interior on display at our experience centre',
-		),
-		'plate'     => array(
-			'src' => $w3,
-			'alt' => 'Sliding-door wardrobe display at the ALEA experience centre',
-			'cap' => 'Wardrobe display / ALEA experience centre',
-		),
-		'note'      => 'Our approved photography does not yet include a wardrobe verified to be hinged, so we are showing you what we actually have rather than labelling a photograph as something it may not be. There is a good deal more on the floor — come and open a door.',
-		'hero_note' => 'To be straight with you: this is a wardrobe interior on display, not a photograph verified to show a hinged wardrobe — we do not yet have one we can honestly label as such.',
 		'choose'    => array(
 			'There is clear floor in front of the wardrobe for a door to swing into.',
 			'You want to see the full depth of the interior in one go, front to back.',
@@ -158,18 +139,6 @@ $presentation = array(
 		'sub'       => 'Not a cupboard with doors but a small room given over to storage. With no shutters to pay for, it generally buys the most storage for the money — provided you have the area to give it.',
 		'h_inside'  => 'What is inside is the whole decision.',
 		'h_centre'  => 'Walk into one before you decide anything.',
-		'hero'      => array(
-			'src' => $w2,
-			'alt' => 'Wardrobe interior and hanging space on display at the ALEA experience centre',
-			'cap' => 'Photograph: wardrobe interior on display at our experience centre',
-		),
-		'plate'     => array(
-			'src' => $w3,
-			'alt' => 'Sliding-door wardrobe display at the ALEA experience centre',
-			'cap' => 'Wardrobe display / ALEA experience centre',
-		),
-		'note'      => 'Our approved photography does not yet include a walk-in wardrobe, so we are showing you what we actually have rather than labelling a photograph as something it is not. The experience centre has more on the floor than these two frames.',
-		'hero_note' => 'To be straight with you: this is a wardrobe interior on display, not a photograph of a walk-in wardrobe — we do not yet have one we can honestly show you here.',
 		'choose'    => array(
 			'A small room, a deep recess or one end of the bedroom can be given over to storage.',
 			'You want the most storage for the money: with no shutters, the budget goes into the interior instead.',
@@ -279,10 +248,7 @@ foreach ( $faq as $faq_item ) {
 
 	<!-- ==================== 1. HERO ==================== -->
 	<section class="ax-hero ax-hero--short">
-		<img class="ax-hero__img"
-			src="<?php echo esc_url( home_url( $t['hero']['src'] ) ); ?>"
-			alt="<?php echo esc_attr( $t['hero']['alt'] ); ?>"
-			loading="eager" fetchpriority="high">
+		<!-- wardrobe photography pending: library has none -->
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Wardrobes &mdash; type <?php echo (int) $type_index; ?> of <?php echo count( $alea_valid_types ); ?></p>
 			<h1 class="ax-hero__title"><?php echo esc_html( $type_name ); ?>.</h1>
@@ -291,13 +257,10 @@ foreach ( $faq as $faq_item ) {
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $book_url ); ?>">Book a free measurement</a>
 			</div>
 			<p class="axp-hero-note">Free, at your home, no obligation &mdash; the measurements are yours to keep either way.</p>
-			<p class="ax-hero__credit"><?php echo esc_html( $t['hero']['cap'] ); ?></p>
-			<?php /* The photography limitation is disclosed BESIDE the photograph it is
-			         about, not only in section 8 — a visitor who reads the hero and
-			         leaves must still see it. Section 8 carries the full wording. */ ?>
-			<?php if ( $t['hero_note'] ) : ?>
-			<p class="axp-hero-note axp-hero-note--flag"><?php echo esc_html( $t['hero_note'] ); ?></p>
-			<?php endif; ?>
+			<?php /* The photography limitation is disclosed HERE, where a hero photograph
+			         would otherwise sit — a visitor who reads the hero and leaves must
+			         still see it. Section 8 carries the full wording. */ ?>
+			<p class="axp-hero-note axp-hero-note--flag"><?php echo esc_html( $photo_hero_note ); ?></p>
 		</div>
 	</section>
 
@@ -545,20 +508,20 @@ foreach ( $faq as $faq_item ) {
 	</section>
 
 	<!-- ==================== 8. EXPERIENCE CENTRE PLATE ==================== -->
-	<!-- One photograph, captioned as exactly what it shows: our own display
-	     centre. The approved pool holds no verified customer-home or factory-floor
-	     photography, so none is claimed. -->
+	<!-- One photograph, captioned as exactly what it shows: the reception desk at
+	     our own experience centre. It is atmosphere, NOT a wardrobe — the caption
+	     says so in as many words. The library holds no wardrobe photograph, and no
+	     verified customer-home or factory-floor photography, so none is claimed. -->
 	<section class="ax-section ax-section--ruled ax-section--sheet">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
+				<!-- wardrobe photography pending: library has none -->
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img src="<?php echo esc_url( home_url( $t['plate']['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $t['plate']['alt'] ); ?>"
-							loading="lazy">
-						<span class="ax-media__tag">Display</span>
+						<?php echo alea_img( 'reception' ); ?>
+						<span class="ax-media__tag">Experience centre</span>
 					</span>
-					<figcaption class="ax-media__caption"><?php echo esc_html( $t['plate']['cap'] ); ?></figcaption>
+					<figcaption class="ax-media__caption">Our experience centre &mdash; the reception desk, not a wardrobe. We have no wardrobe photography to show you yet.</figcaption>
 				</figure>
 				<div class="ax-head ax-mb-0 ax-reveal">
 					<p class="ax-eyebrow">The experience centre</p>
@@ -571,9 +534,7 @@ foreach ( $faq as $faq_item ) {
 						Come and pull a drawer out to full extension and see the <?php echo esc_html( $brands ); ?>
 						hinges and runners working, on our own floor, before you commit to a design.
 					</p>
-					<?php if ( $t['note'] ) : ?>
-					<p class="ax-lead ax-mt-4"><?php echo esc_html( $t['note'] ); ?></p>
-					<?php endif; ?>
+					<p class="ax-lead ax-mt-4"><?php echo esc_html( $photo_note ); ?></p>
 					<div class="ax-btnrow ax-mt-5">
 						<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement &mdash; or just come and look</a>
 					</div>

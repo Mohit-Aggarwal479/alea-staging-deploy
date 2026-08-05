@@ -18,11 +18,19 @@
  * addresses, city-specific delivery promises, and per-city pricing. The copy
  * says outright that there is no separate city price list, which is both true
  * and the strongest thing we can say here.
+ *
+ * IMAGES: every picture on this page comes from images.php by key. That file
+ * holds the verified description of what is actually in each frame (the media
+ * library's filenames are misleading), so no alt text or caption is written
+ * here. Nothing on this page may be captioned as a delivered project, a
+ * customer's home in this city, or the factory floor — the only photography
+ * verified as ALEA's own is of the experience centre.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -122,8 +130,7 @@ $serve_phrase = ( 1 === $city_count )
 
 $presentation = array(
 	'panchkula' => array(
-		'img'   => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-2.jpg',
-		'alt'   => 'Modular kitchen display at the ALEA experience centre',
+		'img'   => 'kitchen-island',
 		'sub'   => sprintf(
 			'Built at our own factory at %1$s — the same district you live in — then delivered and installed at your home.',
 			$f['factory_place']
@@ -148,8 +155,7 @@ $presentation = array(
 		'visit' => 'We come out to homes in Panchkula to measure — free, and with nothing to sign at the end of it. You are also welcome to visit the factory and watch kitchens being built before you commit to one.',
 	),
 	'chandigarh' => array(
-		'img'   => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-4.jpg',
-		'alt'   => 'Modular kitchen display at the ALEA experience centre',
+		'img'   => 'kitchen-tall',
 		'sub'   => sprintf(
 			'Made at our own %1$s sq ft factory at %2$s, then delivered and installed at your home in Chandigarh.',
 			$f['factory_sqft'],
@@ -171,8 +177,7 @@ $presentation = array(
 		'visit' => 'A designer comes to your home in Chandigarh, measures the kitchen and talks it through with you. It is free, there is no obligation, and you keep the measurements whatever you decide afterwards.',
 	),
 	'mohali'    => array(
-		'img'   => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-7.jpg',
-		'alt'   => 'Modular kitchen display at the ALEA experience centre',
+		'img'   => 'kitchen-wide',
 		'sub'   => sprintf(
 			'Manufactured at our own factory at %1$s, delivered to Mohali and installed in %2$d days.',
 			$f['factory_place'],
@@ -195,8 +200,10 @@ $presentation = array(
 		'visit' => 'We measure at your home in Mohali, free of charge, and leave you with the numbers. If you would rather see the machines and the hardware first, come to the factory instead and we will measure afterwards.',
 	),
 	'zirakpur'  => array(
-		'img'   => '/wp-content/uploads/2022/02/k1.jpg',
-		'alt'   => 'Modular kitchen display with base and wall units at the ALEA experience centre',
+		/* Previously opened on a stock Western kitchen that is not ALEA's work
+		   (images.php refuses it). Removed; this page reuses a verified
+		   experience-centre plate rather than someone else's photograph. */
+		'img'   => 'kitchen-island',
 		'sub'   => sprintf(
 			'Made at our own factory at %1$s, then delivered to your home in Zirakpur and fitted by arrangement with you.',
 			$f['factory_place']
@@ -220,22 +227,14 @@ $presentation = array(
 );
 $pres = isset( $presentation[ $city_slug ] ) ? $presentation[ $city_slug ] : reset( $presentation );
 
-/* Collection card images — experience-centre display photography, the only
-   photography verified to be ALEA's own. Alts say "display", never a delivered
-   project, a customer home in this city, or a factory floor. */
+/* Collection card images — catalogue keys only, so the description travels with
+   the file. All three are verified experience-centre photography; the alts in
+   images.php say "display" / "experience centre" and never a delivered project,
+   a customer's home in this city, or a factory floor. */
 $collection_imgs = array(
-	'essential' => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg',
-		'alt' => 'ALEA modular kitchen display with a breakfast table at the experience centre',
-	),
-	'signature' => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg',
-		'alt' => 'ALEA modular kitchen display with an island at the experience centre',
-	),
-	'atelier'   => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-1.jpg',
-		'alt' => 'Sculpted timber joinery at the ALEA experience centre',
-	),
+	'essential' => 'kitchen-tall',
+	'signature' => 'kitchen-island',
+	'atelier'   => 'timber-feature',
 );
 
 /* ---- FAQ: named for the city, honest in substance. The visible answers and
@@ -308,16 +307,11 @@ foreach ( $faq as $item ) {
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero ax-hero--short">
-		<?php /* Experience-centre display photography — the only verified pool.
-		         The alt claims a display and nothing else: never a delivered
-		         project, never a customer's home in this city. A different plate
-		         per city so the city pages do not open identically. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( $pres['img'] ) ); ?>"
-			alt="<?php echo esc_attr( $pres['alt'] ); ?>"
-			loading="eager"
-			fetchpriority="high">
+		<?php /* Experience-centre photography — the only verified pool — pulled
+		         by key from images.php, which supplies the alt. It describes the
+		         experience centre and nothing else: never a delivered project,
+		         never a customer's home in this city. */ ?>
+		<?php echo alea_img( $pres['img'], array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Areas we serve &mdash; <?php echo esc_html( $city ); ?></p>
 			<h1 class="ax-hero__title">Modular kitchens in <?php echo esc_html( $city ); ?>, made in our own factory.</h1>
@@ -473,16 +467,15 @@ foreach ( $faq as $item ) {
 				foreach ( $f['collections'] as $c_slug => $col ) :
 					/* The image map is page-local; facts.php is the file meant to
 					   change. A collection added there must render text-first
-					   rather than emit a warning and a broken <img>. */
-					$col_img = isset( $collection_imgs[ $c_slug ] ) ? $collection_imgs[ $c_slug ] : null;
+					   rather than emit a warning and a broken <img>. alea_img()
+					   also returns '' for anything unusable, so the media block
+					   is skipped rather than left as an empty frame. */
+					$col_img = isset( $collection_imgs[ $c_slug ] ) ? alea_img( $collection_imgs[ $c_slug ] ) : '';
 					?>
 				<article class="ax-card ax-card--collection ax-reveal">
 					<?php if ( $col_img ) : ?>
 					<div class="ax-card__media">
-						<img
-							src="<?php echo esc_url( home_url( $col_img['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $col_img['alt'] ); ?>"
-							loading="lazy">
+						<?php echo $col_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<?php endif; ?>
 					<div class="ax-card__inner">
@@ -558,14 +551,12 @@ foreach ( $faq as $item ) {
 						</p>
 					</header>
 					<?php /* Experience-centre display photography, captioned as exactly
-					         what it is. Nothing here is presented as a project in this
-					         city, because no such photography is verified. */ ?>
+					         what it is; the alt comes from images.php. Nothing here is
+					         presented as a project in this city, because no such
+					         photography is verified. */ ?>
 					<figure class="ax-media ax-media--169 ax-mt-6">
 						<span class="ax-media__frame">
-							<img
-								src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg' ) ); ?>"
-								alt="Open shelving and accessories on display at the ALEA experience centre"
-								loading="lazy">
+							<?php echo alea_img( 'accessories' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="ax-media__tag">Display</span>
 						</span>
 						<figcaption class="ax-media__caption">

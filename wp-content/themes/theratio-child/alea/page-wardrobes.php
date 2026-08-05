@@ -9,15 +9,17 @@
  *   after a free measurement, and points at the KITCHEN estimator for kitchens.
  * - Every number here (factory sq ft, warranty years, install days, hardware
  *   brands, dates, place) is read from facts.php. Nothing is hard-coded.
- * - Every photograph in the approved pool is experience-centre / display
- *   photography. Alt text and captions therefore never claim a delivered
- *   project, a client home, or a factory floor.
- * - FLAGGED POOL LIMITATION: the approved pool contains exactly TWO frames
- *   that show a wardrobe (2022/03/w2.jpg and 2022/03/w3.jpg). w3 is the hero;
- *   w2 carries the experience-centre strip. The strip is deliberately short
- *   rather than padded out with lounge and reception photographs, which would
- *   make a wardrobes page whose visual evidence is mostly not wardrobes.
- *   Wardrobe display photography is pending from the owner.
+ * - Every image comes from images.php via alea_img(). No path and no alt text
+ *   is written by hand, so one page can never contradict another about what a
+ *   frame shows.
+ * - FLAGGED LIBRARY LIMITATION: the media library contains NO wardrobe
+ *   photography at all. The two files this page previously used as its hero
+ *   and its first plate were catalogued frame-by-frame (see images.php, keys
+ *   render-u and render-compact) and are CGI KITCHEN renders, not wardrobes —
+ *   so they are gone from this page, and they have NOT been swapped for a
+ *   kitchen photograph wearing a wardrobe caption.
+ *   Everything shown here is experience-centre photography, captioned as
+ *   exactly that. Wardrobe photography is pending from the owner.
  * - ROUTING (outside this file, flagged not fixed): alea_redesign_map() in
  *   functions.php has no '/wardrobe/' entry yet, so this template is not
  *   routed and its CSS inliner will not fire. The build contract scopes this
@@ -28,6 +30,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f          = alea_facts();
 $sqft       = $f['factory_sqft'];
@@ -41,10 +44,11 @@ $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $phone_disp = alea_fact( 'phone_display' );
 $wa_href    = alea_wa_link( 'Hi ALEA, I would like a free wardrobe measurement.' );
 
-/* The three wardrobe types. Cards are deliberately TEXT cards: the approved
-   photo pool has no photograph verified to show a sliding / hinged / walk-in
-   wardrobe, and putting an unlabelled display photo under a type heading
-   would make a claim we cannot stand behind. The "when" lines are generic
+/* The three wardrobe types. Cards are deliberately TEXT cards: the image
+   catalogue holds no photograph of a sliding / hinged / walk-in wardrobe —
+   it holds no wardrobe photograph of any kind — and putting a display photo
+   of something else under a type heading would make a claim we cannot stand
+   behind. The "when" lines are generic
    industry guidance, framed as guidance — never as an ALEA-specific claim. */
 $types = array(
 	array(
@@ -67,23 +71,19 @@ $types = array(
 	),
 );
 
-/* Experience-centre plates. Captioned as exactly what they are.
-   Deliberately TWO plates, not four: the approved pool holds only two
-   wardrobe frames (w3 is the hero, w2 is here), and the second plate is the
-   internal-fittings display this page's pricing section actually talks about.
-   The lounge and reception photographs used on the homepage are left off —
-   on a wardrobes page they would be three quarters of the visual evidence
-   showing something other than a wardrobe. */
+/* Experience-centre plates. These are NOT wardrobes and their captions say so
+   in as many words: the catalogue contains no wardrobe photography, so this
+   strip shows the room you would actually walk into instead. Alt text comes
+   from images.php; only the caption line is written here, and it must never
+   describe a frame as something the catalogue does not say it is. */
 $plates = array(
 	array(
-		'src' => '/wp-content/uploads/2022/03/w2.jpg',
-		'alt' => 'Wardrobe interior and hanging space on display at the ALEA experience centre',
-		'cap' => 'Wardrobe interior / ALEA experience centre',
+		'key' => 'accessories',
+		'cap' => 'Shelving and accessories display / ALEA experience centre',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg',
-		'alt' => 'Open shelving and internal fittings on display at the ALEA experience centre',
-		'cap' => 'Shelving and internal fittings / ALEA experience centre',
+		'key' => 'lounge',
+		'cap' => 'Client seating area / ALEA experience centre',
 	),
 );
 
@@ -152,10 +152,13 @@ foreach ( $faq as $faq_item ) {
 
 	<!-- ==================== 1. HERO ==================== -->
 	<section class="ax-hero">
-		<img class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/03/w3.jpg' ) ); ?>"
-			alt="Sliding wardrobe display at the ALEA experience centre"
-			loading="eager" fetchpriority="high">
+		<!-- wardrobe photography pending: library has none -->
+		<?php /* The hero frame is the timber feature wall in our experience
+		         centre — atmosphere, not evidence. It is labelled as exactly
+		         that in the credit line below, because no photograph of an
+		         ALEA wardrobe exists in the library yet. The scrim and the
+		         ink background carry the type either way. */ ?>
+		<?php echo alea_img( 'timber-feature', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Wardrobes &mdash; <?php echo esc_html( $place ); ?></p>
 			<h1 class="ax-hero__title">Wardrobes, made on the same factory floor as our kitchens.</h1>
@@ -169,7 +172,7 @@ foreach ( $faq as $faq_item ) {
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $tel_href ); ?>">Call <span class="ax-btn__note"><?php echo esc_html( $phone_disp ); ?></span></a>
 			</div>
 			<p class="axp-hero-note">Free, at your home, no obligation &mdash; measurements are yours to keep either way.</p>
-			<p class="ax-hero__credit">Photograph: sliding wardrobe display at our experience centre</p>
+			<p class="ax-hero__credit">Photograph: timber feature wall at our experience centre &mdash; not a wardrobe</p>
 		</div>
 	</section>
 
@@ -340,24 +343,32 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap">
 			<div class="ax-head ax-reveal">
 				<p class="ax-eyebrow">The experience centre</p>
-				<h2 class="ax-h2">Two photographs. The rest you have to come and open.</h2>
+				<h2 class="ax-h2">We have no wardrobe photographs. So come and open one.</h2>
 				<p class="ax-lead">
-					Two photographs of our own display centre, captioned as exactly what they
-					show. Only two, because we would rather show you the wardrobes than fill
-					the page with pictures of our reception. There is a good deal more on the
-					floor: come and open a door, pull a drawer out to full extension, and see
-					the <?php echo esc_html( $brands_amp ); ?> hinges and runners working
+					Straight answer: we do not yet have a single photograph of an ALEA wardrobe,
+					and we would rather admit that than caption something else as one. The two
+					frames below are our own display centre &mdash; a shelving display and the
+					seating area &mdash; captioned as exactly what they show. The wardrobes are
+					on the floor: come and open a door, pull a drawer out to full extension, and
+					see the <?php echo esc_html( $brands_amp ); ?> hinges and runners working
 					before you decide anything.
 				</p>
 			</div>
+			<!-- wardrobe photography pending: library has none -->
 			<div class="ax-grid ax-grid--2">
-				<?php foreach ( $plates as $plate_i => $plate ) : ?>
+				<?php
+				$plate_n = 0;
+				foreach ( $plates as $plate ) :
+					$plate_img = alea_img( $plate['key'], array( 'class' => '' ) );
+					if ( '' === $plate_img ) {
+						continue; // Unusable frame — render no empty box.
+					}
+					$plate_n++;
+					?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img src="<?php echo esc_url( home_url( $plate['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $plate['alt'] ); ?>"
-							loading="lazy">
-						<span class="ax-media__tag">PLATE <?php echo esc_html( sprintf( '%02d', $plate_i + 1 ) ); ?></span>
+						<?php echo $plate_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="ax-media__tag">PLATE <?php echo esc_html( sprintf( '%02d', $plate_n ) ); ?></span>
 					</span>
 					<figcaption class="ax-media__caption"><?php echo esc_html( $plate['cap'] ); ?></figcaption>
 				</figure>

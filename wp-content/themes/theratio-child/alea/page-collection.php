@@ -14,6 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -56,12 +57,15 @@ $sqft_rft   = (int) alea_fact( 'sqft_per_rft' );
    company-wide ONLY where those keys back it, and must never claim the
    construction, machines or hardware are identical across tiers. Materials and
    carcass specs are not invented anywhere: the quotation itemises them.
-   Images are experience-centre display photography (the only real pool);
-   alts say "display", never "delivered project" or "client home". ---- */
+   IMAGES: only a catalogue key is stored here. The picture and its alt text come
+   from images.php, which was written from what is actually in each frame — so a
+   caption on this page can never contradict the photograph it sits under. Each
+   key below is verified experience-centre display photography (kind
+   'photo-alea'); none of it is a delivered project or a customer's home, and
+   the page never says otherwise. ---- */
 $presentation = array(
 	'essential' => array(
-		'img'  => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg',
-		'alt'  => 'ALEA modular kitchen display with breakfast table at the experience centre',
+		'img_key' => 'kitchen-tall',
 		'desc' => array(
 			sprintf(
 				'Essential is the practical ALEA kitchen: laminate finishes, straightforward layouts, and every rupee going where you can see it. It is made in our own %1$s sq ft factory at %2$s and carries the same %3$d-year written warranty as every ALEA kitchen.',
@@ -73,8 +77,7 @@ $presentation = array(
 		),
 	),
 	'signature' => array(
-		'img'  => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg',
-		'alt'  => 'ALEA modular kitchen display with island at the experience centre',
+		'img_key' => 'kitchen-island',
 		'desc' => array(
 			'Signature is our most-chosen kitchen. The finish options are richer and more considered than Essential’s — this is the tier where the kitchen starts to feel designed for your home rather than picked from a list.',
 			sprintf(
@@ -86,8 +89,7 @@ $presentation = array(
 		),
 	),
 	'atelier'   => array(
-		'img'  => '/wp-content/uploads/2022/04/aleaabout.jpg',
-		'alt'  => 'ALEA modular kitchen and dining display at the experience centre',
+		'img_key' => 'kitchen-wide',
 		'desc' => array(
 			'Atelier is the top of our published range: our top-tier finishes and bespoke elements, made without compromise, for the kitchen you intend to keep for twenty years.',
 			sprintf(
@@ -182,12 +184,13 @@ foreach ( $faq as $item ) {
 
 	<!-- ============ 1. HERO ============ -->
 	<section class="ax-hero ax-hero--short">
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( $pres['img'] ) ); ?>"
-			alt="<?php echo esc_attr( $pres['alt'] ); ?>"
-			loading="eager"
-			fetchpriority="high">
+		<?php
+		/* Experience-centre display photography, taken from the catalogue with its
+		   verified alt. Not captioned as a delivered project or a customer's home,
+		   because it is neither. alea_img() prints nothing if a key is ever
+		   downgraded, so an unusable picture cannot appear here. */
+		echo alea_img( $pres['img_key'], array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside alea_img().
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">The range — collection <?php echo (int) $col_index; ?> of <?php echo count( $alea_valid_collections ); ?></p>
 			<h1 class="ax-hero__title"><?php echo esc_html( $col_name ); ?></h1>
@@ -303,19 +306,18 @@ foreach ( $faq as $item ) {
 						<h2 class="ax-h2">What you get on every ALEA kitchen — including this one.</h2>
 					</div>
 					<?php /* Experience-centre display photography — the only verified pool.
-					         Placed in the shared-standards section on purpose: it is not
-					         captioned as this collection, as a delivered project or as a
-					         customer home, because none of that is verified. */ ?>
+					         Image and alt come from images.php so the caption below can
+					         never contradict the frame. Placed in the shared-standards
+					         section on purpose: it is not captioned as this collection, as
+					         a delivered project or as a customer home, because it is none
+					         of those. */ ?>
 					<figure class="ax-media ax-media--169 ax-mt-6">
 						<span class="ax-media__frame">
-							<img
-								src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg' ) ); ?>"
-								alt="Open shelving and accessories on display at the ALEA experience centre"
-								loading="lazy">
+							<?php echo alea_img( 'accessories' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside alea_img(). ?>
 							<span class="ax-media__tag">Display</span>
 						</span>
 						<figcaption class="ax-media__caption">
-							Accessories on display / ALEA experience centre &mdash;
+							Shelving and accessories on display / ALEA experience centre &mdash;
 							<b>open and close the fittings yourself on a free visit</b>
 						</figcaption>
 					</figure>

@@ -780,24 +780,6 @@ function alea_redesign_map() {
 		   arrives in 'args' and is whitelisted inside page-collection.php.
 		   Paths are the plural /modular-kitchens/ form used in the approved
 		   brief and built from $col_base in that template. */
-		'/modular-kitchens/essential/' => array(
-			'file'  => 'page-collection.php',
-			'args'  => array( 'collection' => 'essential' ),
-			'title' => 'Essential Modular Kitchens — Guide Price Published | ALEA Modular',
-			'desc'  => 'ALEA Essential kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
-		),
-		'/modular-kitchens/signature/' => array(
-			'file'  => 'page-collection.php',
-			'args'  => array( 'collection' => 'signature' ),
-			'title' => 'Signature Modular Kitchens — Guide Price Published | ALEA Modular',
-			'desc'  => 'ALEA Signature kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
-		),
-		'/modular-kitchens/atelier/' => array(
-			'file'  => 'page-collection.php',
-			'args'  => array( 'collection' => 'atelier' ),
-			'title' => 'Atelier Modular Kitchens — Guide Price Published | ALEA Modular',
-			'desc'  => 'ALEA Atelier kitchens, with the guide price per sq ft of cabinetry published on the page. Made in our own factory at Raipur Rani, Panchkula district — 10-year written warranty, installed in 15 days.',
-		),
 		'/our-factory/'            => array(
 			'file'  => 'page-factory.php',
 			'title' => 'Inside Our 95,000 sq ft Factory | ALEA Modular, Raipur Rani',
@@ -915,6 +897,14 @@ function alea_redesign_map() {
 			'title' => 'Book a Free Design Visit or Factory Visit | ALEA Modular',
 			'desc'  => 'Book a free measurement at your home, or visit our factory at Raipur Rani and watch kitchens being built. Free, no obligation, across Panchkula, Chandigarh, Mohali and Zirakpur.',
 		),
+		/* Our work: experience-centre photography only — the library holds no
+		   verified delivered-project photos, and the template says so. */
+		'/projects/'               => array(
+			'file'  => 'page-projects.php',
+			'title' => 'Our Work | Kitchens on Display at Our Experience Centre | ALEA',
+			'desc'  => 'Kitchens and cabinetry photographed at the ALEA experience centre. Come and see them in person, or visit the factory at Raipur Rani where they are built.',
+		),
+
 		/* No street address, opening hours or map embed on this page: none of the
 		   three is verified, so the template says so plainly instead of inventing
 		   them. Keep the description in step with that. */

@@ -6,12 +6,16 @@
  * Included inside <main class="alea-main"> by the page shell.
  * Every business fact on this page is read from facts.php — nothing hard-coded.
  *
- * HONESTY NOTE: no photography of the shop floor exists yet, so every image
- * on this page is a real installed ALEA kitchen, labelled as such, and the
- * page says shop-floor photography is coming. Do not swap in stock imagery.
+ * HONESTY NOTE: no photography of the shop floor or of a finished installation
+ * exists yet. Every photograph on this page was taken in ALEA's own experience
+ * centre and is captioned as exactly that — never as the factory, never as a
+ * customer's home. The page says shop-floor photography is coming. All images
+ * come from the verified catalogue in images.php; never hard-code a path and
+ * never hand-write alt text. Do not swap in stock imagery.
  */
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $sqft         = alea_fact( 'factory_sqft' );            // '95,000'
 $place        = alea_fact( 'factory_place' );           // 'Raipur Rani, Panchkula district'
@@ -70,14 +74,11 @@ foreach ( $faqs as $f ) {
 <div class="ax-root ax-has-stickybar">
 
 	<!-- ================================================================
-	     HERO — one real installed-kitchen photograph. No factory photos
+	     HERO — a photograph of our experience centre. No factory photos
 	     exist yet; the credit line says so plainly.
 	     ================================================================ -->
 	<section class="ax-hero">
-		<img class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-1.jpg' ) ); ?>"
-			alt="Installed ALEA modular kitchen, manufactured at the <?php echo esc_attr( $place ); ?> factory"
-			loading="eager" fetchpriority="high">
+		<?php echo alea_img( 'kitchen-wide', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Inside our factory</p>
 			<h1 class="ax-hero__title">Come and watch your kitchen being made.</h1>
@@ -86,7 +87,7 @@ foreach ( $faqs as $f ) {
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#book-visit">Book a free factory visit</a>
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="tel:<?php echo esc_attr( $phone_tel ); ?>">Call <span class="ax-btn__note"><?php echo esc_html( $phone_disp ); ?></span></a>
 			</div>
-			<p class="ax-hero__credit">Photograph: an installed ALEA kitchen &mdash; shop-floor photography is being shot and will appear here</p>
+			<p class="ax-hero__credit">Photograph: a kitchen and dining display at our experience centre &mdash; shop-floor photography is being shot and will appear here</p>
 		</div>
 	</section>
 
@@ -124,7 +125,7 @@ foreach ( $faqs as $f ) {
 			<div class="ax-prose">
 				<p>Most kitchen brands in the Tricity sell kitchens somebody else builds. We are the other kind: our parent firm has been making furniture since <?php echo esc_html( $since_parent ); ?>, ALEA has been making modular kitchens since <?php echo esc_html( $since_alea ); ?> — <?php echo esc_html( $years ); ?> years of it — and everything we sell is manufactured under our own roof at <?php echo esc_html( $place ); ?>.</p>
 				<p>That is easy to write and easy to fake, which is why this page ends with an invitation rather than a slogan: come and see it. A factory visit is free, and no photograph argues as well as the floor itself.</p>
-				<p class="ax-mono--label">A note on the photographs: documentary photography of the shop floor is in progress. Until it is ready, every image on this page is a real installed ALEA kitchen &mdash; nothing staged, nothing stock.</p>
+				<p class="ax-mono--label">A note on the photographs: documentary photography of the shop floor is in progress. Until it is ready, every photograph on this page was taken in our own experience centre &mdash; displays you can walk around yourself, not the factory floor, and nothing stock.</p>
 			</div>
 		</div>
 	</section>
@@ -178,43 +179,34 @@ foreach ( $faqs as $f ) {
 	     HARDWARE — Hettich / Blum, tied to the written warranty
 	     ================================================================ -->
 	<section class="ax-section ax-section--ruled ax-reveal">
-		<div class="ax-wrap">
-			<div class="ax-grid ax-grid--split">
-				<figure class="ax-media">
-					<div class="ax-media__frame">
-						<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/02/k1.jpg' ) ); ?>"
-							alt="Installed ALEA modular kitchen fitted with branded soft-close hardware"
-							loading="lazy">
-						<span class="ax-media__tag">Installed ALEA kitchen</span>
-					</div>
-					<figcaption class="ax-media__caption">Fitted with <b><?php echo esc_html( $brands_txt ); ?></b> hardware as standard</figcaption>
-				</figure>
-				<div>
-					<div class="ax-head ax-mb-5">
-						<p class="ax-eyebrow">Hardware store room</p>
-						<h2 class="ax-h2">The hardware has a name.</h2>
-						<p class="ax-lead">The part of a kitchen you touch fifty times a day is the hinge and the runner. Ours are branded, and you can inspect the stock yourself on a visit.</p>
-					</div>
-					<ul class="ax-prooflist">
-						<?php foreach ( $brands as $brand ) : ?>
-						<li class="ax-proof">
-							<span class="ax-proof__tick" aria-hidden="true"></span>
-							<div class="ax-proof__text">
-								<strong><?php echo esc_html( $brand ); ?></strong> hinges and runners, fitted at the factory during assembly.
-								<span class="ax-proof__never">Never unbranded hardware</span>
-							</div>
-						</li>
-						<?php endforeach; ?>
-						<li class="ax-proof">
-							<span class="ax-proof__tick" aria-hidden="true"></span>
-							<div class="ax-proof__text">
-								Covered by the <?php echo esc_html( $warranty_yrs ); ?>-year written warranty that comes with every ALEA kitchen.
-								<span class="ax-proof__never">Never a verbal promise</span>
-							</div>
-						</li>
-					</ul>
-				</div>
+		<div class="ax-wrap ax-wrap--text">
+			<!-- hardware photography pending: the library has no image of the hardware
+			     store room or of a hinge/runner, and the previous photo here was stock
+			     imagery of a kitchen that is not ALEA's work. Text only until real
+			     hardware photography exists. -->
+			<div class="ax-head ax-mb-5">
+				<p class="ax-eyebrow">Hardware store room</p>
+				<h2 class="ax-h2">The hardware has a name.</h2>
+				<p class="ax-lead">The part of a kitchen you touch fifty times a day is the hinge and the runner. Ours are branded, and you can inspect the stock yourself on a visit.</p>
 			</div>
+			<ul class="ax-prooflist">
+				<?php foreach ( $brands as $brand ) : ?>
+				<li class="ax-proof">
+					<span class="ax-proof__tick" aria-hidden="true"></span>
+					<div class="ax-proof__text">
+						<strong><?php echo esc_html( $brand ); ?></strong> hinges and runners, fitted at the factory during assembly.
+						<span class="ax-proof__never">Never unbranded hardware</span>
+					</div>
+				</li>
+				<?php endforeach; ?>
+				<li class="ax-proof">
+					<span class="ax-proof__tick" aria-hidden="true"></span>
+					<div class="ax-proof__text">
+						Covered by the <?php echo esc_html( $warranty_yrs ); ?>-year written warranty that comes with every ALEA kitchen.
+						<span class="ax-proof__never">Never a verbal promise</span>
+					</div>
+				</li>
+			</ul>
 		</div>
 	</section>
 
@@ -281,11 +273,10 @@ foreach ( $faqs as $f ) {
 					</ul>
 					<figure class="ax-media ax-mt-6 ax-hide-lg">
 						<div class="ax-media__frame">
-							<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg' ) ); ?>"
-								alt="Installed ALEA modular kitchen in a Tricity home"
-								loading="lazy">
-							<span class="ax-media__tag">Installed ALEA kitchen</span>
+							<?php echo alea_img( 'kitchen-island' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+							<span class="ax-media__tag">Our experience centre</span>
 						</div>
+						<figcaption class="ax-media__caption">A kitchen display at our experience centre &mdash; the same units, made at the factory you are booking to visit</figcaption>
 					</figure>
 				</div>
 				<div class="ax-form ax-form--card">

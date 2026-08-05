@@ -15,6 +15,10 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+/* Every picture on this page comes from the verified catalogue in images.php.
+   No path and no alt text is written here: the filenames in this media library
+   are misleading, so the description lives with the file. */
+require_once __DIR__ . '/images.php';
 
 $f = alea_facts();
 
@@ -54,22 +58,14 @@ $ex_slug = isset( $f['collections']['signature'] ) ? 'signature' : (string) key(
 $ex_name = isset( $f['collections'][ $ex_slug ]['name'] ) ? (string) $f['collections'][ $ex_slug ]['name'] : '';
 list( $ex_low, $ex_high, $ex_sqft ) = alea_kitchen_total( $ex_rft, $ex_slug );
 
-/* Collection cards. Images are experience-centre display photography — the only
-   photography verified to be ALEA's own. Alts say "display", never "delivered
-   project", "client home" or "factory floor". */
+/* Collection cards. Each slug maps to a catalogue KEY, not to a file path — the
+   image and its alt come from images.php, which describes what is actually in
+   the frame (experience-centre displays, never a delivered project, a client
+   home or a factory floor). */
 $collection_imgs = array(
-	'essential' => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg',
-		'alt' => 'ALEA modular kitchen display with a breakfast table at the experience centre',
-	),
-	'signature' => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg',
-		'alt' => 'ALEA modular kitchen display with an island at the experience centre',
-	),
-	'atelier'   => array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-1.jpg',
-		'alt' => 'Sculpted timber joinery at the ALEA experience centre',
-	),
+	'essential' => 'kitchen-tall',
+	'signature' => 'kitchen-island',
+	'atelier'   => 'timber-feature',
 );
 
 /* The six layouts. "When it works" is general kitchen-planning guidance, framed
@@ -123,28 +119,27 @@ $layouts = array(
 	),
 );
 
-/* Experience-centre plates. Captioned as exactly what they show: our own display
-   centre. The approved pool contains no verified customer-home or factory-floor
-   photography, so none is claimed. On a KITCHENS hub the plates must show
-   kitchens and the drawers/hardware the copy invites you to handle — two kitchen
-   displays plus the accessories run, not the reception desk and the lounge. */
+/* Experience-centre plates. Every caption states exactly what stands in the
+   frame. The verified pool holds no customer-home and no factory-floor
+   photography, so none is claimed. The three kitchen photographs are already
+   spent on the hero and the collection cards above, so these plates are the
+   rest of the centre — the stone counter, the accessories run and the seating
+   area — captioned as such rather than relabelled "kitchen display".
+   Keys only: alea_img() supplies the file and its verified alt. */
 $gallery = array(
 	array(
-		'src' => '/wp-content/uploads/2022/02/k1.jpg',
-		'alt' => 'Modular kitchen display with base and wall units at the ALEA experience centre',
-		'cap' => 'Kitchen display / ALEA experience centre',
+		'key' => 'stone-desk',
+		'cap' => 'Sculpted stone counter / ALEA experience centre',
 		'no'  => '01',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/03/par.jpg',
-		'alt' => 'Parallel-layout modular kitchen display at the ALEA experience centre',
-		'cap' => 'Parallel kitchen display / ALEA experience centre',
+		'key' => 'accessories',
+		'cap' => 'Shelving and accessories display / ALEA experience centre',
 		'no'  => '02',
 	),
 	array(
-		'src' => '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-5.jpg',
-		'alt' => 'Open shelving and accessories display at the ALEA experience centre',
-		'cap' => 'Accessories display / ALEA experience centre',
+		'key' => 'lounge',
+		'cap' => 'Client seating area / ALEA experience centre',
 		'no'  => '03',
 	),
 );
@@ -215,17 +210,17 @@ foreach ( $faq as $item ) {
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero">
-		<?php /* L-Shape-Kitchen-01.jpg — an L-shaped kitchen display, deliberately
-		         NOT the homepage hero (aleaabout.jpg), so a visitor arriving from
-		         the homepage is not shown the same photograph twice. Experience-centre
-		         display photography: the alt claims a display, never a delivered
-		         project, a client home or a factory floor. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/02/L-Shape-Kitchen-01.jpg' ) ); ?>"
-			alt="L-shaped modular kitchen display at the ALEA experience centre"
-			loading="eager"
-			fetchpriority="high">
+		<?php
+		/* This hero used to be the catalogue's 'diagram-l' file, captioned as an
+		   "L-shaped kitchen display". That file is a white-on-black LINE DIAGRAM,
+		   not a photograph, so it cannot carry a hero. The only landscape
+		   photograph verified as ALEA's own is the wide kitchen-and-dining view
+		   of the experience centre; it is
+		   also the homepage banner, which is the honest trade against inventing a
+		   photograph this library does not contain. Alt and dimensions come from
+		   the catalogue. */
+		echo alea_img( 'kitchen-wide', array( 'class' => 'ax-hero__img', 'eager' => true ) );
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Modular kitchens &mdash; <?php echo esc_html( $f['factory_place'] ); ?></p>
 			<?php /* No "factory floor" wording over a display photograph: a full-bleed
@@ -294,19 +289,17 @@ foreach ( $faq as $item ) {
 			<div class="ax-grid ax-grid--3">
 				<?php
 				foreach ( $f['collections'] as $slug => $col ) :
-					/* The image map is page-local; facts.php is the file that is meant
+					/* The key map is page-local; facts.php is the file that is meant
 					   to change. A collection added there must render text-first rather
-					   than emit an undefined-key warning and a broken <img>. */
-					$col_img = isset( $collection_imgs[ $slug ] ) ? $collection_imgs[ $slug ] : null;
+					   than emit an undefined-key warning and a broken <img>. alea_img()
+					   returns '' for anything unusable, so the media box is only opened
+					   when a verified picture exists. */
+					$col_img_key  = isset( $collection_imgs[ $slug ] ) ? $collection_imgs[ $slug ] : '';
+					$col_img_html = $col_img_key ? alea_img( $col_img_key ) : '';
 					?>
 				<article class="ax-card ax-card--collection ax-reveal">
-					<?php if ( $col_img ) : ?>
-					<div class="ax-card__media">
-						<img
-							src="<?php echo esc_url( home_url( $col_img['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $col_img['alt'] ); ?>"
-							loading="lazy">
-					</div>
+					<?php if ( $col_img_html ) : ?>
+					<div class="ax-card__media"><?php echo $col_img_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built and escaped by alea_img(). ?></div>
 					<?php endif; ?>
 					<div class="ax-card__inner">
 						<h3 class="ax-card__name"><?php echo esc_html( $col['name'] ); ?></h3>
@@ -443,30 +436,34 @@ foreach ( $faq as $item ) {
 	</section>
 
 	<!-- ================================================== 6. EXPERIENCE CENTRE -->
-	<!-- Honest labels: these are photographs of our own display centre. The
-	     approved pool holds no verified customer-home or factory-floor
-	     photography, so none is claimed here. On this hub the plates are kitchen
-	     displays and the accessories run, so the pictures show what the copy
-	     invites you to open. -->
+	<!-- Honest labels: these are photographs of our own display centre, and each
+	     caption names what actually stands in the frame. The verified pool holds
+	     no customer-home and no factory-floor photography, so none is claimed
+	     here; the kitchen photographs are shown in the hero and the collection
+	     cards above, and these plates are the rest of the centre. -->
 	<section class="ax-section">
 		<div class="ax-wrap">
 			<header class="ax-head ax-reveal">
 				<p class="ax-eyebrow">The experience centre</p>
 				<h2 class="ax-h2">Open the drawers before you decide.</h2>
 				<p class="ax-lead">
-					Kitchen displays standing in our own experience centre, captioned as exactly what they show. Come and
-					open the drawers and handle the <?php echo esc_html( $brands ); ?> hardware yourself &mdash; then visit the factory at
+					Photographs of our own experience centre, each captioned as exactly what it shows. The kitchen displays
+					are pictured above; come and open their drawers and handle the <?php echo esc_html( $brands ); ?> hardware
+					yourself &mdash; then visit the factory at
 					<?php echo esc_html( $f['factory_place'] ); ?> and watch kitchens being built.
 				</p>
 			</header>
 			<div class="ax-grid ax-grid--3">
-				<?php foreach ( $gallery as $p ) : ?>
+				<?php
+				foreach ( $gallery as $p ) :
+					$plate = alea_img( $p['key'] );
+					if ( ! $plate ) {
+						continue; // Unverified picture: drop the whole figure, never leave an empty frame.
+					}
+					?>
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img
-							src="<?php echo esc_url( home_url( $p['src'] ) ); ?>"
-							alt="<?php echo esc_attr( $p['alt'] ); ?>"
-							loading="lazy">
+						<?php echo $plate; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built and escaped by alea_img(). ?>
 						<span class="ax-media__tag">PLATE <?php echo esc_html( $p['no'] ); ?></span>
 					</span>
 					<figcaption class="ax-media__caption"><?php echo esc_html( $p['cap'] ); ?></figcaption>

@@ -31,11 +31,15 @@
  * - The only rupee figure is the published PER SQ FT rate band, derived by
  *   min/max over the collection bands in facts.php. No whole-kitchen total is
  *   rendered anywhere here, so no sq-ft-per-running-foot assumption applies.
- * - The photograph is experience-centre display photography (approved pool),
- *   with the alt text already used for this exact file on the homepage. Its
- *   credit line carries NO location — captioning a display interior "FACTORY
- *   AT ..." would be exactly the mis-framing the image rules exist to prevent.
- *   The factory location is stated as prose in section 5 instead.
+ * - The one photograph comes from images.php by catalogue key, never by path,
+ *   and its alt text comes with it — no page hand-writes a description, so two
+ *   pages cannot describe the same frame differently. The frame is the client
+ *   seating area at ALEA's experience centre: a real photograph of ALEA's own
+ *   premises, not a customer's home, not a delivered project and NOT the
+ *   factory floor. Its credit line therefore carries NO location — captioning
+ *   an experience-centre interior "FACTORY AT ..." would be exactly the
+ *   mis-framing the image rules exist to prevent. The factory location is
+ *   stated as prose in section 5 instead.
  * - This page IS the CTA. The form sits directly under the hero, both anchors
  *   land ON the form card rather than on the section that contains it, and the
  *   page ends on the FAQ — there is no second CTA band.
@@ -44,6 +48,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f          = alea_facts();
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
@@ -163,17 +168,14 @@ foreach ( $faq as $item ) {
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero ax-hero--short">
-		<?php /* Experience-centre display photography (approved pool). The alt is
-		         the one already used for this exact file on the homepage, so the
-		         two pages cannot describe the same photograph differently. It
-		         claims a display centre — never a customer home, a delivered
-		         project or the factory floor. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-7.jpg' ) ); ?>"
-			alt="Client lounge seating at the ALEA experience centre"
-			loading="eager"
-			fetchpriority="high">
+		<?php
+		/* 'lounge' = the client seating area at ALEA's own experience centre, a
+		   verified photograph. Taken by catalogue key so the path and the alt
+		   both live in images.php — this page writes neither. It is not a
+		   customer's home, not a delivered project and not the factory floor,
+		   and nothing on this page says otherwise. */
+		echo alea_img( 'lounge', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- alea_img() escapes its own attributes.
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Contact ALEA</p>
 			<h1 class="ax-hero__title">Talk to the factory.</h1>
@@ -196,10 +198,11 @@ foreach ( $faq as $item ) {
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="#alea-book">Or send a message</a>
 			</div>
 			<?php /* Non-locational on purpose. .ax-hero__credit is the credit line
-			         UNDER a photograph, and this photograph is experience-centre
-			         display work — printing "FACTORY AT ..." across it would caption
-			         a display interior as the factory. The factory location is stated
-			         as prose in section 5 instead, where it belongs. */ ?>
+			         UNDER a photograph, and this photograph shows the client seating
+			         area of the experience centre — printing "FACTORY AT ..." across
+			         it would caption an experience-centre interior as the factory.
+			         The factory location is stated as prose in section 5 instead,
+			         where it belongs. */ ?>
 			<p class="ax-hero__credit">
 				CALL OR WHATSAPP
 				/ SAME NUMBER FOR BOTH

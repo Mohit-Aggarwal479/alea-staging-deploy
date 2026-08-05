@@ -16,11 +16,13 @@
  *   visit. It never promises them as a handout, and never describes coverage.
  * - Two visit types, two different promises: measurement happens at your
  *   home. Nothing on the page claims we measure your kitchen at the factory.
- * - The photograph is experience-centre display photography (approved pool).
- *   Its alt text claims only what is visible — never a customer home, never
- *   a delivered project, never the factory floor. Kept deliberately general:
- *   the uploads directory is not in this repo, so no detail inside the frame
- *   can be verified from the tree.
+ * - Images come from images.php only. No path and no alt text is written by
+ *   hand here: the catalogue holds the description of what is actually in each
+ *   frame, so this page cannot claim a customer's home, a delivered project or
+ *   the factory floor. The hero is 'kitchen-tall' — a kitchen display inside
+ *   ALEA's own experience centre, which is what the frame shows.
+ * - Note the page offers a FACTORY visit but shows no factory photograph:
+ *   the library contains none, and a showroom frame must not stand in for one.
  * - This page IS the CTA, so it deliberately ends on the FAQ. No second
  *   CTA band.
  */
@@ -28,6 +30,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f          = alea_facts();
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
@@ -119,14 +122,12 @@ foreach ( $faq as $item ) {
 
 	<!-- ============ 1. HERO — the reassurance ============ -->
 	<section class="ax-hero ax-hero--short">
-		<?php /* Experience-centre display photograph (approved pool). Alt states
-		         only what is visible — no customer-home or project claim. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-6.jpg' ) ); ?>"
-			alt="Modular kitchen display at the ALEA experience centre"
-			loading="eager"
-			fetchpriority="high">
+		<?php
+		/* Hero image and its alt come from the catalogue in images.php. It is a
+		   kitchen display inside ALEA's experience centre — not a customer's
+		   home, not a delivered project, not the factory. */
+		echo alea_img( 'kitchen-tall', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in alea_img()
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Book a free design visit</p>
 			<h1 class="ax-hero__title">A free visit. <em>At your home or our factory.</em> No obligation.</h1>

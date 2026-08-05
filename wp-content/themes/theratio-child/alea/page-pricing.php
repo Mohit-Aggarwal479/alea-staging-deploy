@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $ax_f      = alea_facts();
 $ax_cols   = $ax_f['collections'];
@@ -129,10 +130,10 @@ foreach ( $ax_faqs as $ax_q ) {
 
 	<!-- ================================================== HERO -->
 	<section class="ax-hero ax-hero--short">
-		<img class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-1.jpg' ) ); ?>"
-			alt="Installed ALEA modular kitchen in a Tricity home"
-			loading="eager" fetchpriority="high">
+		<?php
+		// Experience-centre photography — alt text comes from the image catalogue.
+		echo alea_img( 'kitchen-wide', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in alea_img().
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Factory price list</p>
 			<h1 class="ax-hero__title">A kitchen price list published by the factory that makes them.</h1>
@@ -213,10 +214,8 @@ foreach ( $ax_faqs as $ax_q ) {
 			<div class="ax-grid ax-grid--3">
 
 				<article class="ax-card ax-card--collection ax-reveal">
-					<div class="ax-card__media">
-						<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/02/k1.jpg' ) ); ?>"
-							alt="Installed ALEA modular kitchen" loading="lazy">
-					</div>
+					<!-- collection photography pending: the library holds no image that shows this
+					     collection's finish, and no photograph of a delivered kitchen. -->
 					<div class="ax-card__inner">
 						<h3 class="ax-card__name"><?php echo esc_html( $ax_cols['essential']['name'] ); ?></h3>
 						<p class="ax-card__character"><?php echo esc_html( $ax_cols['essential']['character'] ); ?></p>
@@ -236,10 +235,8 @@ foreach ( $ax_faqs as $ax_q ) {
 				</article>
 
 				<article class="ax-card ax-card--collection ax-reveal ax-reveal--d1">
-					<div class="ax-card__media">
-						<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/02/L-Shape-Kitchen-01.jpg' ) ); ?>"
-							alt="Installed L-shaped ALEA modular kitchen" loading="lazy">
-					</div>
+					<!-- collection photography pending: the library holds no image that shows this
+					     collection's finish, and no photograph of a delivered kitchen. -->
 					<div class="ax-card__inner">
 						<h3 class="ax-card__name"><?php echo esc_html( $ax_cols['signature']['name'] ); ?></h3>
 						<p class="ax-card__character"><?php echo esc_html( $ax_cols['signature']['character'] ); ?></p>
@@ -259,10 +256,8 @@ foreach ( $ax_faqs as $ax_q ) {
 				</article>
 
 				<article class="ax-card ax-card--collection ax-reveal ax-reveal--d2">
-					<div class="ax-card__media">
-						<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/03/par.jpg' ) ); ?>"
-							alt="Installed parallel ALEA modular kitchen" loading="lazy">
-					</div>
+					<!-- collection photography pending: the library holds no image that shows this
+					     collection's finish, and no photograph of a delivered kitchen. -->
 					<div class="ax-card__inner">
 						<h3 class="ax-card__name"><?php echo esc_html( $ax_cols['atelier']['name'] ); ?></h3>
 						<p class="ax-card__character"><?php echo esc_html( $ax_cols['atelier']['character'] ); ?></p>
@@ -328,6 +323,12 @@ foreach ( $ax_faqs as $ax_q ) {
 				<h2 class="ax-h2">The arithmetic, in the open.</h2>
 				<p class="ax-lead">Three illustrative examples computed from the published bands — not real delivered projects. Each assumes standard base + wall units — about <span class="ax-mono"><?php echo esc_html( $ax_sqft_rft ); ?></span> sq ft of cabinetry per running foot. Your own range takes sixty seconds in the calculator.</p>
 			</header>
+			<figure class="ax-media ax-media--diagram ax-reveal">
+				<span class="ax-media__frame">
+					<?php echo alea_img( 'diagram-l' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in alea_img(). ?>
+				</span>
+				<figcaption class="ax-media__caption"><b>Layout diagram</b> / a line drawing, not a photograph / running feet are measured along the cabinetry runs shown here</figcaption>
+			</figure>
 			<div class="ax-grid ax-grid--3">
 				<?php foreach ( $ax_examples as $ax_ei => $ax_ex ) : ?>
 				<article class="ax-card ax-reveal<?php echo 0 < $ax_ei ? esc_attr( ' ax-reveal--d' . $ax_ei ) : ''; ?>">
@@ -394,10 +395,9 @@ foreach ( $ax_faqs as $ax_q ) {
 			<div class="ax-grid ax-grid--split">
 				<figure class="ax-media ax-media--43 ax-reveal">
 					<span class="ax-media__frame">
-						<img src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/04/aleaabout.jpg' ) ); ?>"
-							alt="Inside the ALEA factory at Raipur Rani, Panchkula district" loading="lazy">
+						<?php echo alea_img( 'kitchen-island' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in alea_img(). ?>
 					</span>
-					<figcaption class="ax-media__caption"><b>The factory</b> / <?php echo esc_html( $ax_place ); ?> / <?php echo esc_html( $ax_sqft ); ?> sq ft</figcaption>
+					<figcaption class="ax-media__caption"><b>Our experience centre</b> / a display kitchen with island and dining seating / the collections on this price list can be seen and opened here</figcaption>
 				</figure>
 				<div class="ax-prose ax-reveal ax-reveal--d1">
 					<p class="ax-eyebrow">Why we publish prices</p>

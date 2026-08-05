@@ -17,6 +17,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/facts.php';
+require_once __DIR__ . '/images.php';
 
 $f          = alea_facts();
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
@@ -87,14 +88,12 @@ foreach ( $faq as $item ) {
 
 	<!-- ============ 1. HERO ============ -->
 	<section class="ax-hero ax-hero--short">
-		<?php /* Experience-centre display photograph (approved pool) — alt claims
-		         only what is visible, never a delivered project. */ ?>
-		<img
-			class="ax-hero__img"
-			src="<?php echo esc_url( home_url( '/wp-content/uploads/2022/09/Alea-Modular-Kitchen-Wardrobes-3.jpg' ) ); ?>"
-			alt="Modular kitchen display with island at the ALEA experience centre"
-			loading="eager"
-			fetchpriority="high">
+		<?php
+		/* Image and alt come from the verified catalogue in images.php — never
+		   hard-coded here, and never re-described locally. 'kitchen-island' is
+		   real experience-centre photography, not a delivered project. */
+		echo alea_img( 'kitchen-island', array( 'class' => 'ax-hero__img', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in alea_img()
+		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">The warranty</p>
 			<h1 class="ax-hero__title">A <?php echo (int) $wty; ?>-year warranty. <em>In writing.</em></h1>
