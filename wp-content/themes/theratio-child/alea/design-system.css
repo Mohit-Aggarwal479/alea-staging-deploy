@@ -1,0 +1,2198 @@
+/* ==========================================================================
+   ALEA -- "The Manufacturer's Record"
+   design-system.css -- single file, pure CSS, inlined into <head>.
+   No at-rule imports, no external URL, no font binary. System stacks only.
+
+   Markup contract:
+     <main class="alea-main"><div class="ax-root"> ... </div></main>
+   Optional state classes on .ax-root:
+     .ax-js             set by inline script; gates .ax-reveal
+     .ax-has-stickybar  page renders .ax-stickybar
+     .ax-has-pricestrip page also renders .ax-pricestrip
+
+   ORDER: 1 tokens - 2 reset/base - 3 layout - 4 typography
+          5 components - 6 utilities - 7 responsive - 8 motion/print
+
+   DESIGN LAW -- do not fight these in page markup:
+   - Separation is a hairline or empty space. No decorative box-shadow exists
+     in this file; the only box-shadows are focus rings. Radii are 2-3px.
+   - OXBLOOD appears in exactly five places, all of them conversions:
+     .ax-btn--primary (and CF7 submit) - .ax-chip selected - the live price
+     figure (.ax-price__figure / .ax-pricestrip__value / .ax-stickybar__btn--call)
+     - the .ax-eyebrow rule - the .ax-ox utility. Never add a sixth.
+   - OLIVE is a glyph colour only (proof tick, included tick, 220ms price
+     flash). 3.5:1 on chalk -- legal for graphics, ILLEGAL for text.
+   - Every number is mono + tabular. The single exception is the big price
+     figure, which is the display serif. That exception is the signature.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. TOKENS -- declared on .ax-root only, so nothing leaks into the theme
+      and the theme's :root cannot beat us inside our own subtree.
+   ========================================================================== */
+
+.ax-root {
+  /* ---- Palette (exact, fixed, do not extend) ---- */
+  --ink:          #14110F;  /* text, headings, dark bands            */
+  --chalk:        #F4F4F1;  /* default page ground                    */
+  --sheet:        #FFFFFF;  /* lifted interactive surfaces, sparingly */
+  --oxblood:      #92003B;  /* CONVERSION ONLY                        */
+  --oxblood-deep: #6E002C;  /* conversion hover / active              */
+  --olive:        #7A8A0E;  /* micro-signal glyphs only, <=2%         */
+  --graphite:     #55534E;  /* secondary text, labels, captions       */
+  --rule:         #D8D6D0;  /* hairlines -- the separation device     */
+  --timber:       #8A7F6D;  /* large quiet fills only (ink on top)    */
+  --whatsapp:     #25D366;  /* WhatsApp control only                  */
+  --alert:        #B00020;  /* validation errors only                 */
+
+  /* Derived by alpha only -- no new hues. */
+  --ink-a08:  rgba(20, 17, 15, 0.08);
+  --ink-a24:  rgba(20, 17, 15, 0.24);
+  --ink-a86:  rgba(20, 17, 15, 0.86);
+  --chalk-a24: rgba(244, 244, 241, 0.24);
+  --chalk-a38: rgba(244, 244, 241, 0.38);
+  --chalk-a12: rgba(244, 244, 241, 0.12);
+  --timber-wash: rgba(138, 127, 109, 0.16);
+
+  /* ---- Ground context. Every surface sets these four; components read
+       them so they work identically on chalk, sheet, timber or ink. ---- */
+  --ax-ground:   var(--chalk);
+  --ax-fg:       var(--ink);
+  --ax-fg-muted: var(--graphite);
+  --ax-rule:     var(--rule);
+
+  /* ---- Type ---- */
+  --font-display: Georgia, 'Times New Roman', 'Source Serif 4', serif;
+  --font-text: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Consolas,
+               'Liberation Mono', Menlo, monospace;
+
+  --fs-body: 17px;          /* -> 18px from 768px */
+  --lh-body: 1.65;          /* -> 1.7  from 768px */
+  --measure: 68ch;
+
+  --fs-h1:    clamp(1.75rem, 4vw + 0.85rem, 3.5rem);
+  --fs-h2:    clamp(1.5rem, 2.6vw + 0.7rem, 2.5rem);
+  --fs-h3:    clamp(1.1875rem, 1.2vw + 0.8rem, 1.5rem);
+  --fs-lead:  clamp(1.0625rem, 0.6vw + 0.95rem, 1.1875rem);
+  --fs-price: clamp(1.75rem, 6.5vw, 2.75rem);
+  --fs-micro: 0.6875rem;    /* 11px mono labels  */
+  --fs-nano:  0.625rem;     /* 10px mono kickers */
+  --fs-small: 0.8125rem;    /* 13px mono values  */
+
+  --ls-display: -0.015em;
+  --ls-mono:    0.08em;
+  --ls-mono-wide: 0.14em;
+
+  /* ---- Space (4px base, editorial jumps) ---- */
+  --sp-1: 0.25rem; --sp-2: 0.5rem;  --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem;  --sp-6: 2rem;    --sp-7: 3rem;    --sp-8: 4rem;
+  --sp-9: 6rem;
+
+  --gutter: 20px;           /* -> 28 / 32 / 40 upward */
+  --wrap: 1180px;
+  --section-y: clamp(2.75rem, 9vw, 5.5rem);
+
+  /* ---- Shape, hit targets, motion ---- */
+  --radius: 2px;            /* spec sheet, not app store */
+  --radius-lg: 3px;
+  --tap: 44px;
+  --tap-md: 48px;
+  --tap-lg: 52px;
+  --bar-h: 56px;            /* .ax-stickybar   */
+  --strip-h: 40px;          /* .ax-pricestrip  */
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-fast: 140ms;
+  --t-base: 220ms;          /* price count-up / value flash */
+  --t-reveal: 400ms;        /* scroll reveal                */
+
+  /* ---- Focus: two-tone, never oxblood. Legible on chalk AND on ink. ---- */
+  --focus-inner: var(--chalk);
+  --focus-outer: var(--ink);
+}
+
+
+/* ==========================================================================
+   2. RESET / BASE -- scoped. No bare global element selectors anywhere.
+   ========================================================================== */
+
+.ax-root,
+.ax-root *,
+.ax-root *::before,
+.ax-root *::after { box-sizing: border-box; }
+
+.ax-root {
+  /* Own every inherited property: theratio loads first and is hostile. */
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+  color: var(--ink);
+  background: var(--chalk);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-kerning: normal;
+  max-width: 100%;
+  /* The overflow contract: clip kills sideways scroll from .ax-bleed and
+     from any stray wide child, WITHOUT creating a scroll container -- which
+     is what keeps the docked price panel position:sticky. Never change this
+     pair to overflow:hidden. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.ax-root p,
+.ax-root h1, .ax-root h2, .ax-root h3,
+.ax-root h4, .ax-root h5, .ax-root h6,
+.ax-root figure, .ax-root blockquote,
+.ax-root ul, .ax-root ol, .ax-root dl, .ax-root dd,
+.ax-root pre, .ax-root fieldset { margin: 0; padding: 0; border: 0; }
+
+.ax-root h1, .ax-root h2, .ax-root h3,
+.ax-root h4, .ax-root h5, .ax-root h6 {
+  font-weight: 400;
+  line-height: 1.15;
+  text-transform: none;
+  color: inherit;
+}
+
+.ax-root ul, .ax-root ol { list-style: none; }
+
+.ax-root img,
+.ax-root picture,
+.ax-root svg,
+.ax-root video { display: block; max-width: 100%; height: auto; border: 0; }
+
+.ax-root a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ax-root button,
+.ax-root input,
+.ax-root select,
+.ax-root textarea { font: inherit; color: inherit; margin: 0; }
+
+.ax-root button { background: none; border: 0; cursor: pointer; }
+
+.ax-root table { border-collapse: collapse; border-spacing: 0; width: 100%; }
+
+.ax-root hr {
+  border: 0;
+  border-top: 1px solid var(--ax-rule);
+  height: 0;
+  margin: var(--sp-6) 0;
+}
+
+.ax-root b, .ax-root strong { font-weight: 600; }
+.ax-root em, .ax-root i { font-style: italic; }
+
+/* Selection reads like an editor's marker, not a brand moment. */
+.ax-root ::selection { background: var(--ink); color: var(--chalk); }
+
+/* --- Focus ring: one ring for the whole kit. Dark outer, light inner, so
+       it survives chalk, sheet, timber, photography and ink. Deliberately
+       sets no radius -- it inherits each control's own shape. --- */
+.ax-root :focus { outline: none; }
+
+.ax-root :focus-visible {
+  outline: 2px solid transparent;   /* forced-colors hook */
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--focus-inner), 0 0 0 4px var(--focus-outer);
+}
+
+/* On dark grounds the two tones swap so the ring stays visible. */
+.ax-root .ax-on-ink :focus-visible,
+.ax-root .ax-section--ink :focus-visible,
+.ax-root .ax-hero :focus-visible,
+.ax-root .ax-stickybar :focus-visible,
+.ax-root .ax-pricestrip:focus-visible,
+.ax-root .ax-pricestrip :focus-visible {
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--chalk);
+}
+
+/* --- Ground contexts. Set one class, everything inside is correct. --- */
+.ax-on-chalk {
+  --ax-ground: var(--chalk); --ax-fg: var(--ink);
+  --ax-fg-muted: var(--graphite); --ax-rule: var(--rule);
+  background: var(--chalk); color: var(--ink);
+}
+.ax-on-sheet {
+  --ax-ground: var(--sheet); --ax-fg: var(--ink);
+  --ax-fg-muted: var(--graphite); --ax-rule: var(--rule);
+  background: var(--sheet); color: var(--ink);
+}
+/* Ink on timber is 4.8:1 -- passes AA with no headroom. Short pull-outs and
+   section fills only; use .ax-on-wash for long passages. */
+.ax-on-timber {
+  --ax-ground: var(--timber); --ax-fg: var(--ink);
+  --ax-fg-muted: var(--ink); --ax-rule: var(--ink-a24);
+  background: var(--timber); color: var(--ink);
+}
+.ax-on-wash {
+  --ax-ground: #EAE7E1; --ax-fg: var(--ink);
+  --ax-fg-muted: var(--graphite); --ax-rule: var(--rule);
+  background: var(--timber-wash); color: var(--ink);
+}
+/* #B9B6B0 on ink is 9.4:1; chalk on ink is 17.2:1. */
+.ax-on-ink {
+  --ax-ground: var(--ink); --ax-fg: var(--chalk);
+  --ax-fg-muted: #B9B6B0; --ax-rule: var(--chalk-a24);
+  background: var(--ink); color: var(--chalk);
+}
+
+
+/* ==========================================================================
+   3. LAYOUT -- section rhythm, wrap, bleed, grids
+   ========================================================================== */
+
+.ax-section { position: relative; padding-block: var(--section-y); }
+.ax-section--tight { padding-block: clamp(1.75rem, 6vw, 3rem); }
+.ax-section--xl    { padding-block: clamp(3.5rem, 11vw, var(--sp-9)); }
+.ax-section--flush { padding-block: 0; }
+.ax-section--flush-top    { padding-top: 0; }
+.ax-section--flush-bottom { padding-bottom: 0; }
+/* Sections separate with a hairline or with space. Never a shadow. */
+.ax-section--ruled   { border-top: 1px solid var(--ax-rule); }
+.ax-section--ruled-b { border-bottom: 1px solid var(--ax-rule); }
+
+/* Ground aliases so a section can be written in one class. */
+.ax-section--sheet {
+  --ax-ground: var(--sheet); --ax-rule: var(--rule);
+  background: var(--sheet);
+}
+.ax-section--timber {
+  --ax-ground: var(--timber); --ax-fg: var(--ink); --ax-fg-muted: var(--ink);
+  --ax-rule: var(--ink-a24);
+  background: var(--timber); color: var(--ink);
+}
+.ax-section--ink {
+  --ax-ground: var(--ink); --ax-fg: var(--chalk); --ax-fg-muted: #B9B6B0;
+  --ax-rule: var(--chalk-a24);
+  background: var(--ink); color: var(--chalk);
+}
+
+.ax-wrap {
+  width: 100%;
+  max-width: calc(var(--wrap) + (var(--gutter) * 2));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.ax-wrap--narrow { max-width: calc(760px + (var(--gutter) * 2)); }
+.ax-wrap--text   { max-width: calc(62ch + (var(--gutter) * 2)); }
+.ax-wrap--wide   { max-width: calc(1380px + (var(--gutter) * 2)); }
+.ax-wrap--flush  { padding-inline: 0; }
+
+/* Full-bleed escape. Safe because .ax-root clips the x axis. */
+.ax-bleed {
+  width: 100vw;
+  max-width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* --- Grid helpers. One column on mobile, always. --- */
+.ax-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
+.ax-grid > * { min-width: 0; }
+.ax-grid--tight { gap: var(--sp-4); }
+.ax-grid--loose { gap: var(--sp-7); }
+.ax-grid--flush { gap: 0; }
+
+/* Hairline-separated grid: the 1px gaps ARE the rules; cells paint the
+   current ground. Inside a non-default surface, put the matching
+   .ax-on-* / .ax-section--* class on an ancestor or the rules read grey. */
+.ax-grid--ruled {
+  gap: 1px;
+  background: var(--ax-rule);
+  border: 1px solid var(--ax-rule);
+}
+.ax-grid--ruled > * { background: var(--ax-ground); padding: var(--sp-5); }
+
+.ax-stack > * + *     { margin-top: var(--sp-4); }
+.ax-stack--sm > * + * { margin-top: var(--sp-2); }
+.ax-stack--lg > * + * { margin-top: var(--sp-6); }
+
+.ax-cluster {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3);
+}
+
+
+/* ==========================================================================
+   4. TYPOGRAPHY -- serif carries the emotion, mono carries every fact
+   ========================================================================== */
+
+/* --- Eyebrow: mono uppercase kicker + short oxblood rule.
+       This rule is the ONE decorative use of oxblood the brief allows. --- */
+.ax-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-eyebrow::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 22px;
+  height: 2px;
+  background: var(--oxblood);
+}
+.ax-eyebrow--plain::before { display: none; }
+.ax-eyebrow--center { justify-content: center; }
+/* On ink the oxblood rule is nearly invisible -- switch it to chalk. */
+.ax-on-ink .ax-eyebrow::before,
+.ax-section--ink .ax-eyebrow::before,
+.ax-hero .ax-eyebrow::before { background: var(--chalk); }
+
+/* --- Display headings --- */
+.ax-h1, .ax-h2, .ax-h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ax-fg);
+  letter-spacing: var(--ls-display);
+  text-wrap: balance;
+}
+.ax-h1 { font-size: var(--fs-h1); line-height: 1.05; }
+.ax-h2 { font-size: var(--fs-h2); line-height: 1.1; }
+.ax-h3 { font-size: var(--fs-h3); line-height: 1.2; letter-spacing: -0.01em; }
+/* Emphasis inside a serif headline is italic. Never bold, never coloured. */
+.ax-h1 em, .ax-h2 em, .ax-h3 em { font-style: italic; }
+.ax-h1 + .ax-lead, .ax-h2 + .ax-lead { margin-top: var(--sp-4); }
+
+.ax-lead {
+  font-family: var(--font-text);
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  color: var(--ax-fg-muted);
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+
+/* --- Prose: long-form body copy --- */
+.ax-prose {
+  max-width: var(--measure);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ax-fg);
+  text-wrap: pretty;
+}
+.ax-prose > * + * { margin-top: var(--sp-4); }
+.ax-prose > * + .ax-h2, .ax-prose > * + h2 { margin-top: var(--sp-7); }
+.ax-prose > * + .ax-h3, .ax-prose > * + h3 { margin-top: var(--sp-6); }
+.ax-prose h2 { font-family: var(--font-display); font-size: 1.5rem; }
+.ax-prose h3 { font-family: var(--font-display); font-size: 1.25rem; }
+/* Links carry an ink underline. Oxblood is reserved for conversions. */
+.ax-prose a {
+  color: var(--ax-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--ax-fg-muted);
+  text-decoration-thickness: 1px;
+}
+.ax-prose a:hover { text-decoration-color: var(--ax-fg); text-decoration-thickness: 2px; }
+.ax-prose ul, .ax-prose ol { padding-left: 0; }
+.ax-prose li { position: relative; padding-left: var(--sp-5); }
+.ax-prose li + li { margin-top: var(--sp-2); }
+/* List marks are hairlines and mono numerals -- same language as the rules. */
+.ax-prose ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.72em;
+  width: 10px; height: 1px;
+  background: var(--ax-rule);
+}
+.ax-prose ol { counter-reset: ax-ol; }
+.ax-prose ol > li { counter-increment: ax-ol; }
+.ax-prose ol > li::before {
+  content: counter(ax-ol, decimal-leading-zero);
+  position: absolute;
+  left: 0; top: 0.18em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--ax-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Mono fact primitives reused by every component --- */
+.ax-label-mono, .ax-caption {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 1.35;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--ax-fg);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Section intro block: eyebrow + heading + lead, one rhythm everywhere. */
+.ax-head { margin-bottom: var(--sp-6); max-width: 46ch; }
+.ax-head--wide { max-width: 62ch; }
+.ax-head--center { margin-inline: auto; text-align: center; }
+.ax-head--center .ax-eyebrow { justify-content: center; }
+.ax-head--center .ax-lead { margin-inline: auto; }
+
+
+/* ==========================================================================
+   5. COMPONENTS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   5.1 Buttons -- the only saturated colour on a page is a conversion.
+   -------------------------------------------------------------------------- */
+.ax-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+  padding: 0.8125rem 1.375rem;
+  font-family: var(--font-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.ax-btn:hover  { transform: translateY(-1px); }   /* lift <= 2px, never bouncy */
+.ax-btn:active { transform: translateY(0); }
+.ax-btn[disabled],
+.ax-btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; transform: none; }
+
+/* Primary -- oxblood. White on #92003B is 9.1:1. */
+.ax-btn--primary {
+  background: var(--oxblood);
+  border-color: var(--oxblood);
+  color: #FFFFFF;
+}
+.ax-btn--primary:hover,
+.ax-btn--primary:focus-visible {
+  background: var(--oxblood-deep);
+  border-color: var(--oxblood-deep);
+  color: #FFFFFF;
+}
+
+/* Ghost -- hairline outline. The default for everything secondary. */
+.ax-btn--ghost { background: transparent; border-color: var(--rule); color: var(--ink); }
+.ax-btn--ghost:hover { border-color: var(--ink); background: var(--ink-a08); }
+.ax-on-ink .ax-btn--ghost,
+.ax-section--ink .ax-btn--ghost,
+.ax-hero .ax-btn--ghost { color: var(--chalk); border-color: var(--chalk-a38); }
+.ax-on-ink .ax-btn--ghost:hover,
+.ax-section--ink .ax-btn--ghost:hover,
+.ax-hero .ax-btn--ghost:hover { border-color: var(--chalk); background: var(--chalk-a12); }
+
+/* Solid ink -- for photography grounds, or when oxblood is already spent. */
+.ax-btn--ink { background: var(--ink); border-color: var(--ink); color: var(--chalk); }
+.ax-btn--ink:hover { background: #241F1B; border-color: #241F1B; }
+
+/* WhatsApp -- INK label on green. White on #25D366 is 2.0:1 and fails hard;
+   ink is 9.6:1. Do not "fix" this back to white. */
+.ax-btn--wa { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--ink); }
+.ax-btn--wa:hover { background: #1FBA59; border-color: #1FBA59; color: var(--ink); }
+
+/* Quiet mono text button. */
+.ax-btn--link {
+  min-height: 0;
+  padding: 0.25rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--ax-fg);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg);
+  background: transparent;
+}
+.ax-btn--link:hover { transform: none; }
+
+.ax-btn--lg { min-height: var(--tap-lg); padding: 1rem 1.75rem; font-size: 1rem; }
+.ax-btn--sm { min-height: var(--tap); padding: 0.625rem 1rem; font-size: 0.8125rem; }
+.ax-btn--block { display: flex; width: 100%; }
+/* Full width on phones, auto width from 480px (section 7). */
+.ax-btn--block-sm { display: flex; width: 100%; }
+
+.ax-btn__icon { flex: 0 0 auto; width: 1.125em; height: 1.125em; display: block; }
+/* Mono rider inside a button, e.g. "FROM RS 1,89,000" */
+.ax-btn__note {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  letter-spacing: var(--ls-mono);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+/* Mono caption UNDER a CTA, e.g. "NO OBLIGATION / REPLY IN 24H" */
+.ax-btn-note {
+  margin-top: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+
+/* Inline text link with a heavier underline. */
+.ax-link {
+  color: var(--ax-fg);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ax-fg-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+.ax-link:hover { text-decoration-color: var(--ax-fg); text-decoration-thickness: 2px; }
+
+/* Button row: stacked full-width on mobile, inline from 480px. */
+.ax-btnrow { display: grid; gap: var(--sp-3); }
+.ax-btnrow > .ax-btn { width: 100%; }
+
+
+/* --------------------------------------------------------------------------
+   5.2 .ax-specstrip -- the hairline mono band of four facts under the hero.
+   2x2 on mobile, 4-across from 768px. Dividers are borders (not gaps), so
+   the strip is correct on any ground with no helper class.
+   -------------------------------------------------------------------------- */
+.ax-specstrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--ax-rule);
+  border-left: 1px solid var(--ax-rule);
+}
+.ax-specstrip__item {
+  min-width: 0;
+  padding: var(--sp-4);
+  border-right: 1px solid var(--ax-rule);
+  border-bottom: 1px solid var(--ax-rule);
+}
+.ax-specstrip__label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  line-height: 1.3;
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-specstrip__value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--ax-fg);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  overflow-wrap: anywhere;   /* a long value wraps, never widens the page */
+}
+.ax-specstrip__unit {
+  margin-left: 0.35em;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+
+
+/* --------------------------------------------------------------------------
+   5.3 .ax-hero -- one full-bleed photograph, a scrim, a headline block.
+   <section class="ax-hero">
+     <img class="ax-hero__img" alt="...">
+     <div class="ax-hero__inner"> ... </div>
+   </section>
+   The photo must be a real <img> (alt text + priority loading), not a
+   CSS background. The ::after scrim guarantees AA over any photograph.
+   -------------------------------------------------------------------------- */
+.ax-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: 78vh;
+  max-height: 760px;
+  background: var(--ink);
+  color: var(--chalk);
+  overflow: hidden;
+  --ax-fg: var(--chalk);
+  --ax-fg-muted: #D6D3CE;
+  --ax-rule: var(--chalk-a24);
+}
+@supports (min-height: 1svh) { .ax-hero { min-height: 78svh; } }
+
+.ax-hero__img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+.ax-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgba(20, 17, 15, 0.88) 0%,
+    rgba(20, 17, 15, 0.74) 30%,
+    rgba(20, 17, 15, 0.40) 60%,
+    rgba(20, 17, 15, 0.18) 100%
+  );
+}
+.ax-hero__inner {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--wrap) + (var(--gutter) * 2));
+  margin-inline: auto;
+  padding: var(--sp-7) var(--gutter) var(--sp-6);
+}
+.ax-hero__title {
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: var(--ls-display);
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+.ax-hero__sub {
+  margin-top: var(--sp-4);
+  max-width: 46ch;
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: #E4E1DC;
+  text-wrap: pretty;
+}
+.ax-hero__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+.ax-hero__actions .ax-btn { width: 100%; }
+/* Mono credit line: "3BHK / KHARADI / INSTALLED IN 11 DAYS" */
+.ax-hero__credit {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--chalk-a24);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: #C6C2BB;
+  font-variant-numeric: tabular-nums;
+}
+.ax-hero--short { min-height: 52vh; }
+@supports (min-height: 1svh) { .ax-hero--short { min-height: 52svh; } }
+.ax-hero--flat::after {
+  background: linear-gradient(
+    to top,
+    rgba(20, 17, 15, 0.82) 0%,
+    rgba(20, 17, 15, 0.48) 55%,
+    rgba(20, 17, 15, 0.30) 100%
+  );
+}
+
+
+/* --------------------------------------------------------------------------
+   5.4 Cards -- separation by rule and space. No shadow, ever.
+   -------------------------------------------------------------------------- */
+.ax-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--sp-5);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  transition: border-color var(--t-base) var(--ease);
+}
+.ax-card--flat { background: transparent; border: 0; border-top: 1px solid var(--ax-rule); padding: var(--sp-5) 0 0; }
+.ax-card--pad-0 { padding: 0; }
+.ax-card__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.ax-card__body { margin-top: var(--sp-3); font-size: 0.9375rem; line-height: 1.6; color: var(--graphite); }
+
+/* Collection card: photo -> serif name -> italic character line -> mono band */
+.ax-card--collection { padding: 0; }
+.ax-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;              /* clips the photo only, never a focus ring */
+  background: var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.ax-card__media > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease);
+}
+.ax-card--collection:hover .ax-card__media > img { transform: scale(1.02); }
+.ax-card__inner { flex: 1 1 auto; padding: var(--sp-5); }
+.ax-card__name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+.ax-card__character {
+  margin-top: var(--sp-2);
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+.ax-card__meta {
+  margin-top: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+/* Mono guide-price band, hairline separated -- a measured fact, not a claim. */
+.ax-card__price {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ax-card__price-label {
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.ax-card__price-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* Whole-card click target -- exactly one .ax-card__link per card. */
+.ax-card__link { text-decoration: none; }
+.ax-card__link::after { content: ""; position: absolute; inset: 0; }
+.ax-card:has(.ax-card__link:hover) { border-color: var(--ink); }
+.ax-card:has(.ax-card__link:focus-visible) {
+  box-shadow: 0 0 0 2px var(--chalk), 0 0 0 4px var(--ink);
+}
+
+
+/* --------------------------------------------------------------------------
+   5.5 .ax-spectable -- mono spec / price table. Label left, value right.
+   ALWAYS wrap in .ax-scroll-x: the table carries a 320px min-width so the
+   columns stay legible, and the wrapper -- not the page -- does the scrolling.
+   -------------------------------------------------------------------------- */
+.ax-spectable {
+  width: 100%;
+  min-width: 320px;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ax-spectable caption {
+  caption-side: top;
+  text-align: left;
+  padding-bottom: var(--sp-3);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-spectable th,
+.ax-spectable td {
+  padding: 0.8125rem var(--sp-3);
+  border-bottom: 1px solid var(--ax-rule);
+  text-align: left;
+  vertical-align: baseline;
+}
+.ax-spectable th:first-child, .ax-spectable td:first-child { padding-left: 0; }
+.ax-spectable th:last-child,  .ax-spectable td:last-child  { padding-right: 0; }
+.ax-spectable thead th {
+  padding-block: var(--sp-2);
+  border-bottom-color: var(--ax-fg);
+  font-size: var(--fs-nano);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+  white-space: nowrap;
+}
+.ax-spectable tbody th {
+  width: 46%;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-spectable td { color: var(--ax-fg); font-weight: 500; }
+/* Right-aligned numeric cell. */
+.ax-spectable__num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.ax-spectable__wrap { white-space: normal; }
+/* Total row: a heavier rule, never a coloured fill. */
+.ax-spectable tfoot th,
+.ax-spectable tfoot td {
+  padding-top: var(--sp-4);
+  border-top: 2px solid var(--ax-fg);
+  border-bottom: 0;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg);
+}
+.ax-spectable__note {
+  margin-top: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+
+/* Div/dl variant for when a <table> is awkward inside Elementor. */
+.ax-spectable--rows { display: block; min-width: 0; border-top: 1px solid var(--ax-rule); }
+.ax-spectable__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: 0.8125rem 0;
+  border-bottom: 1px solid var(--ax-rule);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+}
+.ax-spectable__key {
+  min-width: 0;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  font-size: var(--fs-micro);
+  color: var(--ax-fg-muted);
+}
+.ax-spectable__val {
+  text-align: right;
+  font-weight: 600;
+  color: var(--ax-fg);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+
+/* --------------------------------------------------------------------------
+   5.6 .ax-proof -- a claim with an olive tick + optional negative clause.
+   The tick is drawn in CSS: no icon font, no SVG request, nothing to fail.
+   -------------------------------------------------------------------------- */
+.ax-prooflist { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; border-top: 1px solid var(--ax-rule); }
+.ax-proof {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--ax-rule);
+}
+.ax-proof__tick { position: relative; width: 1.25rem; height: 1.25rem; margin-top: 0.15em; }
+.ax-proof__tick::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: 1px;
+  width: 7px; height: 12px;
+  border: 2px solid var(--olive);
+  border-top: 0;
+  border-left: 0;
+  transform: rotate(42deg);
+}
+.ax-proof__text { min-width: 0; font-size: 0.9375rem; line-height: 1.55; color: var(--ax-fg); text-wrap: pretty; }
+/* The negative clause -- "NEVER OUTSOURCED" -- mono, so it reads as fact. */
+.ax-proof__never {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-proof__never::before { content: "\2014"; margin-right: 0.5em; color: var(--ax-rule); }
+
+
+/* --------------------------------------------------------------------------
+   5.7 .ax-steps -- numbered process, mono numerals, mono timing captions.
+   Numbers are graphite, not oxblood: a process step is not a conversion.
+   -------------------------------------------------------------------------- */
+.ax-steps { counter-reset: ax-step; border-top: 1px solid var(--ax-rule); }
+.ax-step {
+  counter-increment: ax-step;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--ax-rule);
+}
+.ax-step::before,
+.ax-step__num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: var(--ls-mono);
+  color: var(--ax-fg-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.28em;
+}
+.ax-step::before { content: counter(ax-step, decimal-leading-zero); }
+/* Supplying your own .ax-step__num? Add .ax-step--manual or you get two. */
+.ax-step--manual::before { content: none; }
+.ax-step__body { min-width: 0; }
+.ax-step__title {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ax-fg);
+}
+.ax-step__text {
+  margin-top: var(--sp-2);
+  max-width: 56ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ax-fg-muted);
+  text-wrap: pretty;
+}
+.ax-step__time {
+  display: inline-block;
+  margin-top: var(--sp-3);
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--ax-rule);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* --------------------------------------------------------------------------
+   5.8 .ax-estimator -- the conversion engine.
+   Mobile: thumb-sized chips, and a live price panel that stays docked to the
+   bottom of the viewport while the options scroll past it. That docking is
+   the single most important interaction in the kit.
+   Desktop (1024px, .ax-estimator--split): options left, price rail right.
+   -------------------------------------------------------------------------- */
+.ax-estimator {
+  position: relative;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-4) 0;
+  --ax-ground: var(--sheet);
+  --ax-rule: var(--rule);
+}
+.ax-estimator__head { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--rule); }
+.ax-estimator__title {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+.ax-estimator__body { padding-block: var(--sp-5); }
+.ax-estimator__group + .ax-estimator__group {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--rule);
+}
+.ax-estimator__q {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.ax-estimator__q-index { font-variant-numeric: tabular-nums; color: var(--graphite); opacity: 0.7; }
+.ax-estimator__foot {
+  padding-block: var(--sp-4);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  line-height: 1.6;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+/* --- Chips. 48px tall, 8px gaps, wrap freely.
+       Selection is recognised four ways so a pure-CSS radio group, a JS
+       toggle and an ARIA toggle button all work with no extra CSS. --- */
+.ax-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.ax-chips--cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
+
+.ax-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-md);
+  padding: 0.625rem 0.9375rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  appearance: none;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+}
+.ax-chip:hover { border-color: var(--ink); }
+/* Native radio/checkbox stays in the DOM (form-native + keyboard) but hidden. */
+.ax-chip__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Pressed / selected -- choosing IS converting, so this state is oxblood. */
+.ax-chip.is-selected,
+.ax-chip[aria-pressed="true"],
+.ax-chip[data-selected="true"],
+.ax-chip:has(input:checked) {
+  background: var(--oxblood);
+  border-color: var(--oxblood);
+  color: #FFFFFF;
+}
+.ax-chip.is-selected:hover,
+.ax-chip[aria-pressed="true"]:hover,
+.ax-chip[data-selected="true"]:hover,
+.ax-chip:has(input:checked):hover {
+  background: var(--oxblood-deep);
+  border-color: var(--oxblood-deep);
+}
+/* Keyboard focus lands on the hidden input -- paint the ring on the chip. */
+.ax-chip:has(input:focus-visible) {
+  box-shadow: 0 0 0 2px var(--chalk), 0 0 0 4px var(--ink);
+}
+.ax-root .ax-chip input:focus-visible { box-shadow: none; outline: none; }
+.ax-chip[disabled],
+.ax-chip[aria-disabled="true"] { opacity: 0.4; pointer-events: none; }
+/* Optional price delta inside a chip, e.g. "+18,000" */
+.ax-chip__delta {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Stepper for running feet / linear measurements --- */
+.ax-stepper {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.ax-stepper__btn {
+  width: var(--tap-md);
+  min-height: var(--tap-md);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  line-height: 1;
+  color: var(--ink);
+  background: transparent;
+  transition: background-color var(--t-fast) var(--ease);
+}
+.ax-stepper__btn:hover { background: var(--ink-a08); }
+.ax-stepper__value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5rem;
+  padding-inline: var(--sp-2);
+  border-inline: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* --- The live price dock --- */
+.ax-price {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;              /* on a 320px screen the CTA drops below */
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-4);
+  margin-inline: calc(var(--sp-4) * -1);
+  padding: var(--sp-4);
+  padding-bottom: calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  background: var(--sheet);
+  border-top: 2px solid var(--ink);
+}
+.ax-price__body { flex: 1 1 11rem; min-width: 0; }
+.ax-price__label {
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+/* The one number that wears the display serif. 8.3:1 on sheet. */
+.ax-price__figure {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-price);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--oxblood);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1;
+  transition: color var(--t-base) var(--ease);
+}
+.ax-price__sub {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
+}
+.ax-price__cta { flex: 0 1 auto; margin-left: auto; }
+.ax-price__cta .ax-btn { white-space: nowrap; }
+/* Value-updated flash: olive micro-signal for ~220ms, then back to oxblood.
+   Toggle .is-updating on .ax-price around the JS count-up. Olive is 3.5:1
+   on white -- legal here only because the figure is large text. */
+.ax-price.is-updating .ax-price__figure,
+.ax-price[data-state="updated"] .ax-price__figure { color: var(--olive); }
+/* The dock must rest ON TOP of the phone furniture, never under it. */
+.ax-root.ax-has-stickybar .ax-price {
+  bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--sp-4);
+}
+.ax-root.ax-has-stickybar.ax-has-pricestrip .ax-price {
+  bottom: calc(var(--bar-h) + var(--strip-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* --- Itemised INCLUDED / NOT INCLUDED --- */
+.ax-included {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin-top: var(--sp-5);
+  border-top: 1px solid var(--rule);
+}
+.ax-included__col { min-width: 0; padding: var(--sp-5) 0; border-bottom: 1px solid var(--rule); }
+.ax-included__title {
+  margin-bottom: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.ax-included__list { font-size: 0.875rem; line-height: 1.5; }
+.ax-included__list li { position: relative; padding-left: 1.5rem; padding-block: 0.375rem; color: var(--ink); }
+.ax-included__list li + li { border-top: 1px solid var(--rule); }
+/* Included: the olive tick (the second and last olive on the page). */
+.ax-included--in .ax-included__list li::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: 0.72em;
+  width: 6px; height: 10px;
+  border: 2px solid var(--olive);
+  border-top: 0;
+  border-left: 0;
+  transform: rotate(42deg);
+}
+/* Not included: a neutral em rule. Never a red cross -- red means error. */
+.ax-included--out .ax-included__list li { color: var(--graphite); }
+.ax-included--out .ax-included__list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1.05em;
+  width: 12px; height: 1px;
+  background: var(--graphite);
+}
+
+
+/* --------------------------------------------------------------------------
+   5.9 Forms -- ours AND Contact Form 7's markup, all scoped under .ax-root.
+   Drop a raw CF7 shortcode inside .ax-form--card and it inherits everything.
+   -------------------------------------------------------------------------- */
+.ax-form { display: block; }
+.ax-form--card {
+  padding: var(--sp-5);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  --ax-ground: var(--sheet);
+  --ax-rule: var(--rule);
+}
+.ax-form__title {
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+.ax-form__note {
+  margin-bottom: var(--sp-5);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.ax-form__fineprint {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  color: var(--graphite);
+}
+
+.ax-field { min-width: 0; margin-bottom: var(--sp-4); }
+.ax-field:last-child { margin-bottom: 0; }
+
+.ax-label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+/* Required marker is ink, not oxblood: a label is not a conversion. */
+.ax-req { margin-left: 0.25em; color: var(--ink); }
+
+/* One control rule for our fields and for CF7's generated inputs.
+   :not([type=submit]) keeps the CF7 submit out of the text-field styling. */
+.ax-input,
+.ax-select,
+.ax-textarea,
+.ax-root .ax-field input[type="text"],
+.ax-root .ax-field input[type="email"],
+.ax-root .ax-field input[type="tel"],
+.ax-root .ax-field input[type="number"],
+.ax-root .ax-field input[type="url"],
+.ax-root .ax-field input[type="date"],
+.ax-root .ax-field input[type="search"],
+.ax-root .ax-field textarea,
+.ax-root .ax-field select,
+.ax-root input.wpcf7-form-control:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+.ax-root textarea.wpcf7-form-control,
+.ax-root textarea.wpcf7-textarea,
+.ax-root select.wpcf7-select,
+.ax-root select.wpcf7-form-control {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: var(--tap-lg);
+  padding: 0.75rem 0.875rem;
+  font-family: var(--font-text);
+  font-size: 16px;              /* load-bearing: stops iOS/Android zoom */
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.ax-input::placeholder,
+.ax-textarea::placeholder,
+.ax-root .ax-field input::placeholder,
+.ax-root .ax-field textarea::placeholder,
+.ax-root .wpcf7-form-control::placeholder { color: var(--graphite); opacity: 1; }
+
+.ax-input:hover, .ax-select:hover, .ax-textarea:hover,
+.ax-root .ax-field input:hover,
+.ax-root .ax-field select:hover,
+.ax-root .ax-field textarea:hover,
+.ax-root input.wpcf7-form-control:hover,
+.ax-root select.wpcf7-select:hover { border-color: var(--graphite); }
+
+.ax-input:focus, .ax-select:focus, .ax-textarea:focus,
+.ax-root .ax-field input:focus,
+.ax-root .ax-field select:focus,
+.ax-root .ax-field textarea:focus,
+.ax-root input.wpcf7-form-control:focus,
+.ax-root textarea.wpcf7-form-control:focus,
+.ax-root select.wpcf7-select:focus {
+  border-color: var(--ink);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--chalk), 0 0 0 4px var(--ink);
+}
+
+/* Numbers a person types are still facts: mono + tabular. */
+.ax-input--num,
+.ax-root .ax-field input[type="tel"],
+.ax-root .ax-field input[type="number"] {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ax-textarea,
+.ax-root .ax-field textarea,
+.ax-root textarea.wpcf7-form-control { min-height: 7rem; line-height: 1.55; resize: vertical; }
+
+/* Select caret drawn with gradients -- no image request, no icon font. */
+.ax-select,
+.ax-root .ax-field select,
+.ax-root select.wpcf7-select,
+.ax-root select.wpcf7-form-control {
+  padding-right: 2.5rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--graphite) 50%),
+    linear-gradient(135deg, var(--graphite) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% + 1px),
+    calc(100% - 14px) calc(50% + 1px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.ax-help {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+
+/* Errors -- alert red (7.3:1 on sheet) AND a leading "!" AND a 2px left
+   marker AND a position under the field. Colour is never the only signal
+   separating an error from the oxblood CTA. */
+.ax-error,
+.ax-root .wpcf7-not-valid-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  margin-top: var(--sp-2);
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--alert);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--alert);
+}
+.ax-error::before,
+.ax-root .wpcf7-not-valid-tip::before { content: "!"; font-weight: 700; }
+
+.ax-field.is-invalid .ax-input,
+.ax-field.is-invalid .ax-select,
+.ax-field.is-invalid .ax-textarea,
+.ax-input.is-error, .ax-select.is-error, .ax-textarea.is-error,
+.ax-root .wpcf7-not-valid { border-color: var(--alert); border-width: 2px; }
+
+/* CF7 response bar */
+.ax-root .wpcf7-response-output {
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--chalk);
+  border: 1px solid var(--rule);
+  border-left-width: 3px;
+  border-left-color: var(--ink);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.ax-root form.invalid .wpcf7-response-output,
+.ax-root form.failed .wpcf7-response-output,
+.ax-root form.aborted .wpcf7-response-output { border-left-color: var(--alert); color: var(--alert); }
+.ax-root form.sent .wpcf7-response-output { border-left-color: var(--olive); color: var(--ink); }
+
+/* CF7 layout hygiene: kill its stray paragraph spacing, keep wraps neutral. */
+.ax-root .wpcf7-form-control-wrap { display: block; width: 100%; }
+.ax-root .wpcf7 form p { margin: 0; }
+.ax-root .wpcf7-spinner { display: inline-block; margin-left: var(--sp-3); }
+.ax-root .wpcf7-list-item { margin: 0 var(--sp-4) var(--sp-2) 0; }
+.ax-root .wpcf7-list-item input[type="checkbox"],
+.ax-root .wpcf7-list-item input[type="radio"] { width: 1.25rem; height: 1.25rem; accent-color: var(--ink); }
+
+/* CF7 submit inherits the primary CTA exactly. Must come after the generic
+   control rule so equal-specificity selectors resolve in its favour. */
+.ax-root input.wpcf7-submit,
+.ax-root button.wpcf7-submit,
+.ax-root .ax-form__submit {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-lg);
+  padding: 1rem 1.75rem;
+  font-family: var(--font-text);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  background: var(--oxblood);
+  border: 1px solid var(--oxblood);
+  border-radius: var(--radius);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.ax-root input.wpcf7-submit:hover,
+.ax-root button.wpcf7-submit:hover,
+.ax-root .ax-form__submit:hover { background: var(--oxblood-deep); border-color: var(--oxblood-deep); }
+
+/* Consent / checkbox row -- 44px tall so it is a legal hit target. */
+.ax-check {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  min-height: var(--tap);
+  padding-block: var(--sp-2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--graphite);
+  cursor: pointer;
+}
+.ax-check input[type="checkbox"] {
+  width: 1.25rem; height: 1.25rem;
+  margin-top: 0.1em;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+/* Honeypot must never occupy space. */
+.ax-hp,
+.ax-root .wpcf7-form-control-wrap[data-name="honeypot"] {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px; overflow: hidden;
+}
+
+
+/* --------------------------------------------------------------------------
+   5.10 .ax-quote -- pull-quote with a named attribution line.
+   The top rule is ink: a testimonial is not a conversion element.
+   -------------------------------------------------------------------------- */
+.ax-quote {
+  max-width: 34ch;
+  padding-top: var(--sp-5);
+  border-top: 2px solid var(--ax-fg);
+}
+.ax-quote--wide { max-width: 48ch; }
+.ax-quote__text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.25rem, 3.4vw, 1.75rem);
+  line-height: 1.35;
+  letter-spacing: -0.008em;
+  color: var(--ax-fg);
+  text-wrap: pretty;
+}
+.ax-quote__text::before { content: "\201C"; }
+.ax-quote__text::after  { content: "\201D"; }
+/* "ROHIT S. / 3BHK / BANER" -- slashes, no avatars, no stars. */
+.ax-quote__attr {
+  display: block;
+  margin-top: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-quote__attr strong { color: var(--ax-fg); font-weight: 600; }
+.ax-quote__sep { margin-inline: 0.5em; color: var(--ax-rule); }
+
+
+/* --------------------------------------------------------------------------
+   5.11 .ax-faq -- <details>/<summary>, hairline separated, +/- affordance,
+   zero JavaScript.
+   -------------------------------------------------------------------------- */
+.ax-faq { border-top: 1px solid var(--ax-rule); }
+.ax-faq__item { border-bottom: 1px solid var(--ax-rule); }
+.ax-faq__q {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  min-height: var(--tap);
+  padding: var(--sp-4) 0;
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--font-text);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ax-fg);
+  text-wrap: pretty;
+  -webkit-tap-highlight-color: transparent;
+}
+.ax-faq__q::-webkit-details-marker { display: none; }
+.ax-faq__q::marker { content: ""; }
+/* The +/- is two hairlines -- same language as every other divider. */
+.ax-faq__q::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-top: 0.3em;
+  background:
+    linear-gradient(var(--ax-fg), var(--ax-fg)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--ax-fg), var(--ax-fg)) center / 1.5px 100% no-repeat;
+  transition: transform var(--t-base) var(--ease);
+}
+.ax-faq__item[open] > .ax-faq__q::after {
+  background: linear-gradient(var(--ax-fg), var(--ax-fg)) center / 100% 1.5px no-repeat;
+  transform: rotate(180deg);
+}
+.ax-faq__a {
+  max-width: var(--measure);
+  padding: 0 2.5rem var(--sp-5) 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ax-fg-muted);
+  text-wrap: pretty;
+}
+.ax-faq__a > * + * { margin-top: var(--sp-3); }
+
+
+/* --------------------------------------------------------------------------
+   5.12 .ax-rating -- the Google rating block. Stars are text glyphs so
+   nothing can fail to load, and they are ink: this page has exactly one
+   saturated colour and it is not gold.
+   -------------------------------------------------------------------------- */
+.ax-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding-block: var(--sp-4);
+  border-top: 1px solid var(--ax-rule);
+  border-bottom: 1px solid var(--ax-rule);
+}
+.ax-rating__figure {
+  font-family: var(--font-mono);
+  font-size: clamp(2rem, 7vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ax-fg);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ax-rating__meta { min-width: 0; }
+.ax-rating__stars {
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  color: var(--ax-fg);
+  white-space: nowrap;
+}
+.ax-rating__empty { color: var(--ax-rule); }
+.ax-rating__count {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ax-rating--stacked { flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
+
+
+/* --------------------------------------------------------------------------
+   5.13 .ax-stickybar -- phone-only bottom action bar, plus the slim price
+   CTA strip that sits directly above it. Both retire at 768px.
+   -------------------------------------------------------------------------- */
+.ax-stickybar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--chalk-a24);      /* the 1px gaps become dividers */
+  border-top: 1px solid var(--ink);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transform: translateY(0);
+  transition: transform var(--t-base) var(--ease);
+}
+.ax-stickybar--3 { grid-template-columns: repeat(3, 1fr); }
+.ax-stickybar.is-hidden { transform: translateY(110%); }
+.ax-stickybar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--bar-h);
+  padding: 0.75rem 0.5rem;
+  border: 0;
+  font-family: var(--font-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--chalk);
+  background: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.ax-stickybar__btn .ax-btn__icon { width: 1.125rem; height: 1.125rem; }
+/* Call is a conversion, so it may wear the oxblood. */
+.ax-stickybar__btn--call { background: var(--oxblood); color: #FFFFFF; }
+.ax-stickybar__btn--call:active { background: var(--oxblood-deep); }
+.ax-stickybar__btn--wa { background: var(--whatsapp); color: var(--ink); }
+.ax-stickybar__btn--wa:active { background: #1FBA59; }
+
+/* Slim live-price strip. If .ax-price is also on the page, hide one of
+   them -- two live figures on one screen is a bug, not a feature. */
+.ax-pricestrip {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
+  z-index: 59;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: var(--strip-h);
+  padding: 0.375rem var(--gutter);
+  background: var(--ink);
+  color: var(--chalk);
+  border-top: 1px solid var(--chalk-a24);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  transform: translateY(0);
+  transition: transform var(--t-base) var(--ease);
+}
+.ax-pricestrip.is-hidden { transform: translateY(200%); }
+.ax-pricestrip__label { color: #B9B6B0; min-width: 0; }
+.ax-pricestrip__value {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ax-pricestrip__cta {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: 0.75rem;
+  margin-right: calc(var(--gutter) * -0.5);
+  font-weight: 700;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-bottom: 2px solid var(--oxblood);
+}
+
+/* Reserve room so the fixed furniture never covers the last element. */
+.ax-root.ax-has-stickybar { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px)); }
+.ax-root.ax-has-stickybar.ax-has-pricestrip {
+  padding-bottom: calc(var(--bar-h) + var(--strip-h) + env(safe-area-inset-bottom, 0px));
+}
+
+
+/* --------------------------------------------------------------------------
+   5.14 .ax-media -- aspect-ratio boxes, cover fit, mono captions.
+   -------------------------------------------------------------------------- */
+.ax-media { position: relative; display: block; margin: 0; min-width: 0; }
+.ax-media__frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--rule);
+  border-radius: var(--radius);
+}
+.ax-media__frame > img,
+.ax-media__frame > video,
+.ax-media__frame > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+.ax-media--43  .ax-media__frame { aspect-ratio: 4 / 3; }
+.ax-media--169 .ax-media__frame { aspect-ratio: 16 / 9; }
+.ax-media--34  .ax-media__frame { aspect-ratio: 3 / 4; }
+.ax-media--11  .ax-media__frame { aspect-ratio: 1 / 1; }
+.ax-media__caption {
+  display: block;
+  max-width: 52ch;
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--ax-rule);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  line-height: 1.6;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ax-media__caption b { color: var(--ax-fg); font-weight: 600; }
+/* Corner spec tag over a photograph: "PLATE 04 / L-SHAPE / 14 RFT" */
+.ax-media__tag {
+  position: absolute;
+  left: 0; bottom: 0;
+  padding: 0.375rem 0.625rem;
+  background: var(--ink-a86);
+  color: var(--chalk);
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+/* Old-Android fallback for browsers without aspect-ratio. */
+@supports not (aspect-ratio: 4 / 3) {
+  .ax-media__frame { height: 0; padding-bottom: 75%; }
+  .ax-media--169 .ax-media__frame { padding-bottom: 56.25%; }
+  .ax-media--34  .ax-media__frame { padding-bottom: 133.33%; }
+  .ax-media--11  .ax-media__frame { padding-bottom: 100%; }
+}
+
+
+/* ==========================================================================
+   6. UTILITIES
+   ========================================================================== */
+
+/* --- Type --- */
+.ax-mono {
+  font-family: var(--font-mono);
+  letter-spacing: var(--ls-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ax-mono--label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-nano);
+  letter-spacing: var(--ls-mono-wide);
+  text-transform: uppercase;
+  color: var(--ax-fg-muted);
+}
+.ax-serif  { font-family: var(--font-display); letter-spacing: -0.012em; }
+.ax-tabnum { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1; }
+.ax-upper  { text-transform: uppercase; letter-spacing: var(--ls-mono); }
+.ax-nowrap { white-space: nowrap; }
+.ax-balance { text-wrap: balance; }
+.ax-measure { max-width: var(--measure); }
+.ax-center { text-align: center; }
+.ax-right  { text-align: right; }
+.ax-muted  { color: var(--ax-fg-muted); }
+.ax-ink    { color: var(--ax-fg); }
+.ax-ox     { color: var(--oxblood); }   /* conversion figures only */
+/* There is deliberately no olive text utility: olive fails AA as text. */
+
+/* --- Spacing scale --- */
+.ax-mt-0 { margin-top: 0; }
+.ax-mt-1 { margin-top: var(--sp-1); }
+.ax-mt-2 { margin-top: var(--sp-2); }
+.ax-mt-3 { margin-top: var(--sp-3); }
+.ax-mt-4 { margin-top: var(--sp-4); }
+.ax-mt-5 { margin-top: var(--sp-5); }
+.ax-mt-6 { margin-top: var(--sp-6); }
+.ax-mt-7 { margin-top: var(--sp-7); }
+.ax-mt-8 { margin-top: var(--sp-8); }
+.ax-mb-0 { margin-bottom: 0; }
+.ax-mb-2 { margin-bottom: var(--sp-2); }
+.ax-mb-3 { margin-bottom: var(--sp-3); }
+.ax-mb-4 { margin-bottom: var(--sp-4); }
+.ax-mb-5 { margin-bottom: var(--sp-5); }
+.ax-mb-6 { margin-bottom: var(--sp-6); }
+.ax-mb-7 { margin-bottom: var(--sp-7); }
+.ax-pt-5 { padding-top: var(--sp-5); }
+.ax-pb-5 { padding-bottom: var(--sp-5); }
+
+/* --- Rules --- */
+.ax-rule-t { border-top: 1px solid var(--ax-rule); }
+.ax-rule-b { border-bottom: 1px solid var(--ax-rule); }
+.ax-rule-strong { border-top: 2px solid var(--ax-fg); }
+.ax-hairline { height: 1px; margin: 0; border: 0; background: var(--ax-rule); }
+
+/* --- Overflow safety: wide content scrolls inside itself, never the page --- */
+.ax-scroll-x {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+/* Horizontal snap rail on mobile; becomes a grid from 768px. */
+.ax-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: var(--sp-4);
+  padding-inline: var(--gutter);
+  margin-inline: calc(var(--gutter) * -1);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.ax-rail > * { scroll-snap-align: start; min-width: 0; }
+
+/* --- Visibility --- */
+.ax-hide-sm { display: none; }    /* hidden below 768px */
+.ax-hide-lg { display: block; }   /* hidden from 768px  */
+.ax-sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Scroll reveal. Content is VISIBLE by default; it only hides once an
+       inline script adds .ax-js to .ax-root, so a blocked or broken script
+       can never leave a blank page. Then toggle .is-visible with an
+       IntersectionObserver. --- */
+.ax-reveal { opacity: 1; transform: none; }
+.ax-root.ax-js .ax-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--t-reveal) var(--ease), transform var(--t-reveal) var(--ease);
+}
+.ax-root.ax-js .ax-reveal.is-visible { opacity: 1; transform: none; }
+.ax-root.ax-js .ax-reveal--d1 { transition-delay: 60ms; }
+.ax-root.ax-js .ax-reveal--d2 { transition-delay: 120ms; }
+.ax-root.ax-js .ax-reveal--d3 { transition-delay: 180ms; }
+
+
+/* ==========================================================================
+   7. RESPONSIVE -- mobile is the base. min-width only, no max-width overrides
+      of layout. Breakpoints: 480 / 640 / 768 / 1024 / 1280.
+   ========================================================================== */
+
+/* ---- >= 480px: stacked CTAs go inline ---- */
+@media (min-width: 480px) {
+  .ax-btn--block-sm { display: inline-flex; width: auto; }
+  .ax-btnrow { grid-auto-flow: column; grid-auto-columns: max-content; align-items: center; }
+  .ax-btnrow > .ax-btn { width: auto; }
+  .ax-hero__actions { flex-direction: row; flex-wrap: wrap; }
+  .ax-hero__actions .ax-btn { width: auto; }
+  .ax-rail { grid-auto-columns: 56%; }
+}
+
+/* ---- >= 640px ---- */
+@media (min-width: 640px) {
+  .ax-root { --gutter: 28px; }
+  .ax-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ax-chips--cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ax-form--card { padding: var(--sp-6); }
+  .ax-formgrid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+}
+
+/* ---- >= 768px: tablet. Desktop body size, specstrip goes 4-across,
+        the phone furniture retires. ---- */
+@media (min-width: 768px) {
+  .ax-root { --gutter: 32px; --fs-body: 18px; --lh-body: 1.7; }
+  .ax-root { font-size: 18px; line-height: 1.7; }
+
+  .ax-hide-sm { display: block; }
+  .ax-hide-lg { display: none; }
+
+  .ax-specstrip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ax-specstrip__item { padding: var(--sp-5) var(--sp-4); }
+  .ax-specstrip__value { font-size: 1.25rem; }
+
+  .ax-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ax-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ax-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .ax-hero { min-height: 72vh; }
+  .ax-hero__inner { padding-block: var(--sp-8) var(--sp-7); }
+  .ax-head { margin-bottom: var(--sp-7); }
+
+  .ax-steps--2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-6); }
+
+  .ax-included { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-6); }
+  .ax-included__col + .ax-included__col { padding-left: var(--sp-6); border-left: 1px solid var(--rule); }
+
+  .ax-estimator { padding: var(--sp-6) var(--sp-6) 0; }
+  .ax-price { margin-inline: calc(var(--sp-6) * -1); padding-inline: var(--sp-6); }
+
+  .ax-root input.wpcf7-submit,
+  .ax-root button.wpcf7-submit,
+  .ax-root .ax-form__submit { display: inline-flex; width: auto; }
+
+  .ax-rating__figure { font-size: 3rem; }
+
+  /* Phone-only furniture retires; the dock returns to the container bottom. */
+  .ax-stickybar, .ax-pricestrip { display: none; }
+  .ax-root.ax-has-stickybar,
+  .ax-root.ax-has-stickybar.ax-has-pricestrip { padding-bottom: 0; }
+  .ax-root.ax-has-stickybar .ax-price,
+  .ax-root.ax-has-stickybar.ax-has-pricestrip .ax-price { bottom: 0; }
+
+  .ax-rail {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-columns: auto;
+    overflow: visible;
+    scroll-snap-type: none;
+    padding-inline: 0;
+    margin-inline: 0;
+  }
+}
+@supports (min-height: 1svh) {
+  @media (min-width: 768px) { .ax-hero { min-height: 72svh; } }
+}
+
+/* ---- >= 1024px: desktop ---- */
+@media (min-width: 1024px) {
+  .ax-root { --gutter: 40px; --section-y: clamp(4rem, 6vw, 7rem); }
+
+  .ax-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* The signature spread: photograph one side, mono facts the other. */
+  .ax-grid--split { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-7); align-items: center; }
+  .ax-grid--split-reverse > :first-child { order: 2; }
+  .ax-grid--sidebar { grid-template-columns: minmax(0, 1fr) 380px; gap: var(--sp-7); align-items: start; }
+  .ax-grid--sidebar-left { grid-template-columns: 320px minmax(0, 1fr); gap: var(--sp-7); align-items: start; }
+
+  .ax-hero { min-height: 82vh; align-items: center; }
+  .ax-hero__title { max-width: 14ch; }
+
+  .ax-chips--cols { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  /* Estimator becomes a two-column instrument: options + a sticky rail. */
+  .ax-estimator--split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 0;
+    padding: 0;
+  }
+  .ax-estimator--split .ax-estimator__main { min-width: 0; padding: var(--sp-6); }
+  .ax-estimator--split .ax-estimator__side { align-self: stretch; padding: var(--sp-6); border-left: 1px solid var(--rule); }
+  .ax-estimator--split .ax-price {
+    position: sticky;
+    top: var(--sp-5);
+    bottom: auto;
+    display: block;
+    margin-inline: 0;
+    padding: 0 0 var(--sp-5);
+    border-top: 0;
+    border-bottom: 2px solid var(--ink);
+  }
+  .ax-estimator--split .ax-price__figure { font-size: 2.75rem; }
+  .ax-estimator--split .ax-price__cta { margin-top: var(--sp-4); }
+  .ax-estimator--split .ax-price__cta .ax-btn { display: flex; width: 100%; }
+
+  .ax-step { grid-template-columns: 3.5rem minmax(0, 1fr) 12rem; column-gap: var(--sp-6); }
+  .ax-step__time { margin-top: 0; justify-self: end; align-self: start; text-align: right; }
+
+  .ax-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ax-spectable { font-size: 0.875rem; }
+  .ax-faq__q { font-size: 1.0625rem; padding-block: var(--sp-5); }
+  .ax-card__name { font-size: 1.5rem; }
+}
+@supports (min-height: 1svh) {
+  @media (min-width: 1024px) { .ax-hero { min-height: 82svh; } }
+}
+
+/* ---- >= 1280px ---- */
+@media (min-width: 1280px) {
+  .ax-grid--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .ax-quote__text { font-size: 2rem; }
+}
+
+/* ---- Short landscape viewports: never let the hero eat the whole screen.
+        Keyed to height, so it cannot disturb the mobile-first width cascade. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .ax-hero { min-height: 460px; max-height: none; }
+  .ax-hero__inner { padding-block: var(--sp-6) var(--sp-5); }
+}
+
+
+/* ==========================================================================
+   8. MOTION, FORCED COLOURS, PRINT
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-root *,
+  .ax-root *::before,
+  .ax-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ax-root.ax-js .ax-reveal { opacity: 1 !important; transform: none !important; }
+  .ax-btn:hover { transform: none; }
+  .ax-card--collection:hover .ax-card__media > img { transform: none; }
+  .ax-rail { scroll-snap-type: none; }
+}
+
+@media (forced-colors: active) {
+  .ax-root .ax-btn,
+  .ax-root .ax-chip,
+  .ax-root .ax-input,
+  .ax-root .ax-select,
+  .ax-root .ax-textarea,
+  .ax-root .ax-stepper { border: 1px solid ButtonBorder; }
+  .ax-root .ax-chip.is-selected,
+  .ax-root .ax-chip[aria-pressed="true"],
+  .ax-root .ax-chip[data-selected="true"],
+  .ax-root .ax-chip:has(input:checked) {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+  .ax-root :focus-visible { outline: 3px solid Highlight; outline-offset: 2px; box-shadow: none; }
+  .ax-hero::after { background: none; }
+}
+
+@media print {
+  .ax-root { background: #FFFFFF; color: #000000; font-size: 11pt; overflow: visible; }
+  .ax-stickybar,
+  .ax-pricestrip,
+  .ax-hero__actions,
+  .ax-chips,
+  .ax-btn { display: none !important; }
+  .ax-section { padding-block: 12pt; }
+  .ax-hero { min-height: 0; max-height: none; }
+  .ax-hero::after { background: none; }
+  .ax-spectable { font-size: 9pt; }
+  .ax-scroll-x, .ax-rail { overflow: visible; }
+  .ax-price { position: static; }
+  .ax-price__figure { color: #000000; }
+  .ax-card, .ax-estimator, .ax-form--card { border-color: #000000; }
+  .ax-faq__item { break-inside: avoid; }
+  .ax-faq__a { display: block; }
+}

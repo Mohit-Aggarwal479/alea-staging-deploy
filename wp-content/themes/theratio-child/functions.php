@@ -761,10 +761,13 @@ add_filter( 'litespeed_ucss_whitelist', function ( $list ) {
  * rollout is page-by-page and instantly reversible (empty the map).
  * ===================================================================== */
 
-/** Path => template file in alea/. Filled in as pages are built & approved. */
+/**
+ * Path => array( file, title, desc ). Filled in as pages are built & approved.
+ * Works for existing WP pages AND brand-new URLs (router forces 200 below).
+ */
 function alea_redesign_map() {
 	return apply_filters( 'alea_redesign_map', array(
-		// '/modular-kitchen/' => 'page-category.php',
+		// '/modular-kitchen/' => array( 'file' => 'page-category.php', 'title' => '...', 'desc' => '...' ),
 	) );
 }
 
@@ -775,24 +778,65 @@ function alea_current_path() {
 	return '/' . trim( $path, '/' ) . ( '/' === $path ? '' : '/' );
 }
 
-add_filter( 'template_include', function ( $template ) {
-	if ( is_admin() || is_feed() || is_embed() ) {
-		return $template;
+/** Resolve the current request against the map (once). */
+function alea_redesign_entry() {
+	static $entry = null, $done = false;
+	if ( $done ) {
+		return $entry;
 	}
-	// Never hijack the Elementor editor / preview.
-	if ( isset( $_GET['elementor-preview'] ) || isset( $_GET['preview'] ) ) {
-		return $template;
+	$done = true;
+	if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		return null;
+	}
+	if ( isset( $_GET['elementor-preview'] ) || isset( $_GET['preview'] ) || isset( $_GET['alea-off'] ) ) {
+		return null; // never hijack the editor; ?alea-off=1 = escape hatch to view the old page
 	}
 	$map  = alea_redesign_map();
 	$path = alea_current_path();
 	if ( empty( $map[ $path ] ) ) {
+		return null;
+	}
+	$e         = is_array( $map[ $path ] ) ? $map[ $path ] : array( 'file' => $map[ $path ] );
+	$e['path'] = $path;
+	$e['abs']  = get_stylesheet_directory() . '/alea/' . basename( $e['file'] );
+	if ( ! file_exists( $e['abs'] ) ) {
+		return null; // fail safe: keep the existing page
+	}
+	$entry = $e;
+	return $entry;
+}
+
+/* Mapped paths always answer 200 — even brand-new URLs with no WP page behind them. */
+add_action( 'template_redirect', function () {
+	$e = alea_redesign_entry();
+	if ( $e && is_404() ) {
+		global $wp_query;
+		$wp_query->is_404 = false;
+		status_header( 200 );
+	}
+}, 0 );
+
+/* Title + meta description for mapped pages. */
+add_filter( 'pre_get_document_title', function ( $title ) {
+	$e = alea_redesign_entry();
+	return ( $e && ! empty( $e['title'] ) ) ? $e['title'] : $title;
+}, 99 );
+add_action( 'wp_head', function () {
+	$e = alea_redesign_entry();
+	if ( $e && ! empty( $e['desc'] ) ) {
+		echo '<meta name="description" content="' . esc_attr( $e['desc'] ) . '">' . "\n";
+	}
+}, 4 );
+
+add_filter( 'template_include', function ( $template ) {
+	if ( is_feed() || is_embed() ) {
 		return $template;
 	}
-	$file = get_stylesheet_directory() . '/alea/' . basename( $map[ $path ] );
-	if ( ! file_exists( $file ) ) {
-		return $template; // fail safe: keep the existing page
+	$e = alea_redesign_entry();
+	if ( ! $e ) {
+		return $template;
 	}
-	$GLOBALS['alea_page_file'] = $file;
+	$GLOBALS['alea_page_file'] = $e['abs'];
 	$shell                     = get_stylesheet_directory() . '/alea/shell.php';
 	return file_exists( $shell ) ? $shell : $template;
 }, 999 );
