@@ -115,6 +115,14 @@ add_action( 'wp_head', function () {
 			'addressCountry'  => 'IN',
 		),
 		'areaServed'  => array( 'Panchkula', 'Chandigarh', 'Mohali', 'Zirakpur' ),
+		// Verified profile URLs (present on the live site). sameAs ties this
+		// LocalBusiness entity to the real accounts for Google's knowledge graph.
+		'sameAs'      => ( function_exists( 'alea_social_profiles' ) ? alea_social_profiles() : array(
+			'https://www.facebook.com/aleamodularkitchen',
+			'https://www.instagram.com/aleamodularkitchen/',
+			'https://www.youtube.com/channel/UC7_2pqYCC8WrASfm8u3cuow',
+			'https://twitter.com/AleaModular',
+		) ),
 		'makesOffer'  => array(
 			array( '@type' => 'Offer', 'itemOffered' => array( '@type' => 'Product', 'name' => 'Modular Kitchen' ) ),
 			array( '@type' => 'Offer', 'itemOffered' => array( '@type' => 'Product', 'name' => 'Modular Wardrobe' ) ),
