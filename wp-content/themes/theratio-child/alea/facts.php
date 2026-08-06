@@ -19,6 +19,14 @@ function alea_facts() {
 		return $f;
 	}
 
+	/* ALEA kitchens since this year. 'years_experience' below is DERIVED from it
+	   so the two can never disagree again: the old literal '13+' copied from the
+	   live site had gone stale against 2009 (it read as 13 years for a span that
+	   is now 17). No '+' suffix — the plain count is what we can defend, and
+	   /about/ tells the reader 1998 and 2009 are the numbers to trust. */
+	$since_alea = '2009';
+	$year_now   = (int) ( function_exists( 'current_time' ) ? current_time( 'Y' ) : gmdate( 'Y' ) );
+
 	$f = array(
 
 		/* ---------- contact ---------- [SITE] */
@@ -29,8 +37,9 @@ function alea_facts() {
 
 		/* ---------- company ---------- */
 		'founded_furniture' => '1998',   // [SITE] Shiv Shakti Furniture, furniture since 1998
-		'alea_since'        => '2009',   // [SITE] "journey in 2009"
-		'years_experience'  => '13+',    // [SITE] "over 13+ years"
+		'alea_since'        => $since_alea, // [SITE] "journey in 2009"
+		// Derived from 'alea_since', never a literal — see the note above.
+		'years_experience'  => (string) max( 0, $year_now - (int) $since_alea ),
 		'factory_sqft'      => '95,000', // [SITE] "manufacturing unit of 95,000 sq. ft"
 		'factory_place'     => 'Raipur Rani, Panchkula district', // [SITE] site says Raipur Rani — do NOT claim "Panchkula city"
 		'service_area'      => array( 'Panchkula', 'Chandigarh', 'Mohali', 'Zirakpur' ),

@@ -39,12 +39,18 @@ $band      = alea_price_band( $slug );
 /* Base path for the three collection URLs. MUST stay identical to the paths
    registered in alea_redesign_map() (functions.php) — sibling links are built
    from this one string so a route and a link can never disagree again. */
-$col_base = '/modular-kitchens/';
+$col_base = '/modular-kitchen/';
 
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
 /* page-calculator.php reads ?collection= and opens on that tier (whitelisted
    against facts.php there, falling back to Signature). */
 $calc_pre   = $calc_url . '?collection=' . rawurlencode( $slug );
+/* This page quotes a guide band and states the written warranty, but linked
+   neither the page the bands are published on nor the warranty page — which
+   had no inbound link anywhere in the redesign. Both are linked from the
+   blocks that already make the claim. Paths match functions.php. */
+$price_url    = home_url( '/modular-kitchen-price/' );
+$warranty_url = home_url( '/warranty/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( sprintf( "Hi ALEA, I'd like a free estimate for %s %s kitchen.", $article, $col_name ) );
 $phone_disp = alea_fact( 'phone_display' );
@@ -222,7 +228,7 @@ foreach ( $faq as $item ) {
 					<p class="axp-band">
 						<span class="axp-band__label">Guide price — <?php echo esc_html( $col_name ); ?></span>
 						<span class="axp-band__value"><?php echo esc_html( $band ); ?></span>
-						<span class="axp-band__note">Per sq ft of cabinetry &middot; exact specification itemised in your quotation</span>
+						<span class="axp-band__note">Per sq ft of cabinetry &middot; exact specification itemised in your quotation &middot; <a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">all three bands, published</a></span>
 					</p>
 				</div>
 			</div>
@@ -333,7 +339,7 @@ foreach ( $faq as $item ) {
 					<li class="ax-proof">
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
-							A <?php echo (int) $f['warranty_years']; ?>-year warranty, in writing — panels and hardware covered against manufacturing defects, full terms in the written document you receive. Ask to read it on your free visit.
+							A <?php echo (int) $f['warranty_years']; ?>-year warranty, in writing — panels and hardware covered against manufacturing defects, full terms in the written document you receive. <a class="ax-link" href="<?php echo esc_url( $warranty_url ); ?>">What the warranty covers</a>, or ask to read it on your free visit.
 							<span class="ax-proof__never">Never a verbal promise</span>
 						</div>
 					</li>

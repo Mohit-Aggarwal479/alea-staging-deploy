@@ -160,6 +160,15 @@ foreach ( $faqs as $fq ) {
 .axp-feetrow{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
 .axp-feetrow .ax-stepper{flex:0 0 auto}
 @media (max-width:639px){.axp-tiers{grid-template-columns:minmax(0,1fr)}}
+/* The price dock needs sticky travel below the desktop rail breakpoint. Its
+   containing block is .ax-estimator__side, which is exactly the dock's own
+   height, so `position:sticky;bottom:0` can never move. display:contents hands
+   the dock the whole .ax-estimator as its containing block, so it pins to the
+   viewport bottom while the four questions are on screen and releases at the
+   end of the estimator. From 1024px the desktop sticky rail is untouched. */
+@media (max-width:1023px){.ax-estimator--split .ax-estimator__side{display:contents}}
+/* Below 768px the fixed .ax-stickybar owns the bottom 56px — dock above it. */
+@media (max-width:767px){.ax-estimator--split .ax-price{bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px));padding-bottom:var(--sp-4)}}
 </style>
 
 	<!-- ============ TOOL-AS-HERO: minimal head, then the instrument ============ -->
@@ -168,7 +177,10 @@ foreach ( $faqs as $fq ) {
 			<div class="ax-head ax-mb-4">
 				<p class="ax-eyebrow">Kitchen cost calculator</p>
 				<h1 class="ax-h2">Your kitchen, priced before anyone asks your name.</h1>
-				<p class="ax-lead">A live guide range built from the same per-sq-ft rates our factory quotes on paper. Adjust it; the price follows.</p>
+				<?php /* The rate card this tool computes from had almost no inbound links
+				         in the redesign, so the page a visitor is choosing a price on now
+				         names it. Path matches the route in functions.php. */ ?>
+				<p class="ax-lead">A live guide range built from the same per-sq-ft rates our factory quotes on paper. Adjust it; the price follows. <a class="ax-link" href="<?php echo esc_url( home_url( '/modular-kitchen-price/' ) ); ?>">See the published price list</a>.</p>
 			</div>
 		</div>
 	</section>
@@ -184,8 +196,8 @@ foreach ( $faqs as $fq ) {
 
 						<!-- 01 · SHAPE -->
 						<div class="ax-estimator__group">
-							<p class="ax-estimator__q"><span>Kitchen shape</span><span class="ax-estimator__q-index">01 / 04</span></p>
-							<div class="ax-chips ax-chips--cols axp-shapes" id="axp-shape-chips">
+							<p class="ax-estimator__q"><span id="axq-shape">Kitchen shape</span><span class="ax-estimator__q-index">01 / 04</span></p>
+							<div class="ax-chips ax-chips--cols axp-shapes" id="axp-shape-chips" role="radiogroup" aria-labelledby="axq-shape">
 								<?php foreach ( $shapes as $slug => $s ) : ?>
 								<label class="ax-chip"<?php echo ( $slug === $sel_shape ) ? ' data-selected="true"' : ''; ?>>
 									<input class="ax-chip__input" type="radio" name="axp-shape" value="<?php echo esc_attr( $slug ); ?>"<?php checked( $slug, $sel_shape ); ?>>
@@ -198,8 +210,8 @@ foreach ( $faqs as $fq ) {
 
 						<!-- 02 · SIZE -->
 						<div class="ax-estimator__group">
-							<p class="ax-estimator__q"><span>Size in running feet</span><span class="ax-estimator__q-index">02 / 04</span></p>
-							<div class="ax-chips" id="axp-feet-chips">
+							<p class="ax-estimator__q"><span id="axq-feet">Size in running feet</span><span class="ax-estimator__q-index">02 / 04</span></p>
+							<div class="ax-chips" id="axp-feet-chips" role="radiogroup" aria-labelledby="axq-feet">
 								<?php foreach ( $feet_presets as $ft ) : ?>
 								<label class="ax-chip"<?php echo ( $ft === $sel_feet ) ? ' data-selected="true"' : ''; ?>>
 									<input class="ax-chip__input" type="radio" name="axp-feet" value="<?php echo esc_attr( $ft ); ?>"<?php checked( $ft, $sel_feet ); ?>>
@@ -210,7 +222,7 @@ foreach ( $faqs as $fq ) {
 							<div class="axp-feetrow ax-mt-3">
 								<span class="ax-stepper">
 									<button type="button" class="ax-stepper__btn" id="axp-dec" aria-label="One running foot less">&minus;</button>
-									<span class="ax-stepper__value" id="axp-feetval" aria-live="polite"><?php echo esc_html( $sel_feet ); ?> ft</span>
+									<span class="ax-stepper__value" id="axp-feetval"><?php echo esc_html( $sel_feet ); ?> ft</span>
 									<button type="button" class="ax-stepper__btn" id="axp-inc" aria-label="One running foot more">+</button>
 								</span>
 								<span class="ax-help ax-mt-0">Fine-tune by the foot</span>
@@ -221,8 +233,8 @@ foreach ( $faqs as $fq ) {
 
 						<!-- 03 · COLLECTION -->
 						<div class="ax-estimator__group">
-							<p class="ax-estimator__q"><span>Collection</span><span class="ax-estimator__q-index">03 / 04</span></p>
-							<div class="ax-chips ax-chips--cols axp-tiers" id="axp-tier-chips">
+							<p class="ax-estimator__q"><span id="axq-tier">Collection</span><span class="ax-estimator__q-index">03 / 04</span></p>
+							<div class="ax-chips ax-chips--cols axp-tiers" id="axp-tier-chips" role="radiogroup" aria-labelledby="axq-tier">
 								<?php foreach ( $collections as $slug => $c ) : ?>
 								<label class="ax-chip"<?php echo ( $slug === $sel_tier ) ? ' data-selected="true"' : ''; ?>>
 									<input class="ax-chip__input" type="radio" name="axp-tier" value="<?php echo esc_attr( $slug ); ?>"<?php checked( $slug, $sel_tier ); ?>>
@@ -236,8 +248,8 @@ foreach ( $faqs as $fq ) {
 
 						<!-- 04 · HARDWARE -->
 						<div class="ax-estimator__group">
-							<p class="ax-estimator__q"><span>Hardware preference</span><span class="ax-estimator__q-index">04 / 04</span></p>
-							<div class="ax-chips" id="axp-hw-chips">
+							<p class="ax-estimator__q"><span id="axq-hw">Hardware preference</span><span class="ax-estimator__q-index">04 / 04</span></p>
+							<div class="ax-chips" id="axp-hw-chips" role="radiogroup" aria-labelledby="axq-hw">
 								<label class="ax-chip" data-selected="true">
 									<input class="ax-chip__input" type="radio" name="axp-hw" value="No preference" checked>
 									<span>No preference</span>
@@ -264,10 +276,14 @@ foreach ( $faqs as $fq ) {
 				<!-- Live price: docked to the viewport bottom on mobile, sticky rail on desktop -->
 				<div class="ax-estimator__side">
 					<div class="ax-price" id="axp-price">
-						<div class="ax-price__body" aria-live="polite">
+						<div class="ax-price__body">
 							<span class="ax-price__label">Your guide estimate</span>
 							<span class="ax-price__figure" id="axp-figure">₹<?php echo esc_html( alea_inr( $init_low ) ); ?> – ₹<?php echo esc_html( alea_inr( $init_high ) ); ?></span>
 							<span class="ax-price__sub" id="axp-sub"><?php echo esc_html( $init_sub ); ?></span>
+							<!-- The only live region on this page: the figure above animates, so
+							     announcing it would read out every intermediate frame. The JS
+							     writes the settled sentence here once, after the changes stop. -->
+							<span class="ax-sr-only" id="axp-announce" aria-live="polite"></span>
 						</div>
 						<div class="ax-price__cta">
 							<a class="ax-btn ax-btn--primary" href="#itemised">Get this itemised on WhatsApp</a>
@@ -397,11 +413,14 @@ foreach ( $faqs as $fq ) {
 			var sizeNote = document.getElementById('axp-sizenote');
 			var feetVal  = document.getElementById('axp-feetval');
 			var waBtn    = document.getElementById('axp-wa');
+			var announce = document.getElementById('axp-announce');
 			if (!figure || !panel) { return; }
 
 			var shown = { low: 0, high: 0 };
 			var rafId = null;
 			var flashTimer = null;
+			var sayTimer = null;
+			var clearTimer = null;
 
 			/* Indian-style grouping: 145000 -> 1,45,000 */
 			function inr(n) {
@@ -441,6 +460,20 @@ foreach ( $faqs as $fq ) {
 				rafId = window.requestAnimationFrame(step);
 			}
 
+			/* One announcement per settled configuration. Debounced past the
+			   count-up so a held-down stepper never reads out a stream of
+			   intermediate figures; cleared afterwards so browse mode does not
+			   re-read a stale sentence. */
+			function say(text) {
+				if (!announce) { return; }
+				if (sayTimer) { window.clearTimeout(sayTimer); }
+				if (clearTimer) { window.clearTimeout(clearTimer); }
+				sayTimer = window.setTimeout(function () {
+					announce.textContent = text;
+					clearTimer = window.setTimeout(function () { announce.textContent = ''; }, 5000);
+				}, 400);
+			}
+
 			function syncChips(name, value) {
 				var inputs = document.querySelectorAll('input[name="' + name + '"]');
 				for (var i = 0; i < inputs.length; i++) {
@@ -473,6 +506,11 @@ foreach ( $faqs as $fq ) {
 						+ 'Estimate shown: ₹' + inr(low) + '–₹' + inr(high) + '. '
 						+ 'Please send me the itemised estimate.';
 					waBtn.href = 'https://wa.me/' + cfg.wa + '?text=' + encodeURIComponent(msg);
+				}
+				/* Only user-driven recalcs speak; the initial settle stays silent. */
+				if (animate) {
+					say(shape.label + ', ' + state.feet + ' running feet, ' + tier.name
+						+ ' — ₹' + inr(low) + ' to ₹' + inr(high));
 				}
 			}
 

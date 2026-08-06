@@ -237,7 +237,10 @@ foreach ( $faqs as $f ) {
 					<dd class="ax-spectable__val">With your kitchen</dd>
 				</div>
 			</dl>
-			<p class="ax-mono--label ax-mt-5">Want to read it first? Ask for the written warranty terms on your free site visit.</p>
+			<?php /* /warranty/ had no inbound link anywhere in the redesign, and this
+			         is the block that describes the document it is about. Path matches
+			         the route registered in functions.php. */ ?>
+			<p class="ax-mono--label ax-mt-5">Want to read it first? <a class="ax-link" href="<?php echo esc_url( home_url( '/warranty/' ) ); ?>">What the warranty covers</a>, or ask for the written warranty terms on your free site visit.</p>
 		</div>
 	</section>
 

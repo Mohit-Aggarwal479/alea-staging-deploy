@@ -40,6 +40,11 @@ $days       = (int) $f['install_days'];
 $brands     = implode( ' and ', $f['hardware_brands'] );
 $brands_amp = implode( ' & ', $f['hardware_brands'] );
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
+/* /projects/ had no inbound link anywhere in the redesign. It is our work
+   photographed at the experience centre — kitchens, not wardrobes — so it is
+   linked from the section that already explains that no wardrobe photograph
+   exists, and the link text says what is actually on the other side. */
+$work_url   = home_url( '/projects/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $phone_disp = alea_fact( 'phone_display' );
 $wa_href    = alea_wa_link( 'Hi ALEA, I would like a free wardrobe measurement.' );
@@ -376,6 +381,7 @@ foreach ( $faq as $faq_item ) {
 			</div>
 			<div class="ax-btnrow ax-mt-6">
 				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement &mdash; or just come and look</a>
+				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See our work &mdash; kitchens, photographed at the experience centre</a>
 			</div>
 		</div>
 	</section>

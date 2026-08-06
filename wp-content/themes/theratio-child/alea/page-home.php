@@ -15,6 +15,16 @@ require_once __DIR__ . '/images.php';
 
 $f          = alea_facts();
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
+/* The other redesigned destinations this page talks about in prose. Each is
+   linked from the section that makes the claim, so the homepage — not only the
+   theme menu — is a way into the factory page, the published price list, the
+   warranty page, our work and the booking page. Paths match functions.php. */
+$visit_url  = home_url( '/book-a-free-design-visit/' );
+$factory_url = home_url( '/our-factory/' );
+$price_url  = home_url( '/modular-kitchen-price/' );
+$warranty_url = home_url( '/warranty/' );
+$work_url   = home_url( '/projects/' );
+$col_base   = '/modular-kitchen/'; // collection pages: /modular-kitchen/{slug}/
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link();
 $phone_disp = alea_fact( 'phone_display' );
@@ -165,7 +175,7 @@ foreach ( $faq as $item ) {
 	);
 }
 ?>
-<div class="ax-root">
+<div class="ax-root ax-has-stickybar">
 
 	<style data-no-optimize="1">
 	/* Page-specific: estimator-teaser shape chips only. */
@@ -189,9 +199,13 @@ foreach ( $faq as $item ) {
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Modular kitchens &amp; wardrobes — <?php echo esc_html( $f['factory_place'] ); ?></p>
 			<h1 class="ax-hero__title">Made in our own factory. Installed in <?php echo (int) $f['install_days']; ?> days.</h1>
+			<?php /* The per-sq-ft rate is a KITCHEN rate. We publish no wardrobe
+			         rate anywhere on this site — wardrobes are priced per design
+			         after a free measurement — so the sentence says which is which. */ ?>
 			<p class="ax-hero__sub">
 				Kitchens and wardrobes built in our <?php echo esc_html( $f['factory_sqft'] ); ?>&nbsp;sq&nbsp;ft factory —
-				from <span class="ax-mono">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per sq ft, priced in public.
+				kitchens priced in public from <span class="ax-mono">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> per sq ft;
+				wardrobes quoted after a free measurement.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
@@ -272,8 +286,12 @@ foreach ( $faq as $item ) {
 					<div class="ax-card__inner">
 						<h3 class="ax-card__name"><?php echo esc_html( $col['name'] ); ?></h3>
 						<p class="ax-card__character"><?php echo esc_html( $col['character'] ); ?></p>
+						<?php /* Exactly ONE .ax-card__link per card (it draws the
+						         whole-card click target), so it goes to the collection
+						         page itself; the estimator is linked from the hero, the
+						         shape chips and the per-month section. */ ?>
 						<p class="ax-card__meta">
-							<a class="ax-card__link" href="<?php echo esc_url( $calc_url ); ?>">Get a price in this range</a>
+							<a class="ax-card__link" href="<?php echo esc_url( home_url( $col_base . $slug . '/' ) ); ?>">See the <?php echo esc_html( $col['name'] ); ?> collection</a>
 						</p>
 					</div>
 					<div class="ax-card__price">
@@ -282,6 +300,9 @@ foreach ( $faq as $item ) {
 					</div>
 				</article>
 				<?php endforeach; ?>
+			</div>
+			<div class="ax-btnrow ax-mt-6">
+				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a>
 			</div>
 			<p class="ax-btn-note">Photographs show displays at our experience centre &mdash; not an installed example of that particular collection</p>
 		</div>
@@ -313,7 +334,9 @@ foreach ( $faq as $item ) {
 					<li class="ax-proof">
 						<span class="ax-proof__tick" aria-hidden="true"></span>
 						<div class="ax-proof__text">
-							A <?php echo (int) $f['warranty_years']; ?>-year warranty, on paper — ask for the written terms on your free site visit.
+							A <?php echo (int) $f['warranty_years']; ?>-year warranty, on paper —
+							<a class="ax-link" href="<?php echo esc_url( $warranty_url ); ?>">read what it covers</a>,
+							or ask for the written terms on your free site visit.
 							<span class="ax-proof__never">Never a verbal promise</span>
 						</div>
 					</li>
@@ -359,6 +382,7 @@ foreach ( $faq as $item ) {
 						</div>
 					</div>
 					<div class="ax-btnrow ax-mt-5">
+						<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $factory_url ); ?>">Inside our factory</a>
 						<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free factory visit</a>
 					</div>
 				</div>
@@ -396,6 +420,7 @@ foreach ( $faq as $item ) {
 				<?php endforeach; ?>
 			</div>
 			<div class="ax-btnrow ax-mt-6">
+				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See more of our work</a>
 				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free visit — see it in person</a>
 			</div>
 		</div>
@@ -548,7 +573,10 @@ foreach ( $faq as $item ) {
 						<a class="ax-btn ax-btn--ink" href="<?php echo esc_url( $tel_href ); ?>">Call <?php echo esc_html( $phone_disp ); ?></a>
 						<a class="ax-btn ax-btn--wa" href="<?php echo esc_url( $wa_href ); ?>">WhatsApp us</a>
 					</div>
-					<p class="ax-btn-note">Prefer to type? The form works too &mdash; we reply on the number you give.</p>
+					<p class="ax-btn-note">
+						Prefer to type? The form works too &mdash; we reply on the number you give.
+						You can also <a class="ax-link" href="<?php echo esc_url( $visit_url ); ?>">book a visit on our booking page</a>.
+					</p>
 				</div>
 				<div class="ax-form ax-form--card ax-reveal">
 					<h3 class="ax-form__title">Book your free visit</h3>

@@ -23,6 +23,12 @@ require_once __DIR__ . '/images.php';
 $f = alea_facts();
 
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
+/* This page quotes a band for every collection but did not link the page those
+   bands are published on, and /projects/ had no inbound link anywhere in the
+   redesign. Both are linked below, from the blocks that already talk about
+   them. Paths match the routes registered in functions.php. */
+$price_url  = home_url( '/modular-kitchen-price/' );
+$work_url   = home_url( '/projects/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( "Hi ALEA, I'd like a free estimate for a modular kitchen." );
 $phone_disp = alea_fact( 'phone_display' );
@@ -317,7 +323,7 @@ foreach ( $faq as $item ) {
 				</article>
 				<?php endforeach; ?>
 			</div>
-			<p class="ax-btn-note">Rates are per square foot of cabinetry &mdash; the same rates the estimator uses</p>
+			<p class="ax-btn-note">Rates are per square foot of cabinetry &mdash; the same rates the estimator uses. <a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a></p>
 		</div>
 	</section>
 
@@ -472,6 +478,7 @@ foreach ( $faq as $item ) {
 			</div>
 			<div class="ax-btnrow ax-mt-6">
 				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free visit &mdash; see it in person</a>
+				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See more of our work</a>
 			</div>
 		</div>
 	</section>

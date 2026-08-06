@@ -282,15 +282,19 @@
   background: var(--ink); color: var(--chalk);
 }
 
+/* Every calc() in this file subtracts a negated term instead of adding, because
+   the PHP inliner that minifies this stylesheet strips the whitespace around
+   `+` — and calc() treats `A+B` as a parse error, voiding the declaration.
+   `-` is not touched by the inliner, so `A - (B * -2)` survives intact. */
 .ax-wrap {
   width: 100%;
-  max-width: calc(var(--wrap) + (var(--gutter) * 2));
+  max-width: calc(var(--wrap) - (var(--gutter) * -2));
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
-.ax-wrap--narrow { max-width: calc(760px + (var(--gutter) * 2)); }
-.ax-wrap--text   { max-width: calc(62ch + (var(--gutter) * 2)); }
-.ax-wrap--wide   { max-width: calc(1380px + (var(--gutter) * 2)); }
+.ax-wrap--narrow { max-width: calc(760px - (var(--gutter) * -2)); }
+.ax-wrap--text   { max-width: calc(62ch - (var(--gutter) * -2)); }
+.ax-wrap--wide   { max-width: calc(1380px - (var(--gutter) * -2)); }
 .ax-wrap--flush  { padding-inline: 0; }
 
 /* Full-bleed escape. Safe because .ax-root clips the x axis. */
@@ -660,7 +664,10 @@
 }
 @supports (min-height: 1svh) { .ax-hero { min-height: 78svh; } }
 
-.ax-hero__img {
+/* .ax-root prefix is load-bearing: the base reset (.ax-root img { height:auto })
+   is (0,1,1) and would otherwise beat a bare .ax-hero__img, leaving the photo at
+   its intrinsic height instead of covering the hero box. */
+.ax-root .ax-hero__img {
   position: absolute;
   inset: 0;
   z-index: -2;
@@ -685,7 +692,7 @@
 .ax-hero__inner {
   position: relative;
   width: 100%;
-  max-width: calc(var(--wrap) + (var(--gutter) * 2));
+  max-width: calc(var(--wrap) - (var(--gutter) * -2));
   margin-inline: auto;
   padding: var(--sp-7) var(--gutter) var(--sp-6);
 }
@@ -1084,7 +1091,9 @@
   text-transform: uppercase;
   color: var(--graphite);
 }
-.ax-estimator__q-index { font-variant-numeric: tabular-nums; color: var(--graphite); opacity: 0.7; }
+/* No opacity here: graphite at 70% over sheet is 3.6:1 and this is 11px text.
+   Full graphite is 7.68:1 on sheet. */
+.ax-estimator__q-index { font-variant-numeric: tabular-nums; color: var(--graphite); }
 .ax-estimator__foot {
   padding-block: var(--sp-4);
   border-top: 1px solid var(--rule);
@@ -1219,7 +1228,7 @@
   gap: var(--sp-3) var(--sp-4);
   margin-inline: calc(var(--sp-4) * -1);
   padding: var(--sp-4);
-  padding-bottom: calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--sp-4) - (env(safe-area-inset-bottom, 0px) * -1));
   background: var(--sheet);
   border-top: 2px solid var(--ink);
 }
@@ -1265,11 +1274,11 @@
 .ax-price[data-state="updated"] .ax-price__figure { color: var(--olive); }
 /* The dock must rest ON TOP of the phone furniture, never under it. */
 .ax-root.ax-has-stickybar .ax-price {
-  bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bar-h) - (env(safe-area-inset-bottom, 0px) * -1));
   padding-bottom: var(--sp-4);
 }
 .ax-root.ax-has-stickybar.ax-has-pricestrip .ax-price {
-  bottom: calc(var(--bar-h) + var(--strip-h) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bar-h) - (var(--strip-h) * -1) - (env(safe-area-inset-bottom, 0px) * -1));
 }
 
 /* --- Itemised INCLUDED / NOT INCLUDED --- */
@@ -1421,11 +1430,15 @@
 .ax-root input.wpcf7-form-control:hover,
 .ax-root select.wpcf7-select:hover { border-color: var(--graphite); }
 
+/* The :not() chain is repeated on the CF7 input selector below on purpose:
+   without it that selector is (0,3,1) and loses to the base control block above
+   (0,6,1), whose `box-shadow: none` then wipes the focus ring off every text
+   input while select/textarea/submit keep theirs. */
 .ax-input:focus, .ax-select:focus, .ax-textarea:focus,
 .ax-root .ax-field input:focus,
 .ax-root .ax-field select:focus,
 .ax-root .ax-field textarea:focus,
-.ax-root input.wpcf7-form-control:focus,
+.ax-root input.wpcf7-form-control:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,
 .ax-root textarea.wpcf7-form-control:focus,
 .ax-root select.wpcf7-select:focus {
   border-color: var(--ink);
@@ -1456,9 +1469,12 @@
   background-image:
     linear-gradient(45deg, transparent 50%, var(--graphite) 50%),
     linear-gradient(135deg, var(--graphite) 50%, transparent 50%);
+  /* `- -1px` rather than `+ 1px`: the CSS inliner strips whitespace around `+`,
+     and calc() requires it, which voided the whole declaration and parked both
+     caret triangles in the top-left corner. `-` is left alone by the inliner. */
   background-position:
-    calc(100% - 20px) calc(50% + 1px),
-    calc(100% - 14px) calc(50% + 1px);
+    calc(100% - 20px) calc(50% - -1px),
+    calc(100% - 14px) calc(50% - -1px);
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
   cursor: pointer;
@@ -1728,7 +1744,9 @@
 .ax-stickybar {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  z-index: 60;
+  z-index: 1000;                     /* clears the theme header (z-index 999),
+                                        whose Elementor mobile nav sits in the
+                                        same band and otherwise buries this */
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
@@ -1771,7 +1789,7 @@
 .ax-pricestrip {
   position: fixed;
   left: 0; right: 0;
-  bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bar-h) - (env(safe-area-inset-bottom, 0px) * -1));
   z-index: 59;
   display: flex;
   align-items: center;
@@ -1813,10 +1831,20 @@
   border-bottom: 2px solid var(--oxblood);
 }
 
-/* Reserve room so the fixed furniture never covers the last element. */
-.ax-root.ax-has-stickybar { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px)); }
-.ax-root.ax-has-stickybar.ax-has-pricestrip {
-  padding-bottom: calc(var(--bar-h) + var(--strip-h) + env(safe-area-inset-bottom, 0px));
+/* Reserve room so the fixed furniture never covers the last element.
+
+   This lives on <body>, not on .ax-root: shell.php closes </main> before
+   get_footer(), so the Elementor site footer renders OUTSIDE .ax-root and
+   padding on .ax-root cannot protect its links. This stylesheet is inlined
+   only on redesigned pages (functions.php guards on $alea_page_file) and the
+   sticky bar is emitted on every one of them, so a bare body rule is already
+   scoped correctly.
+
+   Literal 56px/96px rather than var(--bar-h): the tokens are declared on
+   .ax-root, which is a descendant of body, so body cannot inherit them. */
+body { padding-bottom: calc(56px - (env(safe-area-inset-bottom, 0px) * -1)); }
+body:has(.ax-root.ax-has-pricestrip) {
+  padding-bottom: calc(96px - (env(safe-area-inset-bottom, 0px) * -1));
 }
 
 
@@ -2056,8 +2084,8 @@
 
   /* Phone-only furniture retires; the dock returns to the container bottom. */
   .ax-stickybar, .ax-pricestrip { display: none; }
-  .ax-root.ax-has-stickybar,
-  .ax-root.ax-has-stickybar.ax-has-pricestrip { padding-bottom: 0; }
+  body,
+  body:has(.ax-root.ax-has-pricestrip) { padding-bottom: 0; }
   .ax-root.ax-has-stickybar .ax-price,
   .ax-root.ax-has-stickybar.ax-has-pricestrip .ax-price { bottom: 0; }
 
@@ -2195,4 +2223,27 @@
   .ax-card, .ax-estimator, .ax-form--card { border-color: #000000; }
   .ax-faq__item { break-inside: avoid; }
   .ax-faq__a { display: block; }
+}
+
+/* --------------------------------------------------------------------------
+   THEME CHROME -- restore a visible focus ring on the header/footer controls.
+   theratio sets `outline:none` on .main-navigation links, .mmenu-toggle button
+   and .octf-btn and supplies no replacement, so tabbing through the header is
+   invisible. Those declarations sit inside large parent-theme rules, so they
+   are not deleted here -- the ring is restored instead. It is the same
+   two-tone ALEA ring as .ax-root uses, written as literals because
+   --focus-inner / --focus-outer are scoped to .ax-root and this chrome sits
+   outside it. Chrome only: nothing here touches the redesigned page body.
+   -------------------------------------------------------------------------- */
+.main-navigation a:focus-visible,
+.mobile_mainmenu a:focus-visible,
+.mmenu-toggle button:focus-visible,
+.mmenu-close:focus-visible,
+.side-panel-close:focus-visible,
+.octf-btn:focus-visible,
+#back-to-top:focus-visible,
+.e-contact-buttons a:focus-visible {
+  outline: 2px solid transparent;   /* forced-colors hook */
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #F4F4F1, 0 0 0 4px #14110F;
 }

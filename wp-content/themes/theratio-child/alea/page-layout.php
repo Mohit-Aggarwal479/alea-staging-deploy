@@ -350,16 +350,21 @@ $lay_fig_img  = $lay_fig ? alea_img( $lay_fig['key'], array( 'class' => 'axp-fig
    string so a route and a link can never disagree. */
 $lay_base = '/modular-kitchen/';
 
-/* The three COLLECTION URLs live on their own base — the plural /modular-kitchens/
-   form page-collection.php declares canonical ($col_base there) and the approved
-   brief uses. Kept separate from $lay_base on purpose: the collections are also
-   registered under the singular path, and building them off the layout base would
-   link them at their duplicate URLs and silently retarget them if $lay_base moved. */
-$col_base = '/modular-kitchens/';
+/* The three COLLECTION URLs. Kept as its own string rather than reusing $lay_base
+   so a change to the layout base cannot silently retarget the collection links,
+   but it MUST stay identical to the collection paths registered in
+   alea_redesign_map() (functions.php). */
+$col_base = '/modular-kitchen/';
 
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
 $calc_pre   = $calc_url . '?shape=' . rawurlencode( $lay['calc'] );
 $visit_url  = home_url( '/book-a-free-design-visit/' );
+/* The six layout pages quote a guide band and state the written warranty, but
+   linked neither the page the bands are published on nor the warranty page —
+   which had no inbound link anywhere in the redesign. Both are linked from the
+   blocks that already make the claim. Paths match functions.php. */
+$price_url    = home_url( '/modular-kitchen-price/' );
+$warranty_url = home_url( '/warranty/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( sprintf( "Hi ALEA, I'd like a free estimate for %s %s modular kitchen.", $lay_article, $lay_name ) );
 $phone_disp = alea_fact( 'phone_display' );
@@ -674,7 +679,8 @@ $svg_allowed = array(
 				<h2 class="ax-h2">The same <?php echo esc_html( $lay_name ); ?>, in three collections.</h2>
 				<p class="ax-lead">
 					The layout does not change the rate &mdash; the collection does. <?php echo esc_html( $brands ); ?>
-					hardware is fitted as standard and the <?php echo (int) $f['warranty_years']; ?>-year written warranty
+					hardware is fitted as standard and the
+					<a class="ax-link" href="<?php echo esc_url( $warranty_url ); ?>"><?php echo (int) $f['warranty_years']; ?>-year written warranty</a>
 					applies in all three. What changes is the depth of finish and fitting choice.
 				</p>
 			</header>
@@ -685,10 +691,9 @@ $svg_allowed = array(
 						<h3 class="ax-card__name"><?php echo esc_html( $col['name'] ); ?></h3>
 						<p class="ax-card__character"><?php echo esc_html( $col['character'] ); ?></p>
 						<p class="ax-card__meta">
-							<?php /* Hrefs are built from $col_base — the canonical plural collection
-							         base page-collection.php declares and alea_redesign_map() registers
-							         — never from $lay_base, so these land on the collections' canonical
-							         URLs and cannot be retargeted by a change to the layout base. */ ?>
+							<?php /* Hrefs are built from $col_base — the collection base registered
+							         in alea_redesign_map() — never from $lay_base, so these cannot be
+							         retargeted by a change to the layout base. */ ?>
 							<a class="ax-card__link" href="<?php echo esc_url( home_url( $col_base . $c_slug . '/' ) ); ?>">
 								See the <?php echo esc_html( $col['name'] ); ?> collection
 							</a>
@@ -701,7 +706,7 @@ $svg_allowed = array(
 				</article>
 				<?php endforeach; ?>
 			</div>
-			<p class="ax-btn-note">Rates are per square foot of cabinetry &mdash; the same rates the estimator uses</p>
+			<p class="ax-btn-note">Rates are per square foot of cabinetry &mdash; the same rates the estimator uses. <a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a></p>
 		</div>
 	</section>
 

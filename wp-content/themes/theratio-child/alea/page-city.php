@@ -74,10 +74,13 @@ $city_count = count( $alea_cities );
    registered there for all four city slugs — and collection links from
    $col_base, the same string page-collection.php builds its siblings from. */
 $city_base = '/locations/';
-$col_base  = '/modular-kitchens/';
+$col_base  = '/modular-kitchen/';
 
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
 $visit_url  = home_url( '/book-a-free-design-visit/' );
+/* The city pages quote the same guide bands as everywhere else but did not
+   link the page those bands are published on. Path matches functions.php. */
+$price_url  = home_url( '/modular-kitchen-price/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( sprintf( "Hi ALEA, I'd like a free modular kitchen estimate for my home in %s.", $city ) );
 $phone_disp = alea_fact( 'phone_display' );
@@ -502,6 +505,7 @@ foreach ( $faq as $item ) {
 						Because the rates are per square foot of cabinetry, a length becomes a price like this.
 						The arithmetic is on the page; the estimator does it for your own numbers in about a
 						minute, before we ask for your phone number.
+						<a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a>.
 					</p>
 					<div class="ax-btnrow ax-mt-5">
 						<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>

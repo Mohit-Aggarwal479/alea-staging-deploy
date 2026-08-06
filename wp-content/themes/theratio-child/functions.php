@@ -790,7 +790,7 @@ function alea_redesign_map() {
 		),
 		/* The three collection pages are served by ONE template; the variant
 		   arrives in 'args' and is whitelisted inside page-collection.php.
-		   Paths are the plural /modular-kitchens/ form used in the approved
+		   Paths are the singular /modular-kitchen/ form the router registers
 		   brief and built from $col_base in that template. */
 		'/our-factory/'            => array(
 			'file'  => 'page-factory.php',
@@ -1026,14 +1026,48 @@ add_action( 'template_redirect', function () {
 	}
 }, 0 );
 
-/* Title + meta description for mapped pages. */
+/* Title + meta description + canonical for mapped pages. */
 add_filter( 'pre_get_document_title', function ( $title ) {
 	$e = alea_redesign_entry();
 	return ( $e && ! empty( $e['title'] ) ) ? $e['title'] : $title;
 }, 99 );
-add_action( 'wp_head', function () {
+
+/**
+ * Rank Math prints its own (pre-redesign) <meta name="description"> at wp_head
+ * priority 1, so echoing a second one at priority 4 only ever produced a
+ * duplicate — and the stale first tag is the one that wins. Feed our copy into
+ * Rank Math instead, and record that we did so; the echo below is only a
+ * fallback for when Rank Math is not the emitter.
+ *
+ * Rank Math emits no canonical on these virtual routes (there is no matching
+ * post), so the same pair gives every mapped URL exactly one self-referential
+ * canonical whether or not the plugin is active.
+ */
+add_filter( 'rank_math/frontend/description', function ( $d ) {
 	$e = alea_redesign_entry();
 	if ( $e && ! empty( $e['desc'] ) ) {
+		$GLOBALS['alea_desc_emitted'] = true;
+		return $e['desc'];
+	}
+	return $d;
+}, 99 );
+add_filter( 'rank_math/frontend/canonical', function ( $c ) {
+	$e = alea_redesign_entry();
+	if ( $e ) {
+		$GLOBALS['alea_canonical_emitted'] = true;
+		return home_url( $e['path'] );
+	}
+	return $c;
+}, 99 );
+add_action( 'wp_head', function () {
+	$e = alea_redesign_entry();
+	if ( ! $e ) {
+		return;
+	}
+	if ( empty( $GLOBALS['alea_canonical_emitted'] ) ) {
+		echo '<link rel="canonical" href="' . esc_url( home_url( $e['path'] ) ) . '">' . "\n";
+	}
+	if ( ! empty( $e['desc'] ) && empty( $GLOBALS['alea_desc_emitted'] ) ) {
 		echo '<meta name="description" content="' . esc_attr( $e['desc'] ) . '">' . "\n";
 	}
 }, 4 );
@@ -1063,16 +1097,24 @@ function alea_ds_css() {
 	if ( ! file_exists( $file ) ) {
 		return '';
 	}
-	$key    = 'alea_ds_min_' . md5( (string) filemtime( $file ) . '|' . (string) filesize( $file ) );
+	// 'v2' = minifier revision; bump it whenever the rules below change, or a
+	// stale transient keeps serving the old (broken) output after a deploy.
+	$key    = 'alea_ds_min_' . md5( 'v2|' . (string) filemtime( $file ) . '|' . (string) filesize( $file ) );
 	$cached = get_transient( $key );
 	if ( is_string( $cached ) && '' !== $cached ) {
 		return $cached;
 	}
 	$css = (string) file_get_contents( $file ); // phpcs:ignore
 	// Strip comments, collapse whitespace, trim around punctuation, drop last semicolons.
+	// Only { } ; , > are safe to close up. NEVER add ':' back — it would eat the
+	// descendant combinator in `.ax-root :focus-visible` and collapse it to
+	// `.ax-root:focus-visible`, killing every focus ring on the site. NEVER add
+	// '+' — CSS requires whitespace around '+' inside calc(), so `calc(a+b)` is a
+	// parse error and the whole declaration is dropped (max-width, sticky-bar
+	// offsets, safe-area padding). '~' is left alone for the same class of reason.
 	$css = preg_replace( '#/\*(?!!).*?\*/#s', '', $css );
 	$css = preg_replace( '/\s+/', ' ', $css );
-	$css = preg_replace( '/\s*([{}:;,>~+])\s*/', '$1', $css );
+	$css = preg_replace( '/\s*([{};,>])\s*/', '$1', $css );
 	$css = str_replace( ';}', '}', $css );
 	$css = trim( $css );
 	set_transient( $key, $css, WEEK_IN_SECONDS );
