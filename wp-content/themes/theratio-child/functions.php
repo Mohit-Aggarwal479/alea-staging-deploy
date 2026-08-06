@@ -1094,17 +1094,31 @@ add_filter( 'template_include', function ( $template ) {
  * SEO plugin can discover them and Google would never crawl them. This emits
  * a sitemap at /alea-sitemap.xml and advertises it in robots.txt.
  */
-add_action( 'init', function () {
-	add_rewrite_rule( '^alea-sitemap\.xml$', 'index.php?alea_sitemap=1', 'top' );
-} );
 add_filter( 'query_vars', function ( $v ) {
 	$v[] = 'alea_sitemap';
 	return $v;
+} );
+/*
+ * Matched on the raw path rather than a rewrite rule: a rewrite needs
+ * flush_rewrite_rules() to have run, which cannot be guaranteed from a
+ * deploy that only copies files. Hooking parse_request means the URL works
+ * the moment the file lands.
+ */
+add_action( 'parse_request', function ( $wp ) {
+	$path = alea_current_path();
+	if ( '/alea-sitemap.xml/' === $path || '/alea-sitemap.xml' === $path ) {
+		$wp->query_vars['alea_sitemap'] = 1;
+	}
+	return $wp;
 } );
 add_action( 'template_redirect', function () {
 	if ( ! get_query_var( 'alea_sitemap' ) ) {
 		return;
 	}
+	// A rewrite-less match can still be flagged 404 by the main query.
+	global $wp_query;
+	$wp_query->is_404 = false;
+	status_header( 200 );
 	$map = alea_redesign_map();
 	if ( empty( $map ) ) {
 		return;
@@ -1128,13 +1142,6 @@ add_filter( 'robots_txt', function ( $txt ) {
 	return $txt . "\nSitemap: " . home_url( '/alea-sitemap.xml' ) . "\n";
 }, 20 );
 
-/* Flush rewrite rules once after this ships so /alea-sitemap.xml resolves. */
-add_action( 'init', function () {
-	if ( 'v2' !== get_option( 'alea_rewrite_flushed' ) ) {
-		flush_rewrite_rules( false );
-		update_option( 'alea_rewrite_flushed', 'v2' );
-	}
-}, 99 );
 
 /**
  * Design-system CSS — inlined (LiteSpeed strips our external/inline CSS
