@@ -994,7 +994,21 @@ function alea_redesign_entry() {
 	return $entry;
 }
 
-/* Mapped paths always answer 200 — even brand-new URLs with no WP page behind them. */
+/**
+ * Mapped paths must never be treated as 404s.
+ *
+ * Doing this at template_redirect is too late: WP has already flagged the
+ * query as a 404, and LiteSpeed then tags the response HTTP.404 and sends
+ * `no-cache, no-store` — so every one of our new URLs bypassed the page
+ * cache entirely and paid a full PHP render on every visit.
+ * pre_handle_404 runs inside WP::handle_404() BEFORE is_404 is set, so the
+ * request is simply never a 404 in the first place.
+ */
+add_filter( 'pre_handle_404', function ( $preempt ) {
+	return alea_redesign_entry() ? true : $preempt;
+}, 10, 1 );
+
+/* Belt and braces for anything that still reaches template_redirect as a 404. */
 add_action( 'template_redirect', function () {
 	$e = alea_redesign_entry();
 	if ( ! $e ) {
