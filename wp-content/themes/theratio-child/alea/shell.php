@@ -566,17 +566,25 @@ if ( ! function_exists( 'alea_shell_footer_locations' ) ) {
 				continue;
 			}
 
-			/* Only a list that is mostly /locations/ links, and that names at
-			   least one place outside the service area, is the one we mean. */
+			/* A place list is any list mostly made of place links, naming at
+			   least one place outside the service area. Two URL shapes carry
+			   them in this footer: /locations/{city}/ and the standalone
+			   landing pages /modular-kitchen(s)-in-{city}. Both must be
+			   recognised — matching only the first left a second footer
+			   column still advertising Surat, Jaipur and Jalandhar. */
 			$located = 0;
 			$stray   = false;
 			foreach ( $items[0] as $item ) {
-				if ( ! preg_match( '#href=["\'][^"\']*/locations/([^"\'/]+)/?["\']#i', $item, $h ) ) {
+				$slug = '';
+				if ( preg_match( '#href=["\'][^"\']*/locations/([^"\'/]+)/?["\']#i', $item, $h ) ) {
+					$slug = strtolower( $h[1] );
+				} elseif ( preg_match( '#href=["\'][^"\']*/modular-kitchens?-in-([^"\'/]+)/?["\']#i', $item, $h ) ) {
+					$slug = strtolower( $h[1] );
+				} else {
 					continue;
 				}
 				$located++;
-				$slug = strtolower( $h[1] );
-				$hit  = false;
+				$hit = false;
 				foreach ( $areas as $area ) {
 					if ( sanitize_title( $area ) === $slug ) {
 						$hit = true;
