@@ -10,5 +10,7 @@ deployment:
     - /bin/cp -r wp-content/themes/theratio-child/alea/. "$DEPLOYPATH/wp-content/themes/theratio-child/alea/"
     - /bin/cp wp-content/mu-plugins/alea-quiet-theratio-warnings.php "$DEPLOYPATH/wp-content/mu-plugins/alea-quiet-theratio-warnings.php"
     - /bin/cp wp-content/mu-plugins/alea-sitewide-repairs.php "$DEPLOYPATH/wp-content/mu-plugins/alea-sitewide-repairs.php"
+    - /bin/cp wp-content/mu-plugins/alea-page-cache.php "$DEPLOYPATH/wp-content/mu-plugins/alea-page-cache.php"
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" option get page_on_front >> "$HOME/front-page-backup.log" && $WPB --path="$DEPLOYPATH" option update show_on_front page && $WPB --path="$DEPLOYPATH" option update page_on_front 22618 ) || echo 'ALEA deploy - front-page switch FAILED'
+    - /bin/rm -f "$DEPLOYPATH/wp-content/cache/alea-page/"*.html 2>/dev/null || true
     - WPB=$(command -v wp || echo /usr/local/bin/wp); ( $WPB --path="$DEPLOYPATH" litespeed-purge all || $WPB --path="$DEPLOYPATH" cache flush ) || true
