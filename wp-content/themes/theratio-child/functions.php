@@ -767,6 +767,12 @@ add_filter( 'litespeed_ucss_whitelist', function ( $list ) {
  * rollout is page-by-page and instantly reversible (empty the map).
  * ===================================================================== */
 
+/* The shared lead form's accessibility repair. Loaded here, not from a page
+   template, so EVERY page carrying [contact-form-7 id="7dcf010"] gets real
+   labels and a non-submittable select prompt — not just the one template that
+   used to define the filter. */
+require_once get_stylesheet_directory() . '/alea/cf7.php';
+
 /**
  * Path => array( file, title, desc ). Filled in as pages are built & approved.
  * Works for existing WP pages AND brand-new URLs (router forces 200 below).
@@ -904,6 +910,15 @@ function alea_redesign_map() {
 			'title' => 'About ALEA | Making Modular Kitchens in Our Own Factory Since 2009',
 			'desc'  => 'ALEA has made modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani, Panchkula district since 2009; the furniture business we grew out of dates from 1998. Two dates, one factory, and an open door.',
 		),
+		/* Trade page. Nothing about a dealer arrangement is verified — no margin,
+		   territory, investment figure or dealer count exists in facts.php — so
+		   the template states that absence and the description below promises
+		   nothing the page does not. */
+		'/become-a-dealer/'        => array(
+			'file'  => 'page-dealer.php',
+			'title' => 'Become a Dealer | Sell Kitchens Made in Our Own Factory | ALEA Modular',
+			'desc'  => 'Trade enquiries: ALEA makes modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware, published per-sq-ft rates and a 10-year written warranty. Terms are discussed on a call, not published.',
+		),
 		'/book-a-free-design-visit/' => array(
 			'file'  => 'page-book-visit.php',
 			'title' => 'Book a Free Design Visit or Factory Visit | ALEA Modular',
@@ -924,6 +939,38 @@ function alea_redesign_map() {
 			'file'  => 'page-contact.php',
 			'title' => 'Contact ALEA | Call, WhatsApp or Send Us a Message',
 			'desc'  => 'Talk to the company that makes the kitchens: one number for calls and WhatsApp, or leave your details and we will call you back. Factory at Raipur Rani, Panchkula district; we design and install across Panchkula, Chandigarh, Mohali and Zirakpur.',
+		),
+
+		/* The locations hub. It lists ONLY the facts.php 'service_area' cities that
+		   are routed below, so the title and description here must name those four
+		   and nothing else — the site's legacy city pages are not served by this
+		   template and their coverage claims are not verified. */
+		'/locations/'              => array(
+			'file'  => 'page-locations.php',
+			'title' => 'Where We Work | Kitchens for Panchkula, Chandigarh, Mohali & Zirakpur | ALEA Modular',
+			'desc'  => 'ALEA designs, measures and installs modular kitchens and wardrobes in Panchkula, Chandigarh, Mohali and Zirakpur, all made at our own factory at Raipur Rani, Panchkula district. Free design visit, Hettich & Blum hardware, 10-year written warranty.',
+		),
+
+		/* ---- wave 4 ---- */
+		'/faqs/'                   => array(
+			'file'  => 'page-faqs.php',
+			'title' => 'Kitchen FAQs — Price, Timeline, Materials & Warranty | ALEA Modular',
+			'desc'  => 'Straight answers on what a modular kitchen costs, how long it takes, what hardware we fit, what the 10-year written warranty means, and how the free site visit works.',
+		),
+		'/about/manufacturing-process/' => array(
+			'file'  => 'page-manufacturing.php',
+			'title' => 'How We Make Your Kitchen | ALEA Modular',
+			'desc'  => 'Every ALEA kitchen is made at our own factory at Raipur Rani, Panchkula district, not subcontracted — from panel cutting and edge banding to assembly, checking and dispatch.',
+		),
+		'/about/customer-process/' => array(
+			'file'  => 'page-customer-process.php',
+			'title' => 'From First Call to Cooking | How Buying Works | ALEA Modular',
+			'desc'  => 'Five clear steps: a free measurement at your home, an itemised quotation, manufacturing in our own factory, installation in about 15 days, and a 10-year written warranty.',
+		),
+		'/kitchen-care/'           => array(
+			'file'  => 'page-kitchen-care.php',
+			'title' => 'Kitchen Care & Maintenance Guide | ALEA Modular',
+			'desc'  => 'How to look after laminate, acrylic, PU and stone surfaces, keep soft-close hardware working, and manage moisture in an Indian kitchen — plus when to call us.',
 		),
 
 		/* The four city pages are served by ONE template; the variant arrives in

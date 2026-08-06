@@ -12,10 +12,18 @@
  * customer's home. The page says shop-floor photography is coming. All images
  * come from the verified catalogue in images.php; never hard-code a path and
  * never hand-write alt text. Do not swap in stock imagery.
+ *
+ * THE MANUFACTURING SEQUENCE IS NOT DEFINED HERE. It lives in sequence.php,
+ * which the manufacturing-process page reads too. This page used to hold its
+ * own hand-written copy, and the two drifted: this page's headline said "Five
+ * stages" while the other rendered count() over six, so a reader one click away
+ * got two official answers. The headline count below is now count() of the
+ * shared array — it can never be typed out of step with the list under it.
  */
 
 require_once __DIR__ . '/facts.php';
 require_once __DIR__ . '/images.php';
+require_once __DIR__ . '/sequence.php';
 
 $sqft         = alea_fact( 'factory_sqft' );            // '95,000'
 $place        = alea_fact( 'factory_place' );           // 'Raipur Rani, Panchkula district'
@@ -30,6 +38,19 @@ $phone_tel    = alea_fact( 'phone_tel' );
 
 $brands_txt   = implode( ' and ', $brands );            // "Hettich and Blum"
 $service_txt  = implode( ', ', $service );
+
+/* The spec strip shows the town above the district. Both are SPLIT OUT OF the
+   fact rather than typed, so a correction to factory_place moves the cell with
+   it — this is the one fact the site carries a standing rule about (Raipur Rani
+   is in Panchkula DISTRICT, never Panchkula city), so it must never be a
+   literal string in a template. */
+$place_bits   = array_map( 'trim', explode( ',', (string) $place, 2 ) );
+$place_town   = isset( $place_bits[0] ) ? $place_bits[0] : '';
+$place_dist   = isset( $place_bits[1] ) ? $place_bits[1] : '';
+
+/* Shared manufacturing sequence — see the note in the file header. */
+$stages       = alea_sequence();
+$stage_word   = alea_sequence_count_word( alea_sequence_count() );
 
 $wa_visit     = alea_wa_link( "Hi ALEA, I'd like to book a free factory visit at " . $place . '.' );
 $wa_pin       = alea_wa_link( 'Hi ALEA, please send me the location pin for the factory at ' . $place . '.' );
@@ -103,7 +124,7 @@ foreach ( $faqs as $f ) {
 				</div>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Location</span>
-					<span class="ax-specstrip__value">Raipur Rani<span class="ax-specstrip__unit">Panchkula dist.</span></span>
+					<span class="ax-specstrip__value"><?php echo esc_html( $place_town ); ?><span class="ax-specstrip__unit"><?php echo esc_html( $place_dist ); ?></span></span>
 				</div>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Making furniture since</span>
@@ -131,46 +152,30 @@ foreach ( $faqs as $f ) {
 	</section>
 
 	<!-- ================================================================
-	     WHAT HAPPENS HERE — five plain-language manufacturing stages
+	     WHAT HAPPENS HERE — the shared plain-language manufacturing stages
+	     from sequence.php. Count and wording are NOT typed here.
 	     ================================================================ -->
 	<section class="ax-section ax-section--ruled ax-reveal">
 		<div class="ax-wrap">
 			<div class="ax-head">
 				<p class="ax-eyebrow">What happens here</p>
-				<h2 class="ax-h2">Five stages, in plain language.</h2>
+				<h2 class="ax-h2"><?php echo esc_html( $stage_word ); ?> stages, in plain language.</h2>
 				<p class="ax-lead">No mystique. This is what happens to a sheet of board between your final design and your fitted kitchen.</p>
 			</div>
+			<?php /* Rendered from sequence.php so this page and the manufacturing-process
+			         page cannot describe the same stage in two different ways, or count
+			         them differently. Only title and text are shown here: the per-stage
+			         "what it means for you" rider belongs on the PROCESS page, not on
+			         this one, which is about the PLACE and the visit. */ ?>
 			<ol class="ax-steps">
+				<?php foreach ( $stages as $stage ) : ?>
 				<li class="ax-step">
 					<div class="ax-step__body">
-						<h3 class="ax-step__title">Cutting</h3>
-						<p class="ax-step__text">Full sheets of board are cut by machine into the exact panels on your kitchen&rsquo;s cutting list. Machine cutting is what keeps every panel square and every repeat identical &mdash; the difference you feel later as doors that line up.</p>
+						<h3 class="ax-step__title"><?php echo esc_html( $stage['title'] ); ?></h3>
+						<p class="ax-step__text"><?php echo esc_html( $stage['text'] ); ?></p>
 					</div>
 				</li>
-				<li class="ax-step">
-					<div class="ax-step__body">
-						<h3 class="ax-step__title">Edge banding</h3>
-						<p class="ax-step__text">Every cut edge is sealed under heat and pressure with edge banding. This is the unglamorous step that decides how a kitchen survives an Indian kitchen&rsquo;s steam and spills &mdash; an unsealed edge is where cheap furniture starts to swell.</p>
-					</div>
-				</li>
-				<li class="ax-step">
-					<div class="ax-step__body">
-						<h3 class="ax-step__title">Drilling</h3>
-						<p class="ax-step__text">Hinge cups, shelf pins and fitting holes are drilled by machine at set positions, so the hardware seats square and doors hang true &mdash; not marked out by eye on site with a hand drill.</p>
-					</div>
-				</li>
-				<li class="ax-step">
-					<div class="ax-step__body">
-						<h3 class="ax-step__title">Assembly</h3>
-						<p class="ax-step__text">Panels become carcasses on the factory floor, and the <?php echo esc_html( $brands_txt ); ?> hinges and runners are fitted here &mdash; not out of a toolbox in your flat. Factory assembly is why an ALEA install is fitting, not carpentry.</p>
-					</div>
-				</li>
-				<li class="ax-step">
-					<div class="ax-step__body">
-						<h3 class="ax-step__title">Quality check &amp; dispatch</h3>
-						<p class="ax-step__text">Before anything leaves, each unit is checked against your order &mdash; sizes, finish, hardware action &mdash; then packed and dispatched for installation. If a door does not sit right, it is fixed here, where fixing it is easy.</p>
-					</div>
-				</li>
+				<?php endforeach; ?>
 			</ol>
 		</div>
 	</section>

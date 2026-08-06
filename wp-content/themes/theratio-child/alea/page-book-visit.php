@@ -181,7 +181,7 @@ foreach ( $faq as $item ) {
 					<p class="ax-eyebrow">What happens</p>
 					<h2 class="ax-h2">Three things, and then you decide.</h2>
 					<p class="ax-lead ax-mt-4">
-						A visit at your home usually takes about an hour. Whichever visit you
+						A visit at your home takes as long as your kitchen needs. Whichever visit you
 						choose, nobody asks you for a deposit and nothing is signed on the day.
 					</p>
 				</div>
@@ -328,7 +328,10 @@ foreach ( $faq as $item ) {
 					<div class="ax-step__body">
 						<h3 class="ax-step__title">The visit itself</h3>
 						<p class="ax-step__text">At your home we measure, talk layout and finishes, and leave you with a ballpark. At the factory we walk you through the materials and hardware instead, and measure at your home afterwards. Either way: no deposit, nothing to sign.</p>
-						<span class="ax-step__time">About an hour at your home</span>
+						<?php /* No duration: facts.php verifies no visit length, so this chip
+						         carries a price/obligation marker instead of an invented number.
+						         Matches page-customer-process.php's step 1. */ ?>
+						<span class="ax-step__time">Free / no obligation</span>
 					</div>
 				</li>
 			</ol>
