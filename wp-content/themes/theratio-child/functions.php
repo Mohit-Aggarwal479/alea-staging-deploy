@@ -1087,6 +1087,56 @@ add_filter( 'template_include', function ( $template ) {
 }, 999 );
 
 /**
+ * XML sitemap for the redesigned URLs.
+ *
+ * Most of these routes are virtual — there is no WP post behind the
+ * calculator, pricing, factory, warranty, booking or collection pages — so no
+ * SEO plugin can discover them and Google would never crawl them. This emits
+ * a sitemap at /alea-sitemap.xml and advertises it in robots.txt.
+ */
+add_action( 'init', function () {
+	add_rewrite_rule( '^alea-sitemap\.xml$', 'index.php?alea_sitemap=1', 'top' );
+} );
+add_filter( 'query_vars', function ( $v ) {
+	$v[] = 'alea_sitemap';
+	return $v;
+} );
+add_action( 'template_redirect', function () {
+	if ( ! get_query_var( 'alea_sitemap' ) ) {
+		return;
+	}
+	$map = alea_redesign_map();
+	if ( empty( $map ) ) {
+		return;
+	}
+	header( 'Content-Type: application/xml; charset=UTF-8' );
+	echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+	$top = array( '/kitchen-cost-calculator/', '/modular-kitchen/', '/modular-kitchen-price/' );
+	foreach ( array_keys( $map ) as $path ) {
+		$priority = ( '/' === $path ) ? '1.0' : ( in_array( $path, $top, true ) ? '0.9' : '0.7' );
+		echo "\t<url>\n";
+		echo "\t\t<loc>" . esc_url( home_url( $path ) ) . "</loc>\n";
+		echo "\t\t<changefreq>weekly</changefreq>\n";
+		echo "\t\t<priority>" . esc_html( $priority ) . "</priority>\n";
+		echo "\t</url>\n";
+	}
+	echo '</urlset>';
+	exit;
+}, 0 );
+add_filter( 'robots_txt', function ( $txt ) {
+	return $txt . "\nSitemap: " . home_url( '/alea-sitemap.xml' ) . "\n";
+}, 20 );
+
+/* Flush rewrite rules once after this ships so /alea-sitemap.xml resolves. */
+add_action( 'init', function () {
+	if ( 'v2' !== get_option( 'alea_rewrite_flushed' ) ) {
+		flush_rewrite_rules( false );
+		update_option( 'alea_rewrite_flushed', 'v2' );
+	}
+}, 99 );
+
+/**
  * Design-system CSS — inlined (LiteSpeed strips our external/inline CSS
  * without the opt-out) and minified on the fly. The minified copy is cached
  * in a transient keyed by the file's mtime+size, so the regex cost is paid

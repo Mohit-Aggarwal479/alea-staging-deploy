@@ -139,8 +139,44 @@ function alea_img( $key, $args = array() ) {
 	}
 	$class = isset( $args['class'] ) ? $args['class'] : '';
 	$eager = ! empty( $args['eager'] );
-	$out   = '<img src="' . esc_url( home_url( $im['src'] ) ) . '"';
-	$out  .= ' alt="' . esc_attr( $im['alt'] ) . '"';
+
+	/*
+	 * Prefer WordPress's own attachment markup: it emits srcset/sizes, so a
+	 * phone downloads a ~768px file instead of the full-size original (the
+	 * hero was shipping 1920px to every device). The URL->ID lookup is a DB
+	 * query, so the result is cached for a day. Falls back to a plain <img>
+	 * if the file is not in the media library.
+	 */
+	$id = false;
+	if ( function_exists( 'attachment_url_to_postid' ) ) {
+		$ck = 'alea_att_' . md5( $im['src'] );
+		$id = get_transient( $ck );
+		if ( false === $id ) {
+			$id = (int) attachment_url_to_postid( home_url( $im['src'] ) );
+			set_transient( $ck, $id, DAY_IN_SECONDS );
+		}
+		$id = (int) $id;
+	}
+
+	if ( $id > 0 ) {
+		$attr = array(
+			'alt'      => $im['alt'], // catalogue alt always wins over the media-library one
+			'class'    => $class,
+			'loading'  => $eager ? 'eager' : 'lazy',
+			'decoding' => 'async',
+			'sizes'    => isset( $args['sizes'] ) ? $args['sizes'] : '(max-width: 700px) 100vw, 700px',
+		);
+		if ( $eager ) {
+			$attr['fetchpriority'] = 'high';
+		}
+		$html = wp_get_attachment_image( $id, isset( $args['size'] ) ? $args['size'] : 'large', false, $attr );
+		if ( $html ) {
+			return $html;
+		}
+	}
+
+	$out  = '<img src="' . esc_url( home_url( $im['src'] ) ) . '"';
+	$out .= ' alt="' . esc_attr( $im['alt'] ) . '"';
 	if ( $class ) {
 		$out .= ' class="' . esc_attr( $class ) . '"';
 	}
