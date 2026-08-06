@@ -354,10 +354,7 @@ foreach ( $faqs as $f ) {
 	<!-- ================================================================
 	     STICKY MOBILE BAR — two thumb targets, retires at 768px via CSS
 	     ================================================================ -->
-	<nav class="ax-stickybar" aria-label="Quick contact">
-		<a class="ax-stickybar__btn ax-stickybar__btn--call" href="tel:<?php echo esc_attr( $phone_tel ); ?>">Call</a>
-		<a class="ax-stickybar__btn ax-stickybar__btn--wa" href="<?php echo esc_url( $wa_visit ); ?>" target="_blank" rel="noopener">WhatsApp</a>
-	</nav>
+	<?php /* Sticky mobile bar rendered once, centrally, by the redesign router. */ ?>
 
 	<script data-no-optimize="1" data-no-defer="1">
 	(function () {

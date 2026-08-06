@@ -176,6 +176,8 @@ add_shortcode( 'alea_trust_bar', function () {
 } );
 
 add_action( 'wp_head', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy trust bar not needed
+
 	?>
 <style id="alea-trust-bar-css" data-no-optimize="1">
 .alea-trust-bar{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 26px;
@@ -268,6 +270,8 @@ add_action( 'wp_enqueue_scripts', function () {
 
 /* --- shared styles + scripts (front-end only) --- */
 add_action( 'wp_head', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy component CSS not needed
+
 	if ( is_admin() ) { return; }
 	?>
 <style id="aleac-css" data-no-optimize="1">
@@ -395,6 +399,8 @@ add_shortcode( 'alea_process', function () {
 
 /* --- sticky mobile Call / WhatsApp / Estimate bar (auto) --- */
 add_action( 'wp_footer', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy sticky bar not needed
+
 	if ( is_admin() ) { return; }
 	?>
 <div class="aleac aleac-mbar">
@@ -407,6 +413,8 @@ add_action( 'wp_footer', function () {
 
 /* --- component JS (estimator + before/after) --- */
 add_action( 'wp_footer', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy component JS not needed
+
 	if ( is_admin() ) { return; }
 	?>
 <script id="aleac-js" data-no-optimize="1" data-no-defer="1">
@@ -446,6 +454,8 @@ add_action( 'wp_footer', function () {
  * via do_shortcode(). Namespaced .aleax-* so it can't collide with theme.
  * ===================================================================== */
 add_action( 'wp_head', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy landing CSS not needed
+
 	?>
 <style id="aleax-css" data-no-optimize="1">
 .aleax{--maroon:#92003b;--maroon2:#6d002c;--lime:#b1c900;--lime-deep:#71830a;--ink:#16170f;--ink2:#54564a;--ink3:#87887a;--line:#e3e2d7;--paper:#faf9f6;--stone:#efeee6;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
@@ -641,6 +651,8 @@ add_shortcode( 'alea_landing', function () {
  * dark contexts (hero/page-title/footer/nav) are deliberately untouched.
  * ===================================================================== */
 add_action( 'wp_head', function () {
+	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: site-wide skin (for Elementor pages only) not needed
+
 	if ( is_admin() ) { return; }
 	?>
 <style id="alea-skin-css" data-no-optimize="1">
@@ -1026,13 +1038,65 @@ add_filter( 'template_include', function ( $template ) {
 	return file_exists( $shell ) ? $shell : $template;
 }, 999 );
 
-/** Design-system CSS — inlined (LiteSpeed strips our external/inline CSS without this opt-out). */
+/**
+ * Design-system CSS — inlined (LiteSpeed strips our external/inline CSS
+ * without the opt-out) and minified on the fly. The minified copy is cached
+ * in a transient keyed by the file's mtime+size, so the regex cost is paid
+ * once per deploy rather than once per request.
+ */
+function alea_ds_css() {
+	$file = get_stylesheet_directory() . '/alea/design-system.css';
+	if ( ! file_exists( $file ) ) {
+		return '';
+	}
+	$key    = 'alea_ds_min_' . md5( (string) filemtime( $file ) . '|' . (string) filesize( $file ) );
+	$cached = get_transient( $key );
+	if ( is_string( $cached ) && '' !== $cached ) {
+		return $cached;
+	}
+	$css = (string) file_get_contents( $file ); // phpcs:ignore
+	// Strip comments, collapse whitespace, trim around punctuation, drop last semicolons.
+	$css = preg_replace( '#/\*(?!!).*?\*/#s', '', $css );
+	$css = preg_replace( '/\s+/', ' ', $css );
+	$css = preg_replace( '/\s*([{}:;,>~+])\s*/', '$1', $css );
+	$css = str_replace( ';}', '}', $css );
+	$css = trim( $css );
+	set_transient( $key, $css, WEEK_IN_SECONDS );
+	return $css;
+}
+
 add_action( 'wp_head', function () {
 	if ( empty( $GLOBALS['alea_page_file'] ) ) {
 		return; // only on redesigned pages
 	}
-	$css = get_stylesheet_directory() . '/alea/design-system.css';
-	if ( file_exists( $css ) ) {
-		echo "\n<style id=\"alea-ds\" data-no-optimize=\"1\">" . file_get_contents( $css ) . "</style>\n"; // phpcs:ignore
+	$css = alea_ds_css();
+	if ( '' !== $css ) {
+		echo "\n<style id=\"alea-ds\" data-no-optimize=\"1\">" . $css . "</style>\n"; // phpcs:ignore
 	}
 }, 25 );
+
+/**
+ * ONE sticky mobile action bar for every redesigned page, rendered centrally
+ * so no template can double it up with the legacy .aleac-mbar (which is
+ * suppressed above on these pages).
+ */
+add_action( 'wp_footer', function () {
+	if ( ! alea_redesign_entry() ) {
+		return;
+	}
+	require_once get_stylesheet_directory() . '/alea/facts.php';
+	$tel = 'tel:' . alea_fact( 'phone_tel' );
+	$wa  = alea_wa_link();
+	?>
+<nav class="ax-root ax-stickybar" aria-label="Quick contact">
+	<a class="ax-stickybar__btn ax-stickybar__btn--call" href="<?php echo esc_url( $tel ); ?>">
+		<svg class="ax-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.4 21 3 13.6 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+		Call
+	</a>
+	<a class="ax-stickybar__btn ax-stickybar__btn--wa" href="<?php echo esc_url( $wa ); ?>" target="_blank" rel="noopener">
+		<svg class="ax-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.94L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm5.77 14.06c-.24.68-1.4 1.3-1.96 1.38-.5.07-1.14.1-1.84-.12a16.7 16.7 0 0 1-1.66-.61c-2.93-1.27-4.84-4.22-4.99-4.41-.14-.2-1.19-1.58-1.19-3.02 0-1.44.75-2.15 1.02-2.44.27-.3.58-.37.78-.37h.56c.18 0 .42-.06.65.5.24.58.82 2.02.9 2.17.07.14.12.31.02.5-.1.2-.14.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.3-.13.6.17.29.76 1.24 1.63 2.01 1.12 1 2.06 1.3 2.35 1.45.3.15.47.13.64-.07.17-.2.73-.86.93-1.15.2-.3.4-.24.67-.15.27.1 1.72.81 2.01.96.3.15.49.22.56.34.07.12.07.7-.17 1.38Z"/></svg>
+		WhatsApp
+	</a>
+</nav>
+	<?php
+}, 6 );

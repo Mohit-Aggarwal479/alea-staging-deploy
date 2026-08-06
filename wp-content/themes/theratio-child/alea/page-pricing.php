@@ -477,16 +477,7 @@ foreach ( $ax_faqs as $ax_q ) {
 		<span class="ax-pricestrip__value"><?php echo esc_html( $ax_band_all ); ?> / sq ft</span>
 		<a class="ax-pricestrip__cta" href="<?php echo esc_url( $ax_calc ); ?>">Get my price</a>
 	</div>
-	<div class="ax-stickybar">
-		<a class="ax-stickybar__btn ax-stickybar__btn--call" href="<?php echo esc_url( $ax_tel ); ?>">
-			<svg class="ax-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.4 21 3 13.6 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
-			Call
-		</a>
-		<a class="ax-stickybar__btn ax-stickybar__btn--wa" href="<?php echo esc_url( alea_wa_link() ); ?>">
-			<svg class="ax-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.94L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm5.77 14.06c-.24.68-1.4 1.3-1.96 1.38-.5.07-1.14.1-1.84-.12a16.7 16.7 0 0 1-1.66-.61c-2.93-1.27-4.84-4.22-4.99-4.41-.14-.2-1.19-1.58-1.19-3.02 0-1.44.75-2.15 1.02-2.44.27-.3.58-.37.78-.37h.56c.18 0 .42-.06.65.5.24.58.82 2.02.9 2.17.07.14.12.31.02.5-.1.2-.14.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.3-.13.6.17.29.76 1.24 1.63 2.01 1.12 1 2.06 1.3 2.35 1.45.3.15.47.13.64-.07.17-.2.73-.86.93-1.15.2-.3.4-.24.67-.15.27.1 1.72.81 2.01.96.3.15.49.22.56.34.07.12.07.7-.17 1.38Z"/></svg>
-			WhatsApp
-		</a>
-	</div>
+	<?php /* Sticky mobile bar is rendered once, centrally, by the redesign router. */ ?>
 
 	<script data-no-optimize="1" data-no-defer="1">
 	(function () {
