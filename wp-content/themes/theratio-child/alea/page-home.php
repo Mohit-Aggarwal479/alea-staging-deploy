@@ -34,11 +34,20 @@ $band_low  = (int) $f['collections']['essential']['from'];
 $band_high = (int) $f['collections']['atelier']['to'];
 
 /* Per-month worked examples — one per collection, computed from the published
-   per-sq-ft bands via alea_kitchen_total(). Assumptions (kitchen length in
-   running feet, sq ft of cabinetry per running foot, tenure) are stated in
-   the visible text below. */
-$emi_rft    = 15; // assumed kitchen length, running feet
-$emi_months = 36; // assumed tenure
+   per-sq-ft bands via alea_kitchen_total(). Assumptions (sq ft of cabinetry per
+   running foot, kitchen length, tenure) are stated in the visible text below.
+
+   THE REFERENCE KITCHEN AND THE TENURE COME FROM facts.php, not from literals
+   here: /modular-kitchen-price/ runs the same Signature example under the same
+   "Per month" heading, and assuming a different length on this page made the
+   identical kitchen cost a quarter more a month.
+
+   Rows are labelled with the published BAND, never a single mid-band rate. The
+   band is what facts.php stores, what alea_price_band() renders and what every
+   other page quotes; a bare rate printed beside a monthly figure reads as the
+   price, so a buyer meeting the top of the band later thinks it moved. */
+$emi_rft    = (int) alea_fact( 'example_rft', 12 ); // reference kitchen length, running feet
+$emi_months = (int) alea_fact( 'emi_months', 36 );  // assumed tenure
 $emi_sqft   = 0;  // filled from alea_kitchen_total() below
 $emi_rows   = array();
 foreach ( $f['collections'] as $emi_slug => $emi_col ) {
@@ -46,13 +55,21 @@ foreach ( $f['collections'] as $emi_slug => $emi_col ) {
 	$emi_mid               = (int) round( ( $emi_low + $emi_high ) / 2 ); // mid of the estimated range
 	$emi_rows[ $emi_slug ] = array(
 		'name'  => $emi_col['name'],
-		'rate'  => (int) round( ( (int) $emi_col['from'] + (int) $emi_col['to'] ) / 2 ), // mid-band ₹/sq ft
+		'band'  => alea_price_band( $emi_slug ), // the published band, e.g. "₹1,450–1,950 per sq ft"
 		'low'   => (int) $emi_low,
 		'high'  => (int) $emi_high,
 		'total' => $emi_mid,
-		'month' => (int) ceil( $emi_mid / $emi_months ),
+		// round(), as on /modular-kitchen-price/ — ceil() puts the two pages a rupee apart.
+		'month' => (int) round( $emi_mid / $emi_months ),
 	);
 }
+
+/* The installation window, hedged, from facts.php. The H1 and the process step
+   below both read it, so this page cannot promise a firm "15 days" while /faqs/
+   and /about/customer-process/ answer the same question with "about 15 days".
+   Empty if the fact is ever removed — both places then drop the claim rather
+   than print a zero. */
+$install_window = alea_install_window();
 
 /* Kitchen shapes for the estimator teaser. */
 $shapes = array(
@@ -119,12 +136,15 @@ $faq = array(
 	),
 	array(
 		'q' => 'How long does installation take?',
-		'a' => sprintf(
-			'Installation at your home takes %1$d days. Your kitchen is manufactured before that in our own %2$s sq ft factory at %3$s, so we are never waiting on an outside workshop.',
-			(int) $f['install_days'],
+		/* The leading sentence is alea_install_sentence() from facts.php, not a
+		   string typed here: /faqs/ answers this same question into FAQPage
+		   schema too, and the two must not word the duration differently. */
+		'a' => trim( sprintf(
+			'%1$s Your kitchen is manufactured before that in our own %2$s sq ft factory at %3$s, so we are never waiting on an outside workshop.',
+			alea_install_sentence(),
 			$f['factory_sqft'],
 			$f['factory_place']
-		),
+		) ),
 	),
 	array(
 		'q' => 'What warranty do I get?',
@@ -184,7 +204,7 @@ foreach ( $faq as $item ) {
 	@media(min-width:1024px){.axp-shapes{grid-template-columns:repeat(6,minmax(0,1fr))}}
 	.axp-shape{flex-direction:column;gap:var(--sp-2);padding:var(--sp-4) var(--sp-2);min-height:84px;text-decoration:none}
 	.axp-shape svg{width:30px;height:30px;display:block}
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
 	.axp-hero-alt a{color:inherit}
 	</style>
 
@@ -198,7 +218,9 @@ foreach ( $faq as $item ) {
 		?>
 		<div class="ax-hero__inner">
 			<p class="ax-eyebrow">Modular kitchens &amp; wardrobes — <?php echo esc_html( $f['factory_place'] ); ?></p>
-			<h1 class="ax-hero__title">Made in our own factory. Installed in <?php echo (int) $f['install_days']; ?> days.</h1>
+			<?php /* "about 15 days" from facts.php — the same hedge /faqs/ and
+			         /about/customer-process/ use for this figure. */ ?>
+			<h1 class="ax-hero__title">Made in our own factory.<?php echo $install_window ? ' Fitted in ' . esc_html( $install_window ) . '.' : ''; ?></h1>
 			<?php /* The per-sq-ft rate is a KITCHEN rate. We publish no wardrobe
 			         rate anywhere on this site — wardrobes are priced per design
 			         after a free measurement — so the sentence says which is which. */ ?>
@@ -210,7 +232,7 @@ foreach ( $faq as $item ) {
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free site visit</a> — free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> — free, no obligation</p>
 			<p class="ax-hero__credit">
 				<?php echo esc_html( $f['factory_sqft'] ); ?> SQ FT FACTORY
 				/ <?php echo (int) $f['warranty_years']; ?>-YEAR WRITTEN WARRANTY
@@ -421,7 +443,7 @@ foreach ( $faq as $item ) {
 			</div>
 			<div class="ax-btnrow ax-mt-6">
 				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See more of our work</a>
-				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free visit — see it in person</a>
+				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit — see it in person</a>
 			</div>
 		</div>
 	</section>
@@ -461,7 +483,11 @@ foreach ( $faq as $item ) {
 					<div class="ax-step__body">
 						<h3 class="ax-step__title">Installation</h3>
 						<p class="ax-step__text">Our own team installs at your home.</p>
-						<span class="ax-step__time"><?php echo (int) $f['install_days']; ?> days</span>
+						<?php /* Badge matches /about/customer-process/'s badge for the
+						         identical step — "About 15 days", never a firm 15. */ ?>
+						<?php if ( $install_window ) : ?>
+						<span class="ax-step__time"><?php echo esc_html( ucfirst( $install_window ) ); ?></span>
+						<?php endif; ?>
 					</div>
 				</li>
 				<li class="ax-step">
@@ -513,7 +539,7 @@ foreach ( $faq as $item ) {
 					<div class="ax-spectable--rows">
 						<?php foreach ( $emi_rows as $row ) : ?>
 						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo esc_html( $row['name'] ); ?> &middot; &#8377;<?php echo esc_html( alea_inr( $row['rate'] ) ); ?> / sq ft</span>
+							<span class="ax-spectable__key"><?php echo esc_html( $row['name'] ); ?> &middot; <?php echo esc_html( $row['band'] ); ?></span>
 							<span class="ax-spectable__val ax-ox">&#8377;<?php echo esc_html( alea_inr( $row['month'] ) ); ?> / month</span>
 						</div>
 						<?php endforeach; ?>
@@ -523,13 +549,16 @@ foreach ( $faq as $item ) {
 						assumes standard base + wall units &mdash; about <?php echo (int) alea_fact( 'sqft_per_rft' ); ?> sq ft
 						of cabinetry per running foot &mdash; so <?php echo (int) $emi_rft; ?> rft &asymp;
 						<?php echo (int) $emi_sqft; ?> sq ft.
-						Signature, for instance: <?php echo (int) $emi_sqft; ?> sq ft &times;
+						Signature &mdash; the same worked example as our
+						<a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">published price list</a>:
+						<?php echo (int) $emi_sqft; ?> sq ft &times;
 						&#8377;<?php echo esc_html( alea_inr( $f['collections']['signature']['from'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $f['collections']['signature']['to'] ) ); ?> per sq ft
 						= &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['low'] ) ); ?>&ndash;<?php echo esc_html( alea_inr( $emi_rows['signature']['high'] ) ); ?>.
 						The monthly figure is the midpoint of that range
 						(&#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['total'] ) ); ?>) divided equally over
 						<?php echo (int) $emi_months; ?> months = &#8377;<?php echo esc_html( alea_inr( $emi_rows['signature']['month'] ) ); ?> a month.
-						Bank interest, fees and your final specification will change these figures.
+						Simple division &mdash; no interest or fees included, and your final specification will
+						change these figures. EMI availability and terms depend on your bank; ask on your free site visit.
 					</p>
 					<div class="ax-btnrow ax-mt-5">
 						<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $calc_url ); ?>">Get my exact price band</a>
@@ -563,7 +592,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Let us measure your kitchen — or come and see the factory.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both are free and carry no obligation: a site visit and measurement at your home,

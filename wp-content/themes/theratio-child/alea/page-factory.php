@@ -144,7 +144,13 @@ foreach ( $faqs as $f ) {
 	<section class="ax-section ax-section--ruled ax-reveal">
 		<div class="ax-wrap ax-wrap--text">
 			<div class="ax-prose">
-				<p>Most kitchen brands in the Tricity sell kitchens somebody else builds. We are the other kind: our parent firm has been making furniture since <?php echo esc_html( $since_parent ); ?>, ALEA has been making modular kitchens since <?php echo esc_html( $since_alea ); ?> — <?php echo esc_html( $years ); ?> years of it — and everything we sell is manufactured under our own roof at <?php echo esc_html( $place ); ?>.</p>
+				<?php /* This opener used to begin "Most kitchen brands in the Tricity sell
+				         kitchens somebody else builds" — an unverifiable claim about third
+				         parties on a page whose whole argument is that a reader can check
+				         what we say. facts.php holds no competitor data. It is now framed
+				         the same way as the manufacturing-process page: describe the trade,
+				         then state which kind we are. */ ?>
+				<p>A modular kitchen can be sold by a company that never touches it &mdash; the order is taken in a showroom and placed with a workshop somewhere else. We are the other kind: our parent firm has been making furniture since <?php echo esc_html( $since_parent ); ?>, ALEA has been making modular kitchens since <?php echo esc_html( $since_alea ); ?> &mdash; <?php echo esc_html( $years ); ?> years of it &mdash; and everything we sell is manufactured under our own roof at <?php echo esc_html( $place ); ?>.</p>
 				<p>That is easy to write and easy to fake, which is why this page ends with an invitation rather than a slogan: come and see it. A factory visit is free, and no photograph argues as well as the floor itself.</p>
 				<p class="ax-mono--label">A note on the photographs: documentary photography of the shop floor is in progress. Until it is ready, every photograph on this page was taken in our own experience centre &mdash; displays you can walk around yourself, not the factory floor, and nothing stock.</p>
 			</div>

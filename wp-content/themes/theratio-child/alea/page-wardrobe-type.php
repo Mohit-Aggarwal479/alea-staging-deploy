@@ -60,8 +60,12 @@ $sqft       = $f['factory_sqft'];
 $place      = $f['factory_place'];
 $wty        = (int) $f['warranty_years'];
 $days       = (int) $f['install_days'];
-$brands     = implode( ' and ', $f['hardware_brands'] );
-$brands_amp = implode( ' & ', $f['hardware_brands'] );
+/* Both forms come from alea_brands() in facts.php, which owns the house rule:
+   'and' in every sentence, '&' only where the label is set in mono and space
+   is the constraint (spec strips, spec-table values, eyebrows, meta strips).
+   They used to be two local implode()s and the page mixed them mid-prose. */
+$brands     = alea_brands();
+$brands_amp = alea_brands( 'tight' );
 $areas      = implode( ', ', $f['service_area'] );
 $book_url   = home_url( '/book-a-free-design-visit/' );
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
@@ -76,6 +80,13 @@ $phone_disp = alea_fact( 'phone_display' );
    'nav' and 'sub' are: a walk-in has NO doors, so a heading written around doors
    would contradict this page's own hero copy on /wardrobe/walk-in/. Every H2 on
    the page is either type-neutral or read from this array.
+   'hardware' is per-type for the same reason again: the shared bullet used to
+   promise HINGES on all three variants, which contradicts this page's own
+   trade-offs copy on /wardrobe/sliding/ (a track and a floor channel, not
+   hinges) and names a part a walk-in does not have at all. Only 'hinged' names
+   hinges. The brands are still NOT attributed to sliding-door gear or any other
+   component category — sliding and walk-in simply drop the word rather than
+   swapping in a component we have not verified either brand makes.
    PHOTOGRAPHY: there is none. The media library holds no wardrobe photograph of
    any kind — the two frames previously heroed here turned out to be CGI kitchen
    renders. No image key is carried per type any more; the disclosure below is
@@ -97,6 +108,9 @@ $presentation = array(
 		'sub'       => 'Doors that run across the front of the wardrobe instead of swinging into the room. The usual answer where there is no floor space to spare — and you reach half the opening at a time.',
 		'h_inside'  => 'The doors are the smaller half of the decision.',
 		'h_centre'  => 'Open a door before you decide anything.',
+		/* No hinges on this one: the doors run on a track, as this page's own
+		   trade-offs say four lines below. */
+		'hardware'  => 'runners and soft-close systems',
 		'choose'    => array(
 			'There is no clear floor in front of the wardrobe — a bed, a passage or a corner sits right against it.',
 			'The room is narrow, and a swinging door would take space the room cannot spare.',
@@ -118,6 +132,7 @@ $presentation = array(
 		'sub'       => 'Doors that swing open, so the whole interior is in front of you at once. The simpler mechanism of the two — it only asks for room to open.',
 		'h_inside'  => 'The doors are the smaller half of the decision.',
 		'h_centre'  => 'Open a door before you decide anything.',
+		'hardware'  => 'hinges, runners and soft-close systems',
 		'choose'    => array(
 			'There is clear floor in front of the wardrobe for a door to swing into.',
 			'You want to see the full depth of the interior in one go, front to back.',
@@ -139,6 +154,8 @@ $presentation = array(
 		'sub'       => 'Not a cupboard with doors but a small room given over to storage. With no shutters to pay for, it generally buys the most storage for the money — provided you have the area to give it.',
 		'h_inside'  => 'What is inside is the whole decision.',
 		'h_centre'  => 'Walk into one before you decide anything.',
+		/* No shutters at all on a walk-in, so no hinges to name. */
+		'hardware'  => 'runners and soft-close systems',
 		'choose'    => array(
 			'A small room, a deep recess or one end of the bedroom can be given over to storage.',
 			'You want the most storage for the money: with no shutters, the budget goes into the interior instead.',
@@ -233,7 +250,7 @@ foreach ( $faq as $faq_item ) {
 	/* Page-specific only. Everything else is design-system .ax-*. */
 	/* Colour is inherited from the hero's own ground context (.ax-hero sets
 	   --ax-fg-muted); no hex literal — the palette is fixed in design-system.css. */
-	.axp-hero-note{margin-top:var(--sp-4);font-size:.9375rem;color:var(--ax-fg-muted)}
+	.axp-hero-note{margin-top:var(--sp-4);font-size:15px;color:var(--ax-fg-muted)}
 	.axp-hero-note--flag{max-width:46ch}
 	.axp-note{max-width:60ch}
 	/* Sibling-type rows: the whole row is the tap target, not the label. */
@@ -254,7 +271,7 @@ foreach ( $faq as $faq_item ) {
 			<h1 class="ax-hero__title"><?php echo esc_html( $type_name ); ?>.</h1>
 			<p class="ax-hero__sub"><?php echo esc_html( $t['sub'] ); ?></p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $book_url ); ?>">Book a free measurement</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $book_url ); ?>">Book a free design visit</a>
 			</div>
 			<p class="axp-hero-note">Free, at your home, no obligation &mdash; the measurements are yours to keep either way.</p>
 			<?php /* The photography limitation is disclosed HERE, where a hero photograph
@@ -339,7 +356,7 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-head ax-mb-0 ax-reveal">
-					<p class="ax-eyebrow">What's inside</p>
+					<p class="ax-eyebrow">What is inside</p>
 					<?php /* Per-type heading: a walk-in has no doors, so it must not be
 					         sold on a door-vs-interior trade-off. See $presentation. */ ?>
 					<h2 class="ax-h2"><?php echo esc_html( $t['h_inside'] ); ?></h2>
@@ -396,11 +413,15 @@ foreach ( $faq as $faq_item ) {
 						<li class="ax-proof">
 							<span class="ax-proof__tick" aria-hidden="true"></span>
 							<div class="ax-proof__text">
-								<?php /* Site-wide wording, sourced from facts.php hardware_brands.
-								         Do NOT extend this to sliding-door gear or any other
-								         component category: only the brand names are verified,
-								         and neither brand is an upgrade over the other. */ ?>
-								<?php echo esc_html( $brands ); ?> hinges, runners and soft-close systems, fitted as standard.
+								<?php /* Brands from facts.php hardware_brands; the COMPONENTS named
+								         after them are per-type ($presentation['hardware']), because
+								         this bullet used to promise hinges on all three variants —
+								         including the sliding page, whose own trade-offs describe a
+								         track and a floor channel, and the walk-in page, which has no
+								         shutters at all. Do NOT extend the brands to sliding-door gear
+								         or any other component category: only the brand names are
+								         verified, and neither brand is an upgrade over the other. */ ?>
+								<?php echo esc_html( $brands . ' ' . $t['hardware'] ); ?>, fitted as standard.
 								<span class="ax-proof__never">Never generic hardware</span>
 							</div>
 						</li>
@@ -459,7 +480,7 @@ foreach ( $faq as $faq_item ) {
 						</p>
 					</div>
 					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $book_url ); ?>">Book a free measurement</a>
+						<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $book_url ); ?>">Book a free design visit</a>
 						<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $calc_url ); ?>">Price a kitchen instead</a>
 					</div>
 					<p class="ax-btn-note">The online estimator prices kitchens only &mdash; wardrobes are quoted after the measurement</p>
@@ -536,7 +557,7 @@ foreach ( $faq as $faq_item ) {
 					</p>
 					<p class="ax-lead ax-mt-4"><?php echo esc_html( $photo_note ); ?></p>
 					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement &mdash; or just come and look</a>
+						<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit &mdash; or just come and look</a>
 					</div>
 				</div>
 			</div>
@@ -573,7 +594,7 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap" id="alea-book">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free measurement</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">We measure, then we price it.</h2>
 					<p class="ax-lead ax-mt-4">
 						Someone comes to your home, measures the space and talks through what goes inside a

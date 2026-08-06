@@ -189,18 +189,18 @@ $faq = array(
 	array(
 		'q' => 'Do you serve my area?',
 		'a' => sprintf(
-			'We design, measure and install in %1$s — those %2$d places are the ones we can promise. If you are somewhere else, call %3$s and ask before you make any arrangements: we would rather tell you plainly on the phone what we can and cannot do than take a booking we are not certain we can keep.',
+			'We design, measure and install in %1$s — those %2$s places are the ones we can promise. If you are somewhere else, call %3$s and ask before you make any arrangements: we would rather tell you plainly on the phone what we can and cannot do than take a booking we are not certain we can keep.',
 			$areas_and,
-			$city_count,
+			alea_num_word( $city_count ),
 			$phone_disp
 		),
 	),
 	array(
 		'q' => 'Do you charge for travel to my home?',
 		'a' => sprintf(
-			'No — the free design visit covers %1$s, and there is nothing to pay and nothing to sign for it. We do not publish a travel charge or a coverage radius for anywhere beyond those %2$d places, so if your address is outside them, call %3$s and ask first — you will get a straight answer about your own address before anything is arranged.',
+			'No — the free design visit covers %1$s, and there is nothing to pay and nothing to sign for it. We do not publish a travel charge or a coverage radius for anywhere beyond those %2$s places, so if your address is outside them, call %3$s and ask first — you will get a straight answer about your own address before anything is arranged.',
 			$areas_and,
-			$city_count,
+			alea_num_word( $city_count ),
 			$phone_disp
 		),
 	),
@@ -236,7 +236,7 @@ foreach ( $faq as $item ) {
 	/* Page-specific: the hero's secondary text link and the city-card footer.
 	   The colour is the token .ax-hero itself sets (--ax-fg-muted), never a literal,
 	   so a palette correction reaches this line too. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:var(--ax-fg-muted)}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:var(--ax-fg-muted)}
 	.axp-hero-alt a{color:inherit}
 	.axp-city__cta{margin-top:auto;padding-top:var(--sp-4)}
 	.axp-visit__meta{margin-top:var(--sp-4);padding-top:var(--sp-3);border-top:1px solid var(--ax-rule)}
@@ -254,14 +254,14 @@ foreach ( $faq as $item ) {
 			<p class="ax-eyebrow">Locations</p>
 			<h1 class="ax-hero__title">Where we work</h1>
 			<p class="ax-hero__sub">
-				<?php echo (int) $city_count; ?> places, one factory. We design, measure and install in
+				<?php echo esc_html( alea_num_word( $city_count, true ) ); ?> places, one factory. We design, measure and install in
 				<?php echo esc_html( $areas_and ); ?> &mdash; and this page lists those and nothing else,
 				because those are the ones we can promise.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free visit</a> &mdash; free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				<?php echo (int) $city_count; ?> CITIES SERVED
 				/ OWN <?php echo esc_html( $sqft ); ?> SQ FT FACTORY
@@ -310,11 +310,11 @@ foreach ( $faq as $item ) {
 				<p>
 					Every ALEA kitchen and wardrobe is manufactured at our own <?php echo esc_html( $sqft ); ?> sq ft
 					factory at <?php echo esc_html( $place ); ?>. Nothing is bought in from an outside workshop and
-					badged as ours. From there it is delivered and installed at your home across the Tricity area:
+					badged as ours. From there it is delivered and installed at your home in
 					<?php echo esc_html( $areas_and ); ?>.
 				</p>
 				<p>
-					Those <?php echo (int) $city_count; ?> are the places we design, measure and install in, so they are
+					Those <?php echo esc_html( alea_num_word( $city_count ) ); ?> are the places we design, measure and install in, so they are
 					the only places listed on this page. If your address is outside them, call
 					<?php echo esc_html( $phone_disp ); ?> and ask before you arrange anything &mdash; a straight answer
 					on the phone is worth more than a map we cannot stand behind.
@@ -342,7 +342,7 @@ foreach ( $faq as $item ) {
 	<section class="ax-section ax-section--ruled">
 		<div class="ax-wrap">
 			<header class="ax-head ax-head--wide ax-reveal">
-				<p class="ax-eyebrow">The <?php echo (int) $city_count; ?> we serve</p>
+				<p class="ax-eyebrow">The <?php echo esc_html( alea_num_word( $city_count ) ); ?> we serve</p>
 				<h2 class="ax-h2">Where we design, measure and install.</h2>
 				<p class="ax-lead">
 					A short list is the honest kind. Each of these has a page of its own with the same facts on it &mdash;
@@ -482,12 +482,12 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Tell us where you are.</h2>
 					<p class="ax-lead ax-mt-4">
 						A measurement at your home across <?php echo esc_html( $areas_and ); ?>, or a visit to the factory at
 						<?php echo esc_html( $place ); ?> where you can watch kitchens being built. Both are free and
-						carry no obligation. Outside those <?php echo (int) $city_count; ?> places, call and ask first.
+						carry no obligation. Outside those <?php echo esc_html( alea_num_word( $city_count ) ); ?> places, call and ask first.
 					</p>
 					<div class="ax-btnrow ax-mt-5">
 						<a class="ax-btn ax-btn--ink" href="<?php echo esc_url( $tel_href ); ?>">Call <?php echo esc_html( $phone_disp ); ?></a>

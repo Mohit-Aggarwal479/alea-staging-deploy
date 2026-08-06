@@ -113,7 +113,7 @@ foreach ( $faq as $item ) {
 	<style data-no-optimize="1">
 	/* Page-specific only. Anything design-system.css already does (card padding,
 	   .ax-btnrow stacking, the mono label) is NOT restated here. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
 	/* tel: link in the hero — a real 44px tap target, not a 25px inline box. */
 	.axp-hero-alt a{color:inherit;display:inline-flex;align-items:center;min-height:var(--tap);vertical-align:middle}
 	.axp-visit{gap:var(--sp-4)}
@@ -266,7 +266,7 @@ foreach ( $faq as $item ) {
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
 					<p class="ax-eyebrow">The booking</p>
-					<h2 class="ax-h2">Four lines, and we will do the rest.</h2>
+					<h2 class="ax-h2">Three lines, and we will do the rest.</h2>
 					<p class="ax-lead ax-mt-4">
 						In the message box, please mention three things: the day and time that
 						suit you, your area, and whether you would like the visit at your home or

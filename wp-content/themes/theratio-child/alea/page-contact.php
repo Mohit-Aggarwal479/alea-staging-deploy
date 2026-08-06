@@ -101,12 +101,12 @@ $quick_links = array(
 	),
 	array(
 		'url'   => '/book-a-free-design-visit/',
-		'label' => 'Book a free visit',
+		'label' => 'Book a free design visit',
 		'text'  => sprintf(
 			'A free measurement at your home, or a free visit to the factory at %s to watch kitchens being built.',
 			$f['factory_place']
 		),
-		'cta'   => 'Book a free visit',
+		'cta'   => 'Book a free design visit',
 	),
 );
 
@@ -166,7 +166,7 @@ foreach ( $faq as $item ) {
 	.axp-call{display:inline-block;max-width:100%;margin-top:var(--sp-5);padding-bottom:var(--sp-2);border-bottom:2px solid var(--chalk-a38);color:#FFF;text-decoration:none}
 	.axp-call:hover,.axp-call:focus-visible{border-bottom-color:#FFF}
 	.axp-call__label{display:block;margin-bottom:var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:#C6C2BB}
-	.axp-call__num{display:block;min-height:var(--tap);font-family:var(--font-mono);font-size:clamp(1.5rem,7.5vw,2.75rem);font-weight:700;line-height:1.2;letter-spacing:.01em;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
+	.axp-call__num{display:block;min-height:var(--tap);font-family:var(--font-mono);font-size:clamp(24px,7.5vw,44px);font-weight:700;line-height:1.2;letter-spacing:.01em;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
 	.axp-linkcard__cta{margin-top:auto;padding-top:var(--sp-4)}
 	/* The design system drops the sticky-bar reserve at 768px, but the THEME's
 	   .aleac-mbar stays visible to 781px — so the bar would cover the bottom of
@@ -243,10 +243,16 @@ foreach ( $faq as $item ) {
 				         hours themselves are NOT printed because they are not confirmed
 				         — facts.php 'unverified.working_hours' is the TODO key holding
 				         that gap open. Fill it there and this cell, step 2 and FAQ 1 can
-				         all be made concrete from one place. */ ?>
+				         all be made concrete from one place. The value carries the
+				         promise VERBATIM as step 2 and FAQ 1 word it — "within working
+				         hours" — so label + value + unit read as one sentence ("We call
+				         you back within working hours, on your number") rather than the
+				         bare fragment "Working hours". Do not swap in a duration such as
+				         "same day": no response time is recorded anywhere, and inventing
+				         one here would be an SLA the business has not agreed to. */ ?>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">We call you back</span>
-					<span class="ax-specstrip__value">Working hours<span class="ax-specstrip__unit">on your number</span></span>
+					<span class="ax-specstrip__value">Within working hours<span class="ax-specstrip__unit">on your number</span></span>
 				</div>
 			</div>
 		</div>
@@ -428,10 +434,12 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-head ax-reveal">
 				<p class="ax-eyebrow">What we serve</p>
-				<?php /* Counted, never spelled out: the spec strip above counts the same
+				<?php /* Still counted, never typed — the spec strip above counts the same
 				         array, so adding or retiring an area in facts.php cannot leave a
-				         written word here contradicting the number there. */ ?>
-				<h2 class="ax-h2"><?php echo (int) count( $areas ); ?> areas, named plainly.</h2>
+				         number here contradicting the number there. Spelled out because
+				         this is a heading: alea_num_word() holds the site-wide rule, so
+				         the count and its spelling stay in step. */ ?>
+				<h2 class="ax-h2"><?php echo esc_html( alea_num_word( count( $areas ), true ) ); ?> areas, named plainly.</h2>
 				<p class="ax-lead">
 					These are the areas we design and install in. If you are somewhere else,
 					call and ask rather than guess &mdash; we will tell you straight whether

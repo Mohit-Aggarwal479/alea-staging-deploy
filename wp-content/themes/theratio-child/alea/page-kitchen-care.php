@@ -235,10 +235,10 @@ foreach ( $faq as $item ) {
 	   already re-points to its on-ink muted value — never a raw hex. The link
 	   is padded to clear the kit's 44px tap target: it is the only route from
 	   above the fold to the phone/WhatsApp block. */
-	.axp-hero-alt{margin-top:var(--sp-2);font-size:.9375rem;line-height:1.6;color:var(--ax-fg-muted)}
-	.axp-hero-alt a{color:inherit;display:inline-block;padding-block:.625rem}
+	.axp-hero-alt{margin-top:var(--sp-2);font-size:15px;line-height:1.6;color:var(--ax-fg-muted)}
+	.axp-hero-alt a{color:inherit;display:inline-block;padding-block:10px}
 	.axp-surf+.axp-surf{margin-top:var(--sp-7);padding-top:var(--sp-6);border-top:1px solid var(--ax-rule)}
-	.axp-surf__lead{margin-top:var(--sp-3);max-width:62ch;font-size:.9375rem;line-height:1.6;color:var(--ax-fg-muted);text-wrap:pretty}
+	.axp-surf__lead{margin-top:var(--sp-3);max-width:62ch;font-size:15px;line-height:1.6;color:var(--ax-fg-muted);text-wrap:pretty}
 </style>
 
 	<!-- ================================================== 1. HERO -->
@@ -258,7 +258,7 @@ foreach ( $faq as $item ) {
 				condition of anything.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free visit</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free design visit</a>
 			</div>
 			<p class="axp-hero-alt">or <a href="#alea-call">ask us about your own kitchen</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
@@ -557,7 +557,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Planning a new kitchen, or asking about the one you have?</h2>
 					<p class="ax-lead ax-mt-4">
 						Both visits are free and carry no obligation: a measurement at your home across

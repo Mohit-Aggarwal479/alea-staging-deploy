@@ -113,6 +113,15 @@ $shape_icons = array(
 	'g'        => '<path d="M4 5v13h16V5h-6"/>',
 );
 
+/* The exclusions in running prose, composed once in facts.php so this page's
+   FAQ cannot name a shorter list than the "Not included" column below it — the
+   hand-typed sentence here had already lost the faucet. Empty means "say
+   nothing" (never "nothing is excluded"), so the clause is dropped whole. */
+$excl_prose    = alea_excludes_text();
+$excl_sentence = $excl_prose
+	? ' ' . ucfirst( $excl_prose ) . ' were never inside this number; they are itemised as separate line items, so nothing is hidden inside the kitchen price.'
+	: '';
+
 /* ---- FAQ: one array drives both the visible answers and the JSON-LD,
         so the schema can never drift from the page text. ---- */
 $faqs = array(
@@ -126,11 +135,15 @@ $faqs = array(
 	),
 	array(
 		'q' => 'Will the final quote be higher than this range?',
-		'a' => 'Not for the work this estimate covers. The range includes the carcass, shutters, hardware, edge banding, installation and the ' . $f['warranty_years'] . '-year written warranty. The countertop, chimney, hob, sink, appliances and civil work are not part of any kitchen estimate on this page — they are quoted as separate line items, so nothing is hidden inside the kitchen price.',
+		/* The length in the tool is the visitor's own estimate, so this answer
+		   cannot promise the total will not move — only that the RATE will not.
+		   An unconditional "no" here contradicted the first answer above, which
+		   tells the same reader the figure is confirmed after a site measurement. */
+		'a' => 'Only if your kitchen measures longer than the length you entered. The rate itself does not move — this range is built from the published band, and the band is what we quote against. What changes on the measurement is the running feet.' . $excl_sentence,
 	),
 	array(
 		'q' => 'Do I have to share my phone number to see the price?',
-		'a' => 'No. The range on this page is calculated with nothing asked of you. Share a number only if you want the estimate itemised and sent to you on WhatsApp, or if you want to book a free site measurement.',
+		'a' => 'No. The range on this page is calculated with nothing asked of you. Share a number only if you want the estimate itemised and sent to you on WhatsApp, or if you want to book a free design visit.',
 	),
 );
 
@@ -153,12 +166,15 @@ foreach ( $faqs as $fq ) {
 <div class="ax-root">
 
 <style data-no-optimize="1">
-.axp-shapes .ax-chip{flex-direction:column;gap:.4rem;padding:.75rem .5rem}
+.axp-shapes .ax-chip{flex-direction:column;gap:6.4px;padding:12px 8px}
 .axp-shapes svg{width:26px;height:26px;display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:square}
-.axp-tiers .ax-chip{flex-direction:column;align-items:flex-start;text-align:left;gap:.35rem;padding:.875rem 1rem}
-.axp-tiers .axp-char{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;font-size:.8125rem;line-height:1.45;letter-spacing:normal;text-transform:none}
-.axp-feetrow{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.axp-tiers .ax-chip{flex-direction:column;align-items:flex-start;text-align:left;gap:5.6px;padding:14px 16px}
+.axp-tiers .axp-char{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;font-size:13px;line-height:1.45;letter-spacing:normal;text-transform:none}
+.axp-feetrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .axp-feetrow .ax-stepper{flex:0 0 auto}
+/* The rate table is three short key/value rows; full column width leaves the
+   band stranded far from its collection name. Was an inline style attribute. */
+.axp-ratetable{max-width:512px}
 @media (max-width:639px){.axp-tiers{grid-template-columns:minmax(0,1fr)}}
 /* The price dock needs sticky travel below the desktop rail breakpoint. Its
    containing block is .ax-estimator__side, which is exactly the dock's own
@@ -240,7 +256,9 @@ foreach ( $faqs as $fq ) {
 									<input class="ax-chip__input" type="radio" name="axp-tier" value="<?php echo esc_attr( $slug ); ?>"<?php checked( $slug, $sel_tier ); ?>>
 									<span><?php echo esc_html( $c['name'] ); ?></span>
 									<span class="axp-char"><?php echo esc_html( $c['character'] ); ?></span>
-									<span class="ax-chip__delta">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / sq ft</span>
+									<?php /* Band AND unit from alea_price_band(), so 'price_unit' in
+									         facts.php is the only place the unit is worded. */ ?>
+									<span class="ax-chip__delta"><?php echo esc_html( alea_price_band( $slug ) ); ?></span>
 								</label>
 								<?php endforeach; ?>
 							</div>
@@ -299,42 +317,41 @@ foreach ( $faqs as $fq ) {
 		<div class="ax-wrap">
 			<div class="ax-head">
 				<p class="ax-eyebrow">Read before you compare quotes</p>
-				<h2 class="ax-h2">What this estimate covers — and what it doesn't.</h2>
+				<h2 class="ax-h2">What this estimate covers — and what it does not.</h2>
 				<p class="ax-lead">Most kitchen quotes look cheaper by leaving things out. Ours is only for the kitchen itself, and says so.</p>
 			</div>
+			<?php /* Rendered from facts.php via alea_scope(). /modular-kitchen-price/ and
+			         /modular-kitchen/ both tell the reader this is the same list the
+			         estimator prices from, and it was not — this copy had been typed by
+			         hand and had lost the faucet, and headed its second column "quoted"
+			         where the other two said "itemised". One source now. */ ?>
 			<div class="ax-included">
 				<div class="ax-included__col ax-included--in">
 					<h3 class="ax-included__title">Included in the estimate</h3>
 					<ul class="ax-included__list">
-						<li>Cabinet carcass</li>
-						<li>Shutters</li>
-						<li><?php echo esc_html( $hw_std . ' / ' . $hw_up ); ?> hardware</li>
-						<li>Edge banding</li>
-						<li>Installation (<?php echo esc_html( $f['install_days'] ); ?>-day install)</li>
-						<li><?php echo esc_html( $f['warranty_years'] ); ?>-year written warranty</li>
+						<?php foreach ( alea_scope( 'included' ) as $scope_line ) : ?>
+						<li><?php echo esc_html( $scope_line ); ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 				<div class="ax-included__col ax-included--out">
-					<h3 class="ax-included__title">Not included — quoted separately</h3>
+					<h3 class="ax-included__title">Not included — itemised separately</h3>
 					<ul class="ax-included__list">
-						<li>Countertop</li>
-						<li>Chimney</li>
-						<li>Hob</li>
-						<li>Sink</li>
-						<li>Appliances</li>
-						<li>Civil work (plumbing, electrical, tiling)</li>
+						<?php foreach ( alea_scope( 'excluded' ) as $scope_line ) : ?>
+						<li><?php echo esc_html( $scope_line ); ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 			</div>
 
 			<div class="ax-mt-6">
 				<p class="ax-mono--label ax-mb-3">How we calculate this</p>
-				<p class="ax-prose">Your estimate is your running feet converted into square feet of cabinetry, then multiplied by the per-sq-ft band of the collection you chose. The conversion assumes standard base + wall units — about <?php echo esc_html( alea_fact( 'sqft_per_rft' ) ); ?> sq ft of cabinetry per running foot. The bands are the factory's own rates:</p>
-				<div class="ax-spectable--rows ax-mt-4" style="max-width:32rem">
+				<p class="ax-prose">Your estimate is your running feet converted into square feet of cabinetry, then multiplied by the per-sq-ft band of the collection you chose. The conversion assumes standard base + wall units — about <?php echo esc_html( alea_fact( 'sqft_per_rft' ) ); ?> sq ft of cabinetry per running foot. The bands are the factory’s own rates:</p>
+				<div class="ax-spectable--rows axp-ratetable ax-mt-4">
 					<?php foreach ( $collections as $slug => $c ) : ?>
 					<div class="ax-spectable__row">
 						<span class="ax-spectable__key"><?php echo esc_html( $c['name'] ); ?></span>
-						<span class="ax-spectable__val">₹<?php echo esc_html( alea_inr( $c['from'] ) ); ?>–<?php echo esc_html( alea_inr( $c['to'] ) ); ?> / sq ft</span>
+						<span class="ax-spectable__val"><?php echo esc_html( alea_price_band( $slug ) ); ?></span>
 					</div>
 					<?php endforeach; ?>
 				</div>
@@ -349,7 +366,7 @@ foreach ( $faqs as $fq ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--2 ax-grid--loose">
 				<div>
-					<p class="ax-eyebrow">You've seen the number — now get it in writing</p>
+					<p class="ax-eyebrow">You have seen the number — now get it in writing</p>
 					<h2 class="ax-h2">Get this estimate itemised on WhatsApp.</h2>
 					<p class="ax-lead ax-mt-4">Your configuration and range travel with the message — cabinet by cabinet, with the <?php echo esc_html( $f['warranty_years'] ); ?>-year written warranty stated. Ask for the written warranty terms on your free site visit.</p>
 					<div class="ax-btnrow ax-mt-5">

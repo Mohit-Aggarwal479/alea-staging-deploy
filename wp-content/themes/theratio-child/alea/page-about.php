@@ -22,7 +22,7 @@
  *   anecdote, no "first branch", no expansion milestones, no award years.
  * - AGE IS NEVER ASSERTED AS A COUNT OF YEARS. facts.php carries a [SITE]
  *   'years_experience' string ('13+') that has gone stale against its own
- *   'alea_since' (2009). This page renders 2009 in 3.25rem mono and invites the
+ *   'alea_since' (2009). This page renders 2009 in 52px mono and invites the
  *   reader to subtract, so printing a years figure beside it would publish a
  *   contradiction on the very page that exists to end one. The fix belongs in
  *   facts.php (derive the figure from 'alea_since'); until then this template
@@ -66,7 +66,7 @@ $since_parent = alea_fact( 'founded_furniture' );        // '1998'
 $since_alea   = alea_fact( 'alea_since' );               // '2009'
 /* NOTE: facts.php's 'years_experience' ('13+') is deliberately NOT read here.
    It is a stale [SITE] string that disagrees with 'alea_since' (2009), and this
-   page prints 2009 at 3.25rem and asks the reader to do the subtraction. Age is
+   page prints 2009 at 52px and asks the reader to do the subtraction. Age is
    expressed as a date, never as a count. */
 $sqft         = alea_fact( 'factory_sqft' );             // '95,000'
 $place        = alea_fact( 'factory_place' );            // 'Raipur Rani, Panchkula district'
@@ -197,11 +197,13 @@ foreach ( $faq as $item ) {
 	/* Page-specific: the two-date mono block and the correction call-out. */
 	.axp-mile{min-width:0}
 	.axp-mile__label{display:block;margin-bottom:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}
-	.axp-mile__year{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(2.25rem,9vw,3.25rem);line-height:1;letter-spacing:.02em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
-	.axp-mile__text{margin-top:var(--sp-4);font-size:.9375rem;line-height:1.6;color:var(--ax-fg-muted);text-wrap:pretty}
+	.axp-mile__year{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(36px,9vw,52px);line-height:1;letter-spacing:.02em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+	.axp-mile__text{margin-top:var(--sp-4);font-size:15px;line-height:1.6;color:var(--ax-fg-muted);text-wrap:pretty}
 	.axp-correct{margin-top:var(--sp-6);padding-left:var(--sp-4);border-left:2px solid var(--ax-fg);max-width:62ch}
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
-	.axp-hero-alt a{color:inherit}
+	/* .axp-hero-alt used to be re-declared here. It is now .ax-hero__alt in
+	   design-system.css, which also gives the anchor a --tap-sized target — the
+	   local copy left the hero's second call to action an ~83x13px inline
+	   fragment. Do not reintroduce a page-local override. */
 	</style>
 
 	<!-- ================================================== 1. HERO -->
@@ -222,7 +224,7 @@ foreach ( $faq as $item ) {
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="<?php echo esc_url( $visit_url ); ?>">book a free visit</a> &mdash; free, no obligation</p>
+			<p class="ax-hero__alt">or <a href="<?php echo esc_url( $visit_url ); ?>">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				ALEA SINCE <?php echo esc_html( $since_alea ); ?>
 				/ OWN <?php echo esc_html( $sqft ); ?> SQ FT FACTORY
@@ -413,9 +415,19 @@ foreach ( $faq as $item ) {
 						<?php echo (int) $ex_rft; ?> running feet &asymp; <?php echo (int) $ex_sqft; ?> sq ft at the
 						published <?php echo esc_html( $ex_name ); ?> band.
 					</p>
+					<?php /* The exclusions come from facts.php ('scope_excluded_prose' via
+					         alea_excludes_text()), not from a sentence typed here. This line
+					         used to name five items and omit CIVIL WORK, so the reader was
+					         told tiling, plumbing and electrical sat inside the per-sq-ft
+					         rate — while /about/customer-process/ tells the same reader they
+					         must have that work finished before we start. It is also the
+					         most expensive thing a buyer can be surprised by. */ ?>
+					<?php $ax_excl = alea_excludes_text(); ?>
+					<?php if ( $ax_excl ) : ?>
 					<p class="ax-prose ax-mt-3">
-						Cabinetry only; countertop, chimney, hob, sink and appliances are itemised separately.
+						Cabinetry only. Itemised separately: <?php echo esc_html( $ax_excl ); ?>.
 					</p>
+					<?php endif; ?>
 				</div>
 			</div>
 		</div>
@@ -527,7 +539,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Come and check the claim.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both visits are free and carry no obligation: a measurement at your home across

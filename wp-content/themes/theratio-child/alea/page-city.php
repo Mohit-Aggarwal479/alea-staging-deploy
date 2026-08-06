@@ -81,10 +81,17 @@ $visit_url  = home_url( '/book-a-free-design-visit/' );
 /* The city pages quote the same guide bands as everywhere else but did not
    link the page those bands are published on. Path matches functions.php. */
 $price_url  = home_url( '/modular-kitchen-price/' );
+/* The four company-wide facts this page used to restate in full each have a page
+   of their own. Paths match the ones registered in alea_redesign_map(). */
+$factory_url  = home_url( '/our-factory/' );
+$warranty_url = home_url( '/warranty/' );
+$about_url    = home_url( '/about/' );
 $tel_href   = 'tel:' . alea_fact( 'phone_tel' );
 $wa_href    = alea_wa_link( sprintf( "Hi ALEA, I'd like a free modular kitchen estimate for my home in %s.", $city ) );
 $phone_disp = alea_fact( 'phone_display' );
-$brands     = implode( ' and ', $f['hardware_brands'] );
+/* House connector, from facts.php — "Hettich and Blum" in prose, never a second
+   local implode() that can drift to "&". */
+$brands     = alea_brands();
 /* Built from the FILTERED list, not raw service_area: every place named here is
    also a place this page can link to and count, so the prose, the sibling nav
    and the counts cannot silently disagree. */
@@ -129,7 +136,7 @@ list( $ex_low, $ex_high, $ex_sqft ) = alea_kitchen_total( $ex_rft, $ex_slug );
    true (and grammatical) if service_area ever shrinks to a single entry. */
 $serve_phrase = ( 1 === $city_count )
 	? 'the one place we serve'
-	: sprintf( 'one of the %d places we serve', $city_count );
+	: sprintf( 'one of the %s places we serve', alea_num_word( $city_count ) );
 
 $presentation = array(
 	'panchkula' => array(
@@ -298,15 +305,11 @@ foreach ( $faq as $item ) {
 ?>
 <div class="ax-root">
 
-	<style data-no-optimize="1">
-	/* Page-specific: the hero's secondary text link and the whole-row city links. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:var(--ax-fg-muted)}
-	.axp-hero-alt a{display:inline-block;min-height:var(--tap);line-height:var(--tap);padding-inline:2px;color:inherit}
-	.axp-sibrow{min-height:var(--tap-lg,56px);align-items:center}
-	.axp-sibrow--link{text-decoration:none;color:inherit}
-	.axp-sibrow--link .ax-spectable__key{color:var(--ax-fg);text-decoration:underline;text-decoration-color:var(--ax-rule);text-underline-offset:.22em}
-	.axp-sibrow--link:hover .ax-spectable__key{text-decoration-color:var(--ax-fg)}
-	</style>
+	<?php /* No page-local <style> block. The hero's secondary text link is
+	         .ax-hero__alt and the whole-row links are .ax-spectable__row--tap /
+	         --link, both in design-system.css — this page used to re-declare
+	         both, and its copy of the row link had drifted to a --tap-lg
+	         fallback of 56px against the real token's 52px. */ ?>
 
 	<!-- ================================================== 1. HERO -->
 	<section class="ax-hero ax-hero--short">
@@ -322,7 +325,7 @@ foreach ( $faq as $item ) {
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free visit</a> &mdash; free, no obligation</p>
+			<p class="ax-hero__alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				MADE AT <?php echo esc_html( $f['factory_place'] ); ?>
 				/ <?php echo (int) $f['warranty_years']; ?>-YEAR WRITTEN WARRANTY
@@ -458,10 +461,10 @@ foreach ( $faq as $item ) {
 				         'collections' (the same array the cards loop over) and the
 				         area count from the filtered list — so adding or retiring
 				         either cannot leave this heading quoting a stale number. */ ?>
-				<h2 class="ax-h2">The same <?php echo (int) count( $f['collections'] ); ?> bands in <?php echo esc_html( $city ); ?> as everywhere else.</h2>
+				<h2 class="ax-h2">The same <?php echo esc_html( alea_num_word( count( $f['collections'] ) ) ); ?> bands in <?php echo esc_html( $city ); ?> as everywhere else.</h2>
 				<p class="ax-lead">
 					Rates are per square foot of cabinetry and they are the same in all
-					<?php echo (int) $city_count; ?> areas we serve. There is no
+					<?php echo esc_html( alea_num_word( $city_count ) ); ?> areas we serve. There is no
 					<?php echo esc_html( $city ); ?> price list, and no local surcharge hiding behind a form.
 				</p>
 			</header>
@@ -498,113 +501,78 @@ foreach ( $faq as $item ) {
 				<?php endforeach; ?>
 			</div>
 
-			<div class="ax-grid ax-grid--split ax-mt-7">
-				<div class="ax-reveal">
-					<h3 class="ax-h3">What a kitchen length turns into, in rupees.</h3>
-					<p class="ax-lead ax-mt-4">
-						Because the rates are per square foot of cabinetry, a length becomes a price like this.
-						The arithmetic is on the page; the estimator does it for your own numbers in about a
-						minute, before we ask for your phone number.
-						<a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a>.
-					</p>
-					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
-					</div>
-				</div>
-				<div class="ax-reveal">
-					<div class="ax-spectable--rows">
-						<div class="ax-spectable__row">
-							<span class="ax-spectable__key">Kitchen length</span>
-							<span class="ax-spectable__val"><?php echo (int) $ex_rft; ?> running feet</span>
-						</div>
-						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo (int) $ex_rft; ?> rft &times; <?php echo (int) $sqft_rft; ?> sq ft</span>
-							<span class="ax-spectable__val"><?php echo (int) $ex_sqft; ?> sq ft of cabinetry</span>
-						</div>
-						<div class="ax-spectable__row">
-							<span class="ax-spectable__key"><?php echo esc_html( $ex_name ); ?> band</span>
-							<span class="ax-spectable__val"><?php echo esc_html( alea_price_band( $ex_slug ) ); ?></span>
-						</div>
-						<div class="ax-spectable__row">
-							<span class="ax-spectable__key">Estimated range</span>
-							<span class="ax-spectable__val"><strong>&#8377;<?php echo esc_html( alea_inr( $ex_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $ex_high ) ); ?></strong></span>
-						</div>
-					</div>
-					<p class="ax-spectable__note">
-						Illustrative arithmetic only, not a quotation and not a delivered project &mdash; assumes
-						standard base + wall units, about <?php echo (int) $sqft_rft; ?> sq ft of cabinetry per
-						running foot. Cabinetry only; countertop, chimney, hob, sink and appliances are itemised
-						separately.
-					</p>
+			<?php /* The worked arithmetic that used to sit here — kitchen length,
+			         sq ft, band, estimated range — was the same four rows on all
+			         four city pages, and it is published in full, with the
+			         exclusions and the assumption spelt out, on
+			         /modular-kitchen-price/. One sentence and the link rather
+			         than a fourth copy of somebody else's page. The same worked
+			         example still runs in the FAQ below, where a reader who
+			         searched for the price in this city needs a number rather
+			         than a link. */ ?>
+			<div class="ax-reveal ax-mt-7">
+				<p class="ax-lead">
+					Because the rates are per square foot of cabinetry, a kitchen length becomes a price.
+					<a class="ax-link" href="<?php echo esc_url( $price_url ); ?>">The published price list</a>
+					works that arithmetic through in full; the estimator does it for your own numbers in about
+					a minute, before we ask for your phone number.
+				</p>
+				<?php
+				/* Exclusions from facts.php via alea_excludes_text(), worded as
+				   /about/ words them. The sentence typed here before named five
+				   items and omitted CIVIL WORK, which told the reader tiling,
+				   plumbing and electrical sat inside the per-sq-ft rate. */
+				$ax_excl = alea_excludes_text();
+				?>
+				<?php if ( $ax_excl ) : ?>
+				<p class="ax-caption ax-mt-4">
+					Cabinetry only. Itemised separately: <?php echo esc_html( $ax_excl ); ?>.
+				</p>
+				<?php endif; ?>
+				<div class="ax-btnrow ax-mt-5">
+					<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<!-- ================================================== 6. WHY BUY FROM THE FACTORY -->
+	<!-- ================================================== 6. WHAT TO CHECK, AND WHERE -->
+	<?php /* This was a four-item proof block — factory, hardware, warranty,
+	         published prices — restated in full on every city page, so the same
+	         sixty lines stood on four URLs. Not one of those four facts is
+	         city-specific, and each already has a page that sets it out properly,
+	         so the block is now the sentence and the links to those pages. The
+	         city pages should send a reader to the record, not paraphrase it a
+	         fourth time. */ ?>
 	<section class="ax-section ax-section--sheet ax-section--ruled">
-		<div class="ax-wrap">
-			<div class="ax-grid ax-grid--split">
-				<div class="ax-reveal">
-					<header class="ax-head ax-mb-0">
-						<p class="ax-eyebrow">Why buy from the factory</p>
-						<h2 class="ax-h2">Four things you can check before you pay us anything.</h2>
-						<p class="ax-lead ax-mt-4">
-							Each of these is either written down or standing in a building you can walk into.
-							That is the only kind of claim we are prepared to put on a city page.
-						</p>
-					</header>
-					<?php /* Experience-centre display photography, captioned as exactly
-					         what it is; the alt comes from images.php. Nothing here is
-					         presented as a project in this city, because no such
-					         photography is verified. */ ?>
-					<figure class="ax-media ax-media--169 ax-mt-6">
-						<span class="ax-media__frame">
-							<?php echo alea_img( 'accessories' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							<span class="ax-media__tag">Display</span>
-						</span>
-						<figcaption class="ax-media__caption">
-							Accessories on display / ALEA experience centre &mdash;
-							<b>open and close the fittings yourself on a free visit</b>
-						</figcaption>
-					</figure>
-				</div>
-				<ul class="ax-prooflist ax-reveal">
-					<li class="ax-proof">
-						<span class="ax-proof__tick" aria-hidden="true"></span>
-						<div class="ax-proof__text">
-							Our own <?php echo esc_html( $f['factory_sqft'] ); ?> sq ft factory at
-							<?php echo esc_html( $f['factory_place'] ); ?> &mdash; where your kitchen is actually
-							made, and where you can stand and watch it happen.
-							<span class="ax-proof__never">Never outsourced</span>
-						</div>
-					</li>
-					<li class="ax-proof">
-						<span class="ax-proof__tick" aria-hidden="true"></span>
-						<div class="ax-proof__text">
-							Hardware from <?php echo esc_html( $brands ); ?> fitted as standard &mdash; hinges,
-							runners and soft-close systems from named brands, itemised on your quotation.
-							<span class="ax-proof__never">Never generic hardware</span>
-						</div>
-					</li>
-					<li class="ax-proof">
-						<span class="ax-proof__tick" aria-hidden="true"></span>
-						<div class="ax-proof__text">
-							A <?php echo (int) $f['warranty_years']; ?>-year warranty, in writing, with the full
-							terms in the written document you receive. Ask to read it on the free visit.
-							<span class="ax-proof__never">Never a verbal promise</span>
-						</div>
-					</li>
-					<li class="ax-proof">
-						<span class="ax-proof__tick" aria-hidden="true"></span>
-						<div class="ax-proof__text">
-							Prices published on the page &mdash; the same
-							&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?>
-							<?php echo esc_html( $price_unit ); ?> bands in <?php echo esc_html( $city ); ?> as everywhere.
-							<span class="ax-proof__never">Never a different number by area</span>
-						</div>
-					</li>
-				</ul>
+		<div class="ax-wrap ax-wrap--narrow">
+			<header class="ax-head ax-reveal">
+				<p class="ax-eyebrow">Before you pay us anything</p>
+				<h2 class="ax-h2">Four things worth checking, and where each is written down.</h2>
+				<p class="ax-lead ax-mt-4">
+					The factory, the <?php echo esc_html( $brands ); ?> hardware fitted as standard, the written
+					warranty and the published bands are the same for <?php echo esc_html( $city ); ?> as for
+					every other area we serve. Each one is set out in full on its own page, so you can read it
+					rather than take a city page's word for it.
+				</p>
+			</header>
+			<div class="ax-spectable--rows ax-reveal">
+				<a class="ax-spectable__row ax-spectable__row--tap ax-spectable__row--link" href="<?php echo esc_url( $factory_url ); ?>">
+					<span class="ax-spectable__key">Where your kitchen is made</span>
+					<span class="ax-spectable__val"><?php echo esc_html( $f['factory_sqft'] ); ?> sq ft &middot; <?php echo esc_html( $f['factory_place'] ); ?></span>
+				</a>
+				<a class="ax-spectable__row ax-spectable__row--tap ax-spectable__row--link" href="<?php echo esc_url( $warranty_url ); ?>">
+					<span class="ax-spectable__key">What the warranty says</span>
+					<span class="ax-spectable__val"><?php echo (int) $f['warranty_years']; ?> years, in writing</span>
+				</a>
+				<a class="ax-spectable__row ax-spectable__row--tap ax-spectable__row--link" href="<?php echo esc_url( $price_url ); ?>">
+					<span class="ax-spectable__key">What it costs, published</span>
+					<span class="ax-spectable__val">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> <?php echo esc_html( $price_unit ); ?></span>
+				</a>
+				<a class="ax-spectable__row ax-spectable__row--tap ax-spectable__row--link" href="<?php echo esc_url( $about_url ); ?>">
+					<span class="ax-spectable__key">Who is behind the factory</span>
+					<span class="ax-spectable__val">Furniture since <?php echo esc_html( $f['founded_furniture'] ); ?> &middot; ALEA since <?php echo esc_html( $f['alea_since'] ); ?></span>
+				</a>
 			</div>
 		</div>
 	</section>
@@ -617,7 +585,7 @@ foreach ( $faq as $item ) {
 				<h2 class="ax-h2">We visit homes in <?php echo esc_html( $city ); ?>.</h2>
 				<p class="ax-lead ax-mt-4"><?php echo esc_html( $pres['visit'] ); ?></p>
 				<div class="ax-btnrow ax-mt-5">
-					<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free visit in <?php echo esc_html( $city ); ?></a>
+					<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free design visit in <?php echo esc_html( $city ); ?></a>
 				</div>
 				<p class="ax-btn-note">
 					Free &middot; no obligation &middot; we visit <?php echo esc_html( $areas ); ?>
@@ -632,7 +600,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap ax-wrap--narrow">
 			<header class="ax-head ax-reveal">
 				<p class="ax-eyebrow">Areas we serve</p>
-				<h2 class="ax-h2">The <?php echo (int) $city_count; ?> areas we deliver and install in.</h2>
+				<h2 class="ax-h2">The <?php echo esc_html( alea_num_word( $city_count ) ); ?> areas we deliver and install in.</h2>
 				<p class="ax-lead">
 					These are the only areas we claim. If you are just outside one of them, call and ask
 					&mdash; we will tell you plainly whether we can reach you.
@@ -648,12 +616,12 @@ foreach ( $faq as $item ) {
 				foreach ( $alea_cities as $r_slug => $r_name ) :
 					if ( $r_slug === $city_slug ) :
 					?>
-				<div class="ax-spectable__row axp-sibrow">
+				<div class="ax-spectable__row ax-spectable__row--tap">
 					<span class="ax-spectable__key"><?php echo esc_html( $r_name ); ?> &mdash; this page</span>
 					<span class="ax-spectable__val">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> <?php echo esc_html( $price_unit ); ?></span>
 				</div>
 					<?php else : ?>
-				<a class="ax-spectable__row axp-sibrow axp-sibrow--link" href="<?php echo esc_url( home_url( $city_base . $r_slug . '/' ) ); ?>">
+				<a class="ax-spectable__row ax-spectable__row--tap ax-spectable__row--link" href="<?php echo esc_url( home_url( $city_base . $r_slug . '/' ) ); ?>">
 					<span class="ax-spectable__key">Modular kitchens in <?php echo esc_html( $r_name ); ?></span>
 					<span class="ax-spectable__val">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> <?php echo esc_html( $price_unit ); ?></span>
 				</a>
@@ -662,7 +630,7 @@ foreach ( $faq as $item ) {
 			</div>
 			<p class="ax-spectable__note">
 				Same factory, same hardware, same written warranty, same published bands in all
-				<?php echo (int) $city_count; ?>.
+				<?php echo esc_html( alea_num_word( $city_count ) ); ?>.
 			</p>
 		</div>
 	</section>
@@ -694,7 +662,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Let us measure your kitchen in <?php echo esc_html( $city ); ?>.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both are free and carry no obligation: a measurement at your home in

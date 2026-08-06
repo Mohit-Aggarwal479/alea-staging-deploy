@@ -37,8 +37,12 @@ $sqft       = $f['factory_sqft'];
 $place      = $f['factory_place'];
 $wty        = (int) $f['warranty_years'];
 $days       = (int) $f['install_days'];
-$brands     = implode( ' and ', $f['hardware_brands'] );
-$brands_amp = implode( ' & ', $f['hardware_brands'] );
+/* Both forms come from alea_brands() in facts.php, which owns the house rule:
+   'and' in every sentence, '&' only where the label is set in mono and space
+   is the constraint (spec strips, spec-table values, eyebrows, meta strips).
+   They used to be two local implode()s and the page mixed them mid-prose. */
+$brands     = alea_brands();
+$brands_amp = alea_brands( 'tight' );
 $calc_url   = home_url( '/kitchen-cost-calculator/' );
 /* /projects/ had no inbound link anywhere in the redesign. It is our work
    photographed at the experience centre — kitchens, not wardrobes — so it is
@@ -148,7 +152,7 @@ foreach ( $faq as $faq_item ) {
 	.axp-type .axp-more{margin-top:auto;padding-top:var(--sp-5)}
 	.axp-when{margin-top:var(--sp-2)}
 	.axp-note{max-width:60ch}
-	.axp-hero-note{margin-top:var(--sp-4);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-note{margin-top:var(--sp-4);font-size:15px;color:#E4E1DC}
 	/* The design system drops the sticky-bar reserve at 768px, but the THEME's
 	   .aleac-mbar stays visible to 781px — so the bar would cover the bottom of
 	   the page on an iPad in portrait. Re-reserve across that 14px band. */
@@ -169,11 +173,11 @@ foreach ( $faq as $faq_item ) {
 			<h1 class="ax-hero__title">Wardrobes, made on the same factory floor as our kitchens.</h1>
 			<p class="ax-hero__sub">
 				Sliding, hinged and walk-in &mdash; built in our own <?php echo esc_html( $sqft ); ?>&nbsp;sq&nbsp;ft factory,
-				fitted with <?php echo esc_html( $brands_amp ); ?> hardware as standard, and carrying the same
+				fitted with <?php echo esc_html( $brands ); ?> hardware as standard, and carrying the same
 				<?php echo esc_html( $wty ); ?>-year written warranty.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free measurement</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free design visit</a>
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $tel_href ); ?>">Call <span class="ax-btn__note"><?php echo esc_html( $phone_disp ); ?></span></a>
 			</div>
 			<p class="axp-hero-note">Free, at your home, no obligation &mdash; measurements are yours to keep either way.</p>
@@ -334,7 +338,7 @@ foreach ( $faq as $faq_item ) {
 						</ul>
 					</div>
 					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--primary" href="#alea-book">Book a free measurement</a>
+						<a class="ax-btn ax-btn--primary" href="#alea-book">Book a free design visit</a>
 						<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $calc_url ); ?>">Price a kitchen instead</a>
 					</div>
 					<p class="ax-btn-note">The online estimator prices kitchens only &mdash; wardrobes are quoted after the measurement</p>
@@ -355,7 +359,7 @@ foreach ( $faq as $faq_item ) {
 					frames below are our own display centre &mdash; a shelving display and the
 					seating area &mdash; captioned as exactly what they show. The wardrobes are
 					on the floor: come and open a door, pull a drawer out to full extension, and
-					see the <?php echo esc_html( $brands_amp ); ?> hinges and runners working
+					see the <?php echo esc_html( $brands ); ?> hinges and runners working
 					before you decide anything.
 				</p>
 			</div>
@@ -380,7 +384,7 @@ foreach ( $faq as $faq_item ) {
 				<?php endforeach; ?>
 			</div>
 			<div class="ax-btnrow ax-mt-6">
-				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement &mdash; or just come and look</a>
+				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit &mdash; or just come and look</a>
 				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See our work &mdash; kitchens, photographed at the experience centre</a>
 			</div>
 		</div>
@@ -416,7 +420,7 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap" id="alea-book">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free measurement</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">We measure, then we price it.</h2>
 					<p class="ax-lead ax-mt-4">
 						Someone comes to your home, measures the space, and talks through what goes inside.

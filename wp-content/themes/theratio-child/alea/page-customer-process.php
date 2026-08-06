@@ -195,17 +195,13 @@ foreach ( $faq as $item ) {
 	<style data-no-optimize="1">
 	/* Page-specific: the hero's secondary text link, and the three-line
 	   we / you / you-get list inside each step. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:var(--ax-fg-muted)}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:var(--ax-fg-muted)}
 	.axp-hero-alt a{color:inherit}
 	.axp-do{margin-top:var(--sp-4);border-top:1px solid var(--ax-rule)}
 	.axp-do__row{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-1);padding:var(--sp-3) 0;border-bottom:1px solid var(--ax-rule)}
 	.axp-do__k{font-family:var(--font-mono);font-size:var(--fs-nano);line-height:1.4;letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}
-	.axp-do__v{min-width:0;font-size:.9375rem;line-height:1.55;color:var(--ax-fg);text-wrap:pretty}
-	@media (min-width:640px){.axp-do__row{grid-template-columns:8.5rem minmax(0,1fr);gap:var(--sp-4);align-items:baseline}}
-	/* .ax-step__time is nested in .ax-step__body here, so it is not a grid item:
-	   the kit's >=1024px `margin-top:0` would strip its separation and the 12rem
-	   third column it was meant to occupy would sit empty. Restore both. */
-	@media (min-width:1024px){.ax-root .ax-steps .ax-step{grid-template-columns:3.5rem minmax(0,1fr)}.ax-root .ax-step__body .ax-step__time{margin-top:var(--sp-3)}}
+	.axp-do__v{min-width:0;font-size:15px;line-height:1.55;color:var(--ax-fg);text-wrap:pretty}
+	@media (min-width:640px){.axp-do__row{grid-template-columns:136px minmax(0,1fr);gap:var(--sp-4);align-items:baseline}}
 	</style>
 
 	<!-- ================================================== 1. HERO -->
@@ -225,14 +221,14 @@ foreach ( $faq as $item ) {
 			<p class="ax-eyebrow">How it works</p>
 			<h1 class="ax-hero__title">From first call to cooking.</h1>
 			<p class="ax-hero__sub">
-				<?php echo (int) count( $steps ); ?> steps, in order, with what we do, what we need from you and what you
+				<?php echo esc_html( alea_num_word( count( $steps ), true ) ); ?> steps, in order, with what we do, what we need from you and what you
 				actually receive at each one. It begins with a free measurement at your home and ends with a
 				<?php echo (int) $warranty_yrs; ?>-year warranty in writing.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free site visit</a> &mdash; free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				<?php echo (int) count( $steps ); ?> STEPS
 				/ FREE SITE VISIT
@@ -274,7 +270,7 @@ foreach ( $faq as $item ) {
 	<section class="ax-section">
 		<div class="ax-wrap">
 			<header class="ax-head ax-head--wide ax-reveal">
-				<p class="ax-eyebrow">The <?php echo (int) count( $steps ); ?> steps</p>
+				<p class="ax-eyebrow">The <?php echo esc_html( alea_num_word( count( $steps ) ) ); ?> steps</p>
 				<h2 class="ax-h2">What happens, in the order it happens.</h2>
 				<p class="ax-lead">
 					Each step says three things: what we do, what we need from you, and what you hold in your hand
@@ -289,10 +285,10 @@ foreach ( $faq as $item ) {
 						<h3 class="ax-step__title"><?php echo esc_html( $s['title'] ); ?></h3>
 						<p class="ax-step__text"><?php echo esc_html( $s['text'] ); ?></p>
 						<?php /* .ax-step__time sits INSIDE .ax-step__body: as a direct child of
-						         .ax-step it would land in the 2.75rem numeral column below
-						         1024px. Nested it is not a grid item, so the kit's >=1024px
-						         rules for it are inert — the .axp-* block above re-adds the
-						         spacing and drops the now-empty third column. */ ?>
+						         .ax-step it would land in the 44px numeral column below
+						         1024px. Nested it is not a grid item, which is why the kit's
+						         >=1024px rules for it are scoped to `.ax-step > .ax-step__time`
+						         — the chip keeps its own margin-top here. */ ?>
 						<span class="ax-step__time"><?php echo esc_html( $s['time'] ); ?></span>
 						<?php /* A real <dl>: each label is tied to its value, so a screen
 						         reader reads three pairs rather than six loose fragments. */ ?>
@@ -423,7 +419,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Step one is a measurement, and it costs nothing.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both visits are free and carry no obligation: a measurement at your home across

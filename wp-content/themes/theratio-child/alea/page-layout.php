@@ -407,14 +407,20 @@ $faq = array(
 	),
 	array(
 		'q' => sprintf( 'What does %s %s kitchen cost?', $lay_article, $lay_name ),
+		/* Both articles are derived from the numbers rather than written into the
+		   string: this shape's range can open on 8 or 18, and a hard-coded "a"
+		   printed "a 8-running-foot kitchen" — in the visible answer and in the
+		   FAQPage JSON-LD below, which renders from this same array. */
 		'a' => sprintf(
-			'Our rates are published per square foot of cabinetry, and %1$s is %2$s. Assuming standard base and wall units — about %3$d sq ft of cabinetry per running foot — a %4$d-running-foot kitchen works out to roughly ₹%5$s–%6$s, and a %7$d-running-foot one to roughly ₹%8$s–%9$s. That is illustrative arithmetic from the published band, not a quotation, and it covers cabinetry only. The estimator does the same sum for your own length before we ask for your phone number.',
+			'Our rates are published per square foot of cabinetry, and %1$s is %2$s. Assuming standard base and wall units — about %3$d sq ft of cabinetry per running foot — %4$s %5$d-running-foot kitchen works out to roughly ₹%6$s–%7$s, and %8$s %9$d-running-foot one to roughly ₹%10$s–%11$s. That is illustrative arithmetic from the published band, not a quotation, and it covers cabinetry only. The estimator does the same sum for your own length before we ask for your phone number.',
 			$ex_name,
 			$ex_band,
 			$sqft_rft,
+			alea_num_article( $rft_lo ),
 			$rft_lo,
 			alea_inr( $lo_low ),
 			alea_inr( $lo_high ),
+			alea_num_article( $rft_hi ),
 			$rft_hi,
 			alea_inr( $hi_low ),
 			alea_inr( $hi_high )
@@ -455,11 +461,11 @@ $svg_allowed = array(
 	/* Page-specific: the layout diagram, the guide-price block, the nav cards. */
 	.axp-dia{width:60px;height:60px;display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:square;margin-bottom:var(--sp-4)}
 	.axp-dia--card{width:34px;height:34px;color:var(--graphite);margin-bottom:var(--sp-3)}
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:var(--ax-fg-muted)}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:var(--ax-fg-muted)}
 	.axp-hero-alt a{color:inherit}
 	.axp-band{border-top:2px solid var(--ax-fg);padding-top:var(--sp-4)}
 	.axp-band__label{display:block;margin-bottom:var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}
-	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(1.375rem,4.5vw,2rem);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
+	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(22px,4.5vw,32px);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
 	.axp-band__note{margin-top:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.6;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg-muted)}
 	.axp-nav__cta{margin-top:auto;padding-top:var(--sp-4)}
 	/* Diagram / design-render figure: shown whole, never cropped, so a line
@@ -487,7 +493,7 @@ $svg_allowed = array(
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_pre ); ?>">Price this layout</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free measurement</a> &mdash; free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				TYPICALLY <?php echo (int) $rft_lo; ?>&ndash;<?php echo (int) $rft_hi; ?> RUNNING FEET (GUIDANCE)
 				/ <?php echo (int) $f['warranty_years']; ?>-YEAR WRITTEN WARRANTY
@@ -807,7 +813,7 @@ $svg_allowed = array(
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Let us measure the room before you commit to a shape.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both are free and carry no obligation: a site visit and measurement at your home across

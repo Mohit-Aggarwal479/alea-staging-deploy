@@ -137,7 +137,9 @@ $faq = array(
 	array(
 		'q' => 'What support would I get?',
 		'a' => sprintf(
-			'The honest answer is that we publish no support package, so anything specific — display units, training, marketing, credit — is settled on the call rather than promised here. What is already true, and checkable before you ever speak to us, is what sits behind the product: it is manufactured in our own %1$s sq ft factory at %2$s rather than bought in, %3$s hardware is fitted as standard, our per-sq-ft rates are published openly on this site, and every kitchen carries a %4$d-year warranty in writing. You would be selling factory-made product with a real document behind it.',
+			/* Four facts in one 63-word sentence read as a wall. Same four facts,
+			   one sentence each — the answer is scanned, not studied. */
+			'The honest answer is that we publish no support package, so anything specific — display units, training, marketing, credit — is settled on the call rather than promised here. What is already true, and checkable before you ever speak to us, is what sits behind the product. It is made in our own %1$s sq ft factory at %2$s, not bought in. %3$s hardware is fitted as standard. Our per-sq-ft rates are published on this site. Every kitchen carries a %4$d-year warranty in writing. You would be selling factory-made product with a real document behind it.',
 			$sqft,
 			$place,
 			$brands,
@@ -147,7 +149,7 @@ $faq = array(
 	array(
 		'q' => 'How do I start?',
 		'a' => sprintf(
-			'Send the enquiry form on this page and put four things in its message box: your business name, your city, your current line of business and a good time to call. The form is the same one the rest of the site uses, so it also asks for a name, a phone number, an email and how soon you are planning — that last question is worded for homeowners, so pick whichever timing is nearest and tell us your real position in the message box. The call and WhatsApp buttons on this page do the same job if that is quicker. You are also welcome to come to %1$s and see the factory first; that visit is free and carries no obligation, and it is the fastest way to judge whether any of this is worth your time.',
+			'Send the enquiry form on this page and put four things in its message box: your business name, your city, your current line of business and a good time to call. The form is the one the whole site uses, so it also asks how soon you are planning. That question is written for homeowners — pick the nearest option and put your real position in the message box. The call and WhatsApp buttons on this page do the same job if that is quicker. You are also welcome to come to %1$s and see the factory first; that visit is free and carries no obligation, and it is the fastest way to judge whether any of this is worth your time.',
 			$place
 		),
 	),
@@ -174,7 +176,7 @@ foreach ( $faq as $item ) {
 	<style data-no-optimize="1">
 	/* Page-specific: the hero's secondary text link and the plain-statement
 	   call-out used wherever this page has to say "we do not publish that". */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
 	.axp-hero-alt a{color:inherit}
 	.axp-plain{margin-top:var(--sp-6);padding-left:var(--sp-4);border-left:2px solid var(--ax-fg);max-width:62ch}
 	.axp-plain__label{display:block;margin-bottom:var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}

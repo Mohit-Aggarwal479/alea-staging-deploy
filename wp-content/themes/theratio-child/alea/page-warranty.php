@@ -102,7 +102,7 @@ foreach ( $faq as $item ) {
 				You hold the paper — the promise is not made over the phone.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free visit — read the terms</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free design visit — read the terms</a>
 			</div>
 			<p class="ax-hero__credit">
 				<?php echo (int) $wty; ?>-YEAR WRITTEN WARRANTY
@@ -330,7 +330,7 @@ foreach ( $faq as $item ) {
 	<!-- id="estimate": landing anchor for the theme's site-wide sticky mobile
 	     bar (.aleac-mbar "Free Estimate" button in functions.php). It sits on
 	     the inner wrap because the section already carries id="alea-book",
-	     the target of this page's own "book a free visit" CTAs. -->
+	     the target of this page's own "Book a free design visit" CTAs. -->
 	<section class="ax-section ax-section--ruled" id="alea-book">
 		<div class="ax-wrap" id="estimate">
 			<div class="ax-grid ax-grid--split">
@@ -338,7 +338,7 @@ foreach ( $faq as $item ) {
 					<p class="ax-eyebrow">Read it yourself</p>
 					<h2 class="ax-h2">Come and read the warranty before you spend a rupee.</h2>
 					<p class="ax-lead ax-mt-4">
-						Book a free site visit at your home, or a free factory visit at
+						Book a free design visit at your home, or a free factory visit at
 						<?php echo esc_html( $f['factory_place'] ); ?> — either way, ask for the written
 						warranty terms and take your time with them. Both visits are free and carry no obligation.
 					</p>

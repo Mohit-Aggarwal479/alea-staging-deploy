@@ -32,6 +32,12 @@
  *   only one printed. The design and manufacturing answers say plainly that we
  *   do not publish a number and point the reader at dates in writing, which is
  *   a better answer than a figure nobody could be held to.
+ * - THE INSTALLATION SENTENCE IS NOT WRITTEN HERE. It comes from
+ *   alea_install_sentence() in facts.php, which hedges the figure ("about")
+ *   because 'install_days' is recorded as a bare number with no anchor. The
+ *   same question is answered on other pages that also emit FAQPage schema, so
+ *   the sentence has one home; change it there, not here. It is the ON-SITE
+ *   window only and never a total lead time, which this site does not publish.
  * - NO WARRANTY COVERAGE TABLE. The warranty is "10 years, in writing" and the
  *   terms live "in the written document you receive". The answer says why a
  *   web-page summary is deliberately not offered in its place.
@@ -237,14 +243,17 @@ $groups = array(
 				),
 			),
 			array(
-				/* The only duration this site publishes. Dropped entirely rather
-				   than printed as "about 0 days" if facts.php ever loses the key. */
+				/* The only duration this site publishes, and its leading sentence is
+				   alea_install_sentence() from facts.php rather than a string typed
+				   here: the same question is answered on the home page and on
+				   /modular-kitchen/ too, and all three feed FAQPage schema, so the
+				   wording has to come from one place or Google can surface two
+				   different answers to one question. Only the clause after it is
+				   local to this page. Dropped entirely rather than printed as
+				   "about 0 days" if facts.php ever loses the key. */
 				'if' => $install_days > 0,
 				'q'  => 'How long does installation take?',
-				'a'  => sprintf(
-					'Installation at your home takes about %1$d days. The cabinets arrive from the factory already built, so the work in your flat is fitting, levelling and aligning rather than carpentry on your floor.',
-					$install_days
-				),
+				'a'  => alea_install_sentence() . ' The cabinets arrive from the factory already built, so the work in your flat is fitting, levelling and aligning rather than carpentry on your floor.',
 			),
 			array(
 				'q' => 'What actually happens on installation day?',
@@ -417,10 +426,10 @@ foreach ( $groups as $g ) {
 	<style data-no-optimize="1">
 	/* Page-specific: the hero's secondary text link, the mono jump index, and
 	   scroll-margin so a deep link does not land under the theme header. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
-	/* Hero and city links: real 44px tap targets, not 25px inline boxes. */
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
+	/* Hero link: a real 44px tap target, not a 25px inline box. (The city links
+	   below get theirs from the kit's .ax-btn-note a rule.) */
 	.axp-hero-alt a{color:inherit;display:inline-flex;align-items:center;min-height:var(--tap);vertical-align:middle}
-	.axp-cities a{display:inline-flex;align-items:center;min-height:var(--tap);padding-inline:.25em}
 	.axp-jump{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-5)}
 	.axp-jump__link{display:inline-flex;align-items:center;min-height:var(--tap);font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg);text-decoration:none;border-bottom:1px solid var(--ax-rule)}
 	.axp-jump__link:hover{border-bottom-color:var(--ax-fg)}
@@ -448,7 +457,7 @@ foreach ( $groups as $g ) {
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free site visit</a> &mdash; free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				<?php echo (int) $answer_count; ?> ANSWERS
 				/ &#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?>&ndash;<?php echo esc_html( alea_inr( $band_high ) ); ?> <?php echo esc_html( strtoupper( $price_unit ) ); ?>
@@ -536,7 +545,11 @@ foreach ( $groups as $g ) {
 					<a class="ax-btn ax-btn--primary" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 					<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $price_url ); ?>">See the published price list</a>
 				<?php elseif ( 'timeline' === $g['id'] ) : ?>
-					<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free measurement</a>
+					<?php /* One label for one action, site-wide: "Book a free design visit"
+					         is this destination's own H1, <title> and slug. What happens on
+					         the visit is still called a measurement in prose — it is just
+					         not a second name for the button. */ ?>
+					<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit</a>
 					<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $factory_url ); ?>">Inside the factory</a>
 				<?php elseif ( 'materials' === $g['id'] ) : ?>
 					<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $kitchens_url ); ?>">The three collections</a>

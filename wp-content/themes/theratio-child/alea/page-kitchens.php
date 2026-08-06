@@ -208,7 +208,7 @@ foreach ( $faq as $item ) {
 
 	<style data-no-optimize="1">
 	/* Page-specific: layout-grid cards and the hero's secondary text link. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
 	.axp-hero-alt a{color:inherit}
 	.axp-layout__icon{width:34px;height:34px;color:var(--graphite)}
 	.axp-layout__cta{margin-top:auto;padding-top:var(--sp-4)}
@@ -235,13 +235,16 @@ foreach ( $faq as $item ) {
 			         without a locative implication. */ ?>
 			<h1 class="ax-hero__title">Kitchens made in our own factory.</h1>
 			<p class="ax-hero__sub">
-				<?php echo (int) count( $f['collections'] ); ?> collections, <?php echo (int) count( $layouts ); ?> layouts, one factory standard &mdash; priced in public from
+				<?php /* Counts are still derived, never typed — but spelled out, because
+				         this is a sentence. Numerals stay in the credit line and the spec
+				         strip below, where the mono setting is the point. */ ?>
+				<?php echo esc_html( alea_num_word( count( $f['collections'] ), true ) ); ?> collections, <?php echo esc_html( alea_num_word( count( $layouts ) ) ); ?> layouts, one factory standard &mdash; priced in public from
 				<span class="ax-mono">&#8377;<?php echo esc_html( alea_inr( $band_low ) ); ?></span> <?php echo esc_html( $price_unit ); ?> of cabinetry.
 			</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_url ); ?>">Get my price</a>
 			</div>
-			<p class="axp-hero-alt">or <a href="#alea-book">book a free site visit</a> &mdash; free, no obligation</p>
+			<p class="axp-hero-alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<?php /* Hub-specific credit line — the homepage already carries the
 			         factory / warranty / hardware triplet, so this one leads with
 			         what this page is for. Counts are derived, never typed. */ ?>
@@ -410,26 +413,25 @@ foreach ( $faq as $item ) {
 					separately on your quotation, so nothing appears later.
 				</p>
 			</header>
+			<?php /* Rendered from facts.php via alea_scope(), because the lead above calls
+			         this "the same list the estimator prices from" — and while these two
+			         columns were typed by hand, the estimator's copy had lost the faucet
+			         and headed its second column "quoted" rather than "itemised". */ ?>
 			<div class="ax-included ax-reveal">
 				<div class="ax-included__col ax-included--in">
 					<h3 class="ax-included__title">Included in the per-sq-ft rate</h3>
 					<ul class="ax-included__list">
-						<li>Cabinet carcasses and shutters, built in our own factory</li>
-						<li>Machine edge banding on every panel</li>
-						<li><?php echo esc_html( $brands ); ?> soft-close hinges and runners</li>
-						<li>Delivery across <?php echo esc_html( $areas ); ?></li>
-						<li>Installation by our own factory team</li>
-						<li>A <?php echo (int) $f['warranty_years']; ?>-year written warranty</li>
+						<?php foreach ( alea_scope( 'included' ) as $scope_line ) : ?>
+						<li><?php echo esc_html( $scope_line ); ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 				<div class="ax-included__col ax-included--out">
 					<h3 class="ax-included__title">Not included &mdash; itemised separately</h3>
 					<ul class="ax-included__list">
-						<li>Countertop &mdash; priced by material and run</li>
-						<li>Chimney and hob</li>
-						<li>Sink and faucet</li>
-						<li>Appliances</li>
-						<li>Civil work &mdash; tiling, plumbing, electrical</li>
+						<?php foreach ( alea_scope( 'excluded' ) as $scope_line ) : ?>
+						<li><?php echo esc_html( $scope_line ); ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 			</div>
@@ -477,7 +479,7 @@ foreach ( $faq as $item ) {
 				<?php endforeach; ?>
 			</div>
 			<div class="ax-btnrow ax-mt-6">
-				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free visit &mdash; see it in person</a>
+				<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit &mdash; see it in person</a>
 				<a class="ax-btn ax-btn--ghost" href="<?php echo esc_url( $work_url ); ?>">See more of our work</a>
 			</div>
 		</div>
@@ -507,7 +509,7 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Let us measure your kitchen &mdash; or come and see the factory.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both are free and carry no obligation: a site visit and measurement at your home across

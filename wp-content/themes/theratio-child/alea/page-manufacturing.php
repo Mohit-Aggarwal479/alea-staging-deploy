@@ -183,7 +183,7 @@ foreach ( $faq as $faq_item ) {
 	   for you" rider under each manufacturing stage. The "For you" label is real
 	   markup (.axp-means__k), never CSS content: it is copy the reader is meant
 	   to read, so it has to be selectable, translatable and present in the DOM. */
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem;color:#E4E1DC}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px;color:#E4E1DC}
 	.axp-hero-alt a{color:inherit}
 	.axp-means{display:block;margin-top:var(--sp-3);padding-top:var(--sp-2);border-top:1px solid var(--ax-rule);max-width:56ch;font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.5;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg)}
 	.axp-means__k{margin-right:.6em;color:var(--ax-fg-muted)}
@@ -207,7 +207,7 @@ foreach ( $faq as $faq_item ) {
 				This page is the sequence your kitchen goes through, in plain language.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free visit</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="#alea-book">Book a free design visit</a>
 				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $factory_url ); ?>">See inside the factory</a>
 			</div>
 			<p class="axp-hero-alt">Free, no obligation &mdash; or <a href="<?php echo esc_url( $calc_url ); ?>">get a price first</a></p>
@@ -422,7 +422,7 @@ foreach ( $faq as $faq_item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Come and watch the sequence for yourself.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both visits are free and carry no obligation: a measurement at your home across

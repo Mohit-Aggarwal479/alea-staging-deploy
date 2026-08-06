@@ -203,6 +203,20 @@ function alea_img_alt( $key ) {
 	return empty( $all[ $key ] ) ? '' : $all[ $key ]['alt'];
 }
 
+/**
+ * Intrinsic pixel size, for metadata that has to declare it (og:image:width /
+ * height). Lives here with the file, like the alt text, so no template can
+ * publish a size that does not match the picture. array( w, h ), or array() if
+ * the catalogue does not record one.
+ */
+function alea_img_dims( $key ) {
+	$all = alea_images();
+	if ( empty( $all[ $key ]['w'] ) || empty( $all[ $key ]['h'] ) ) {
+		return array();
+	}
+	return array( (int) $all[ $key ]['w'], (int) $all[ $key ]['h'] );
+}
+
 /** Keys of a given kind, e.g. alea_img_keys('photo-alea'). */
 function alea_img_keys( $kind ) {
 	$out = array();

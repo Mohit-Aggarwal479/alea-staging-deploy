@@ -169,7 +169,7 @@ foreach ( $faq as $item ) {
 	   already owns the hero's body colour, so the palette stays in one file. */
 	.axp-pending{padding:var(--sp-4);border:1px solid var(--ax-rule);border-left:3px solid var(--ax-fg);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.75;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg-muted)}
 	.axp-pending b{color:var(--ax-fg);font-weight:600}
-	.axp-hero-alt{margin-top:var(--sp-3);font-size:.9375rem}
+	.axp-hero-alt{margin-top:var(--sp-3);font-size:15px}
 	.axp-hero-alt a{display:inline-flex;align-items:center;min-height:var(--tap)}
 	</style>
 
@@ -191,7 +191,7 @@ foreach ( $faq as $item ) {
 				because those are customers&rsquo; homes, and they are not ours to put online.
 			</p>
 			<div class="ax-hero__actions">
-				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free visit</a>
+				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free design visit</a>
 			</div>
 			<?php /* Secondary path is a real target, not an 11px inline link:
 			         .axp-hero-alt a carries min-height:var(--tap). */ ?>
@@ -212,11 +212,14 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap ax-wrap--flush">
 			<div class="ax-specstrip">
 				<?php /* Counts the hero too — every photograph on the page, so the
-				         figure survives being counted off the screen. The gallery's
-				         own subtotal is stated on the gallery, where it applies. */ ?>
+				         figure survives being counted off the screen. The unit names
+				         where the eighth one is rather than printing a second bare
+				         number under the first, which read as a contradiction. The
+				         gallery's own subtotal is stated on the gallery too, where
+				         it applies. */ ?>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Photographs published</span>
-					<span class="ax-specstrip__value"><?php echo (int) $photo_total; ?><span class="ax-specstrip__unit"><?php echo (int) count( $plates ); ?> in the gallery</span></span>
+					<span class="ax-specstrip__value"><?php echo (int) $photo_total; ?><span class="ax-specstrip__unit"><?php echo (int) count( $plates ); ?> in the gallery, 1 above</span></span>
 				</div>
 				<div class="ax-specstrip__item">
 					<span class="ax-specstrip__label">Photographed at</span>
@@ -350,7 +353,7 @@ foreach ( $faq as $item ) {
 					         .ax-grid--split centres this shorter column against the
 					         4-item prooflist. One primary per screen, so this one yields. */ ?>
 					<div class="ax-btnrow ax-mt-5">
-						<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free visit</a>
+						<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $visit_url ); ?>">Book a free design visit</a>
 					</div>
 					<p class="ax-btn-note">Free &middot; no obligation &middot; you keep the measurements either way</p>
 				</div>
@@ -472,12 +475,13 @@ foreach ( $faq as $item ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Come and inspect the work yourself.</h2>
 					<p class="ax-lead ax-mt-4">
-						Both visits are free and carry no obligation: the experience centre and factory at
-						<?php echo esc_html( $f['factory_place'] ); ?>, or a measurement at your own home
-						across <?php echo esc_html( $areas ); ?>.
+						Every visit is free and carries no obligation: the experience centre, where the
+						kitchens above are standing; the factory at
+						<?php echo esc_html( $f['factory_place'] ); ?>, a separate site you can drive out
+						to; or a measurement at your own home across <?php echo esc_html( $areas ); ?>.
 					</p>
 					<div class="ax-btnrow ax-mt-5">
 						<a class="ax-btn ax-btn--ink" href="<?php echo esc_url( $tel_href ); ?>">Call <?php echo esc_html( $phone_disp ); ?></a>
@@ -485,7 +489,7 @@ foreach ( $faq as $item ) {
 					</div>
 					<?php /* The offer is now a link. Section 6 is the last calculator CTA
 					         above this point, so an unlinked mention here dead-ends. */ ?>
-					<p class="ax-btn-note">Would rather see the number first? <a href="<?php echo esc_url( $calc_url ); ?>">The estimator</a> is free and needs no sign-up.</p>
+					<p class="ax-btn-note">Would rather see the number first? <a class="ax-link" href="<?php echo esc_url( $calc_url ); ?>">The estimator</a> is free and needs no sign-up.</p>
 				</div>
 				<div class="ax-form ax-form--card ax-reveal">
 					<h3 class="ax-form__title">Book your free visit</h3>

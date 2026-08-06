@@ -89,32 +89,40 @@ add_filter( 'style_loader_src', function ( $src ) {
 /* =========================================================================
  * 4) LOCAL SEO — LocalBusiness structured data
  * Gives Google the location signal it currently lacks so the site can rank for
- * "modular kitchen in / near me". NAP/geo below are best-known values — confirm
- * against the Google Business Profile before relying on them. Rating/reviews are
- * intentionally NOT injected here (Google requires those to reflect on-page
- * review content).
+ * "modular kitchen in / near me". Rating/reviews are intentionally NOT injected
+ * here (Google requires those to reflect on-page review content).
+ *
+ * THE NODE MAY ONLY ASSERT WHAT THE VISIBLE SITE ASSERTS. Structured data is
+ * read by machines, so nothing here may outrun facts.php:
+ *  - phone and areaServed are READ from facts.php, never retyped, so the node
+ *    and the pages can never drift apart.
+ *  - there is NO 'address': no postal address is verified, which is exactly why
+ *    /contact/ publishes none. The old node claimed addressLocality "Panchkula"
+ *    against facts.php's explicit instruction on 'factory_place' (the factory is
+ *    at Raipur Rani, and "Panchkula city" must not be claimed). Add 'address'
+ *    back only when a verified postal address exists in facts.php.
+ *  - there is NO 'email': no email address is published anywhere on the site or
+ *    recorded in facts.php.
+ *  - 'image' comes from the images.php catalogue. The old value pointed at a
+ *    2022/04 Logo.svg that 404s, and Google does not accept SVG for a schema
+ *    image in any case.
  * ========================================================================= */
 add_action( 'wp_head', function () {
 	if ( is_admin() ) {
 		return;
 	}
+	require_once get_stylesheet_directory() . '/alea/facts.php';
+	require_once get_stylesheet_directory() . '/alea/images.php';
+
 	$data = array(
 		'@context'    => 'https://schema.org',
 		'@type'       => array( 'HomeGoodsStore', 'LocalBusiness' ),
 		'@id'         => home_url( '/#localbusiness' ),
 		'name'        => 'ALEA Modular Kitchen & Wardrobe',
 		'url'         => home_url( '/' ),
-		'telephone'   => '+91-95549-95449',
-		'email'       => 'info@aleamodular.com',
-		'image'       => home_url( '/wp-content/uploads/2022/04/Logo.svg' ),
+		'telephone'   => alea_fact( 'phone_tel' ),
 		'priceRange'  => '₹₹',
-		'address'     => array(
-			'@type'           => 'PostalAddress',
-			'addressLocality' => 'Panchkula',
-			'addressRegion'   => 'Haryana',
-			'addressCountry'  => 'IN',
-		),
-		'areaServed'  => array( 'Panchkula', 'Chandigarh', 'Mohali', 'Zirakpur' ),
+		'areaServed'  => alea_fact( 'service_area', array() ),
 		// Verified profile URLs (present on the live site). sameAs ties this
 		// LocalBusiness entity to the real accounts for Google's knowledge graph.
 		'sameAs'      => ( function_exists( 'alea_social_profiles' ) ? alea_social_profiles() : array(
@@ -128,6 +136,12 @@ add_action( 'wp_head', function () {
 			array( '@type' => 'Offer', 'itemOffered' => array( '@type' => 'Product', 'name' => 'Modular Wardrobe' ) ),
 		),
 	);
+	// Photography, from the catalogue, so the schema image can never be a path
+	// nobody checked. Omitted entirely rather than guessed if unavailable.
+	$image = alea_img_src( 'kitchen-wide' );
+	if ( '' !== $image ) {
+		$data['image'] = $image;
+	}
 	echo "\n<script type=\"application/ld+json\" id=\"alea-localbusiness-schema\">"
 		. wp_json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 		. "</script>\n";
@@ -163,25 +177,19 @@ document.addEventListener('DOMContentLoaded', function () {
 }, 100 );
 
 /* =========================================================================
- * 6) TRUST BAR — reusable shortcode  [alea_trust_bar]
- * Drop this shortcode into Elementor (ideally just under the hero) to show a
- * compact strip of the proof points ALEA already earned but currently buries.
- * Styling is scoped so it won't collide with theme CSS.
+ * 6) TRUST BAR — RETIRED  [alea_trust_bar]
+ * Published "Since 1998" (1998 is the furniture parent business, not ALEA —
+ * facts.php carries both dates and /about/ explains them) and "100% termite &
+ * water-proof", a material claim that appears nowhere in facts.php and on no
+ * redesigned page. Both were retyped here rather than read from facts.php, so
+ * they could not be corrected in one place.
+ *
+ * The registration is DELIBERATELY KEPT and returns nothing: any legacy page
+ * still carrying the shortcode renders an empty strip rather than the literal
+ * text "[alea_trust_bar]". Do not reinstate — the redesigned pages state these
+ * proof points from facts.php in their own words.
  * ========================================================================= */
-add_shortcode( 'alea_trust_bar', function () {
-	$items = array(
-		'Since 1998',
-		'95,000 sq ft own factory',
-		'100% termite &amp; water-proof',
-		'Installed in ~15 days',
-	);
-	$html  = '<div class="alea-trust-bar" role="list">';
-	foreach ( $items as $it ) {
-		$html .= '<span class="alea-trust-item" role="listitem">' . $it . '</span>';
-	}
-	$html .= '</div>';
-	return $html;
-} );
+add_shortcode( 'alea_trust_bar', '__return_empty_string' );
 
 add_action( 'wp_head', function () {
 	if ( function_exists( 'alea_redesign_entry' ) && alea_redesign_entry() ) { return; } // redesigned page: legacy trust bar not needed
@@ -377,33 +385,27 @@ add_shortcode( 'alea_before_after', function ( $atts ) {
 	<?php return ob_get_clean();
 } );
 
-/* --- [alea_pricing] --- */
-add_shortcode( 'alea_pricing', function () {
-	ob_start(); ?>
-<div class="aleac aleac-pr">
-  <div class="t"><span class="nm">Essential</span><div class="amt">₹1,150<small>/ sq ft</small></div><ul><li>Moisture-resistant ply carcass</li><li>Laminate shutters</li><li>Soft-close hinges</li><li>10-year written warranty</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
-  <div class="t feat"><span class="nm">Premium · Most chosen</span><div class="amt">₹1,750<small>/ sq ft</small></div><ul><li>100% termite &amp; water-proof carcass</li><li>Acrylic / PU shutters</li><li>European soft-close hardware</li><li>10-year warranty</li></ul><a class="abtn abtn-primary" href="#estimate">Get estimate</a></div>
-  <div class="t"><span class="nm">Luxury</span><div class="amt">₹2,600<small>/ sq ft</small></div><ul><li>Premium finishes &amp; glass</li><li>Motorised &amp; automation options</li><li>Bespoke island &amp; tall units</li><li>10-year written warranty</li></ul><a class="abtn" style="border:1px solid #d2d1c4" href="#estimate">Get estimate</a></div>
-</div>
-	<?php return ob_get_clean();
-} );
+/* --- [alea_pricing] — RETIRED ---
+ * Published a second, contradictory rate card: tiers named "Essential /
+ * Premium / Luxury" (the collections are Essential / Signature / Atelier),
+ * flat figures instead of the published bands, and ₹2,600 shown as a STARTING
+ * rate when facts.php has it as the TOP of the Atelier band. It also claimed a
+ * "100% termite & water-proof carcass" and "European soft-close hardware",
+ * neither of which is in facts.php.
+ * facts.php 'collections' + alea_price_band() are the only source for rates;
+ * /modular-kitchen-price/ is the page that publishes them.
+ * Registration kept, output empty — see the note on [alea_trust_bar] above. */
+add_shortcode( 'alea_pricing', '__return_empty_string' );
 
-/* --- [alea_process] --- */
-add_shortcode( 'alea_process', function () {
-	$steps = array(
-		array( '01', 'Free consultation', 'We understand your space, style and budget — at home or our showroom.', 'Day 1 · free' ),
-		array( '02', 'Site measurement', 'Precise measurements so everything fits to the millimetre.', 'Within 2–3 days' ),
-		array( '03', '3D design &amp; quote', 'See your kitchen in 3D with a clear, itemised price.', '~1 week' ),
-		array( '04', 'Approve &amp; confirm', 'Lock the design and finishes; production begins.', 'On approval' ),
-		array( '05', 'In-house manufacturing', 'Built in our 95,000 sq ft factory with European hardware.', '3–4 weeks' ),
-		array( '06', 'Install &amp; service', 'Fitted on schedule, backed by our after-sales team.', '1–2 days · 10-yr warranty' ),
-	);
-	ob_start(); echo '<div class="aleac aleac-ps">';
-	foreach ( $steps as $s ) {
-		echo '<div class="s"><span class="n">STEP ' . $s[0] . '</span><h3>' . $s[1] . '</h3><p>' . $s[2] . '</p><span class="w">' . $s[3] . '</span></div>';
-	}
-	echo '</div>'; return ob_get_clean();
-} );
+/* --- [alea_process] — RETIRED ---
+ * Published stage durations the redesign deliberately refuses to publish
+ * ("~1 week" design, "3-4 weeks" manufacturing — /faqs/ explains why no such
+ * number is printed) and, worst of all, "1-2 days" for installation against
+ * the site-wide 15 days in facts.php 'install_days'.
+ * sequence.php owns the manufacturing stages and carries the honesty rules
+ * they are written under; /about/customer-process/ owns the buyer's steps.
+ * Registration kept, output empty — see the note on [alea_trust_bar] above. */
+add_shortcode( 'alea_process', '__return_empty_string' );
 
 /* --- sticky mobile Call / WhatsApp / Estimate bar (auto) --- */
 add_action( 'wp_footer', function () {
@@ -565,89 +567,18 @@ add_action( 'wp_head', function () {
 	<?php
 }, 23 );
 
-add_shortcode( 'alea_landing', function () {
-	$up = home_url( '/wp-content/uploads' );
-	$hero = $up . '/2026/03/uploaded-image-31.png';
-	$wa   = 'https://wa.me/919554995449?text=Hi%20ALEA%2C%20I%27d%20like%20a%20free%20modular%20kitchen%20estimate.';
-	ob_start(); ?>
-<div class="aleax">
-
-  <section class="aleax-bleed aleax-hero"><div class="in">
-    <div>
-      <p class="eb">Panchkula · Tricity's modular specialists</p>
-      <h1>Kitchens &amp; wardrobes, engineered around your life.</h1>
-      <p class="sub">Factory-made modular interiors with a written 10-year warranty — designed, built and installed by ALEA. Get an instant price, then a free site visit.</p>
-      <div class="cta">
-        <a class="abtn abtn-primary" href="#estimate-tool">Get my instant price →</a>
-        <a class="abtn abtn-ghost" href="<?php echo esc_url( $wa ); ?>">WhatsApp us</a>
-      </div>
-      <div class="trust"><span>★★★★★ <b>4.8</b>/5</span><span><b>2,000+</b> interiors</span><span><b>10-year</b> warranty</span><span><b>95,000 sq ft</b> factory</span></div>
-    </div>
-    <div class="fig" style="background-image:url(<?php echo esc_url( $hero ); ?>)"><div class="badge"><span class="bmark">✓</span><div><b>10-Year</b><span>Written warranty</span></div></div></div>
-  </div></section>
-
-  <section class="aleax-stats">
-    <div class="aleax-stat"><b>12+</b><span>Years</span></div>
-    <div class="aleax-stat"><b>2,000+</b><span>Projects</span></div>
-    <div class="aleax-stat"><b>10-yr</b><span>Warranty</span></div>
-    <div class="aleax-stat"><b>15 days</b><span>Avg. install</span></div>
-  </section>
-
-  <section id="estimate-tool" class="aleax-sec"><div class="aleax-in">
-    <?php echo do_shortcode( '[alea_estimator]' ); ?>
-  </div></section>
-
-  <section class="aleax-bleed aleax-why"><div class="in">
-    <div class="aleax-head"><p class="eb">Why ALEA</p><h2>Built better, priced honestly, delivered on time.</h2></div>
-    <div class="grid">
-      <div class="aleax-card"><div class="ic">⌂</div><h3>Our own factory</h3><p>95,000 sq ft of in-house manufacturing — no middlemen, no hidden markups, full quality control.</p></div>
-      <div class="aleax-card"><div class="ic">✦</div><h3>European hardware</h3><p>Hettich &amp; Blum soft-close hinges and channels as standard — not a paid upgrade.</p></div>
-      <div class="aleax-card"><div class="ic">✓</div><h3>10-year warranty</h3><p>Written, honoured, and backed by a local after-sales team you can actually reach.</p></div>
-      <div class="aleax-card"><div class="ic">◷</div><h3>On-time install</h3><p>A clear schedule from day one — most kitchens fitted within 15 days of approval.</p></div>
-    </div>
-  </div></section>
-
-  <section class="aleax-sec"><div class="aleax-in">
-    <div class="aleax-head"><p class="eb">See the difference</p><h2>From bare space to a kitchen you'll love.</h2><p class="lead">Drag the slider to reveal an ALEA transformation.</p></div>
-    <?php echo do_shortcode( '[alea_before_after after="' . esc_url( $hero ) . '"]' ); ?>
-  </div></section>
-
-  <section class="aleax-bleed aleax-band"><div class="in">
-    <div class="aleax-head"><p class="eb">Transparent pricing</p><h2>Clear per-running-foot pricing. No surprises.</h2><p class="lead">Indicative ranges — your exact quote comes after a free site measurement.</p></div>
-    <?php echo do_shortcode( '[alea_pricing]' ); ?>
-  </div></section>
-
-  <section class="aleax-sec"><div class="aleax-in">
-    <div class="aleax-head"><p class="eb">How it works</p><h2>From first call to cooking — in clear steps.</h2></div>
-    <?php echo do_shortcode( '[alea_process]' ); ?>
-  </div></section>
-
-  <?php /* Testimonials removed 2026-07-25: the previous three quotes were
-           placeholder content, not real customer reviews. Reinstate only
-           with verified Google reviews. */ ?>
-
-  <section class="aleax-sec aleax-faq"><div class="aleax-in" style="max-width:820px">
-    <div class="aleax-head"><p class="eb">Good to know</p><h2>Questions homeowners ask us.</h2></div>
-    <details open><summary>How much does an ALEA modular kitchen cost?</summary><p>Our rates run from ₹1,150 to ₹2,600 per square foot of cabinetry depending on the carcass, shutter finish and hardware you choose — most full kitchens land between ₹1 and ₹3 lakh. Use the instant estimator above for a ballpark, then book a free site visit for an exact, itemised quote.</p></details>
-    <details><summary>How long does design and installation take?</summary><p>Design and 3D approval usually take about a week. Manufacturing runs 3–4 weeks in our own factory, and on-site installation is typically 1–2 days — most projects are fully fitted within 15 days of approval.</p></details>
-    <details><summary>What is covered by the 10-year warranty?</summary><p>The carcass, hardware and workmanship are covered in writing for 10 years, supported by a local after-sales team. Exact terms are shared with your quote.</p></details>
-    <details><summary>Which materials and hardware do you use?</summary><p>Moisture- and termite-resistant carcasses, your choice of laminate, acrylic or PU shutters, and European soft-close hardware (Hettich / Blum) as standard across our Premium and Luxury tiers.</p></details>
-    <details><summary>Do you offer EMI or finance options?</summary><p>Yes — EMI is available from roughly ₹3,300/month depending on the project value. Ask our designer for current options during your consultation.</p></details>
-    <details><summary>Which areas do you serve?</summary><p>We design, manufacture and install across the Tricity — Panchkula, Chandigarh, Mohali, Zirakpur and nearby areas.</p></details>
-  </div></section>
-
-  <section id="estimate" class="aleax-bleed aleax-cta"><div class="in">
-    <p class="eb">Free &amp; no-obligation</p>
-    <h2>Book your free design consultation.</h2>
-    <p class="lead">Share your name and number — a senior designer will call within 24 hours with ideas and an estimate.</p>
-    <div class="promise"><span>Free design &amp; 3D quote</span><span>10-year written warranty</span><span>Made in our own factory</span><span>On-time installation</span></div>
-    <div class="formwrap"><?php echo do_shortcode( '[contact-form-7 id="7dcf010" title="Home Page form"]' ); ?></div>
-    <p class="altcta">Prefer to talk now? Call <a href="tel:+919554995449">+91 95549 95449</a> or <a href="<?php echo esc_url( $wa ); ?>">WhatsApp us</a>.</p>
-  </div></section>
-
-</div>
-	<?php return ob_get_clean();
-} );
+/* --- [alea_landing] — RETIRED ---
+ * The pre-redesign homepage. It published three figures that facts.php holds
+ * as explicitly UNVERIFIED and that no redesigned page states:
+ *   "★★★★★ 4.8/5"      -> facts.php 'unverified.google_rating' is null
+ *   "2,000+ interiors"  -> facts.php 'unverified.projects_count' is null
+ *   "12+ Years"         -> contradicts 'years_experience', which is DERIVED
+ *                          from 'alea_since' (2009) so it cannot go stale
+ * plus a "~₹3,300/month" EMI figure and a rate card drawn from the retired
+ * [alea_pricing] and [alea_process] above. The homepage is now page-home.php,
+ * routed at '/' by alea_redesign_map() and reading every fact from facts.php.
+ * Registration kept, output empty — see the note on [alea_trust_bar] above. */
+add_shortcode( 'alea_landing', '__return_empty_string' );
 
 /* =====================================================================
  * BLOCK 10 — SITE-WIDE DESIGN SKIN
@@ -789,7 +720,7 @@ function alea_redesign_map() {
 	return apply_filters( 'alea_redesign_map', array(
 		'/'                        => array(
 			'file'  => 'page-home.php',
-			'title' => 'Modular Kitchens Made in Our Own Factory | ALEA Modular, Panchkula',
+			'title' => 'Modular Kitchens Made in Our Own Factory | ALEA, Panchkula',
 			'desc'  => 'Modular kitchens manufactured in our own 95,000 sq ft unit near Panchkula. Hettich & Blum hardware, 10-year written warranty, installed in about 15 days. Prices published.',
 		),
 		'/kitchen-cost-calculator/' => array(
@@ -800,7 +731,9 @@ function alea_redesign_map() {
 		'/modular-kitchen-price/'  => array(
 			'file'  => 'page-pricing.php',
 			'title' => 'Modular Kitchen Prices — Published by the Factory | ALEA Modular',
-			'desc'  => 'The Tricity\'s only factory-published kitchen price list: ₹1,150–2,600 per sq ft by collection, with what\'s included and honest exclusions.',
+			/* No "only in the Tricity" claim: nothing verifies what competitors
+			   publish, and the page itself makes no such claim. */
+			'desc'  => 'Our factory-published kitchen price list: ₹1,150–2,600 per sq ft by collection, with what\'s included and what isn\'t.',
 		),
 		/* The three collection pages are served by ONE template; the variant
 		   arrives in 'args' and is whitelisted inside page-collection.php.
@@ -809,7 +742,9 @@ function alea_redesign_map() {
 		'/our-factory/'            => array(
 			'file'  => 'page-factory.php',
 			'title' => 'Inside Our 95,000 sq ft Factory | ALEA Modular, Raipur Rani',
-			'desc'  => 'Every ALEA kitchen is made in our own 95,000 sq ft manufacturing unit at Raipur Rani, Panchkula district — CNC machining, Hettich & Blum hardware, 10-year written warranty.',
+			/* NO machine names here. sequence.php forbids them and the page states
+			   none — the stages below are the ones alea_sequence() actually renders. */
+			'desc'  => 'Every ALEA kitchen is made in our own 95,000 sq ft factory at Raipur Rani, Panchkula district — panel cutting, edge banding, assembly, checking and dispatch.',
 		),
 
 		/* ---- wave 2 ---- */
@@ -821,7 +756,7 @@ function alea_redesign_map() {
 		'/modular-kitchen/essential/' => array(
 			'file'  => 'page-collection.php',
 			'args'  => array( 'collection' => 'essential' ),
-			'title' => 'Essential Collection | Modular Kitchens from ₹1,150 / sq ft | ALEA',
+			'title' => 'Essential Collection | Kitchens from ₹1,150 / sq ft | ALEA',
 			'desc'  => 'The Essential collection: practical, factory-built modular kitchens from ₹1,150 per sq ft of cabinetry, with the same hardware and 10-year written warranty as every ALEA kitchen.',
 		),
 		'/modular-kitchen/signature/' => array(
@@ -865,13 +800,13 @@ function alea_redesign_map() {
 		'/modular-kitchen/straight-shape/' => array(
 			'file'  => 'page-layout.php',
 			'args'  => array( 'layout' => 'straight-shape' ),
-			'title' => 'Straight-Line Modular Kitchens | When the Layout Works | ALEA Modular',
+			'title' => 'Straight-Line Modular Kitchens | When the Layout Works | ALEA',
 			'desc'  => 'Straight-line kitchens: everything along a single wall, typically 6–10 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
 		),
 		'/modular-kitchen/parallel-shape/' => array(
 			'file'  => 'page-layout.php',
 			'args'  => array( 'layout' => 'parallel-shape' ),
-			'title' => 'Parallel Modular Kitchens | When the Galley Layout Works | ALEA Modular',
+			'title' => 'Parallel Modular Kitchens | When the Layout Works | ALEA',
 			'desc'  => 'Parallel (galley) kitchens: two facing runs with a walkway between, typically 10–16 running feet as general planning guidance. Priced per sq ft of cabinetry from our own factory, with a 10-year written warranty.',
 		),
 		'/modular-kitchen/island-shape/' => array(
@@ -893,20 +828,20 @@ function alea_redesign_map() {
 		'/wardrobe/sliding/'       => array(
 			'file'  => 'page-wardrobe-type.php',
 			'args'  => array( 'type' => 'sliding' ),
-			'title' => 'Sliding Wardrobes | Doors That Run Across the Front | ALEA Modular',
-			'desc'  => 'Sliding wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
+			'title' => 'Sliding Wardrobes | Doors That Run Across the Front | ALEA',
+			'desc'  => 'Sliding wardrobes made in our own factory at Raipur Rani, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement.',
 		),
 		'/wardrobe/hinged/'        => array(
 			'file'  => 'page-wardrobe-type.php',
 			'args'  => array( 'type' => 'hinged' ),
 			'title' => 'Hinged Wardrobes | Doors That Swing Fully Open | ALEA Modular',
-			'desc'  => 'Hinged wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
+			'desc'  => 'Hinged wardrobes made in our own factory at Raipur Rani, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement.',
 		),
 		'/wardrobe/walk-in/'       => array(
 			'file'  => 'page-wardrobe-type.php',
 			'args'  => array( 'type' => 'walk-in' ),
 			'title' => 'Walk-In Wardrobes | A Room Given Over to Storage | ALEA Modular',
-			'desc'  => 'Walk-in wardrobes made in our own factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement at your home.',
+			'desc'  => 'Walk-in wardrobes made in our own factory at Raipur Rani, with Hettich & Blum hardware and a 10-year written warranty. Priced after a free measurement.',
 		),
 		'/warranty/'               => array(
 			'file'  => 'page-warranty.php',
@@ -915,8 +850,8 @@ function alea_redesign_map() {
 		),
 		'/about/'                  => array(
 			'file'  => 'page-about.php',
-			'title' => 'About ALEA | Making Modular Kitchens in Our Own Factory Since 2009',
-			'desc'  => 'ALEA has made modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani, Panchkula district since 2009; the furniture business we grew out of dates from 1998. Two dates, one factory, and an open door.',
+			'title' => 'About ALEA | Modular Kitchens in Our Own Factory Since 2009',
+			'desc'  => 'ALEA has made modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani since 2009; the furniture business we grew out of dates from 1998.',
 		),
 		/* Trade page. Nothing about a dealer arrangement is verified — no margin,
 		   territory, investment figure or dealer count exists in facts.php — so
@@ -924,8 +859,8 @@ function alea_redesign_map() {
 		   nothing the page does not. */
 		'/become-a-dealer/'        => array(
 			'file'  => 'page-dealer.php',
-			'title' => 'Become a Dealer | Sell Kitchens Made in Our Own Factory | ALEA Modular',
-			'desc'  => 'Trade enquiries: ALEA makes modular kitchens and wardrobes in our own 95,000 sq ft factory at Raipur Rani, Panchkula district, with Hettich & Blum hardware, published per-sq-ft rates and a 10-year written warranty. Terms are discussed on a call, not published.',
+			'title' => 'Become a Dealer | Kitchens Made in Our Own Factory | ALEA',
+			'desc'  => 'Trade enquiries: kitchens and wardrobes from our own 95,000 sq ft factory at Raipur Rani, with published per-sq-ft rates. Terms are discussed on a call, not published.',
 		),
 		'/book-a-free-design-visit/' => array(
 			'file'  => 'page-book-visit.php',
@@ -946,7 +881,7 @@ function alea_redesign_map() {
 		'/contact/'                => array(
 			'file'  => 'page-contact.php',
 			'title' => 'Contact ALEA | Call, WhatsApp or Send Us a Message',
-			'desc'  => 'Talk to the company that makes the kitchens: one number for calls and WhatsApp, or leave your details and we will call you back. Factory at Raipur Rani, Panchkula district; we design and install across Panchkula, Chandigarh, Mohali and Zirakpur.',
+			'desc'  => 'Talk to the company that makes the kitchens: one number for calls and WhatsApp, or leave your details and we will call you back. Factory at Raipur Rani.',
 		),
 
 		/* The locations hub. It lists ONLY the facts.php 'service_area' cities that
@@ -955,14 +890,14 @@ function alea_redesign_map() {
 		   template and their coverage claims are not verified. */
 		'/locations/'              => array(
 			'file'  => 'page-locations.php',
-			'title' => 'Where We Work | Kitchens for Panchkula, Chandigarh, Mohali & Zirakpur | ALEA Modular',
-			'desc'  => 'ALEA designs, measures and installs modular kitchens and wardrobes in Panchkula, Chandigarh, Mohali and Zirakpur, all made at our own factory at Raipur Rani, Panchkula district. Free design visit, Hettich & Blum hardware, 10-year written warranty.',
+			'title' => 'Kitchens for Panchkula, Chandigarh, Mohali & Zirakpur | ALEA',
+			'desc'  => 'ALEA designs, measures and installs modular kitchens and wardrobes in Panchkula, Chandigarh, Mohali and Zirakpur — all made at our own factory at Raipur Rani.',
 		),
 
 		/* ---- wave 4 ---- */
 		'/faqs/'                   => array(
 			'file'  => 'page-faqs.php',
-			'title' => 'Kitchen FAQs — Price, Timeline, Materials & Warranty | ALEA Modular',
+			'title' => 'Kitchen FAQs — Price, Timeline, Materials & Warranty | ALEA',
 			'desc'  => 'Straight answers on what a modular kitchen costs, how long it takes, what hardware we fit, what the 10-year written warranty means, and how the free site visit works.',
 		),
 		'/about/manufacturing-process/' => array(
@@ -990,26 +925,26 @@ function alea_redesign_map() {
 		'/locations/panchkula/' => array(
 			'file'  => 'page-city.php',
 			'args'  => array( 'city' => 'panchkula' ),
-			'title' => 'Modular Kitchens in Panchkula — Made in Our Own Factory | ALEA Modular',
-			'desc'  => 'Modular kitchens for Panchkula homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+			'title' => 'Modular Kitchens in Panchkula — Made in Our Own Factory | ALEA',
+			'desc'  => 'Modular kitchens for Panchkula homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware and a 10-year written warranty.',
 		),
 		'/locations/chandigarh/' => array(
 			'file'  => 'page-city.php',
 			'args'  => array( 'city' => 'chandigarh' ),
-			'title' => 'Modular Kitchens in Chandigarh — Made in Our Own Factory | ALEA Modular',
-			'desc'  => 'Modular kitchens for Chandigarh homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+			'title' => 'Modular Kitchens in Chandigarh — Made in Our Own Factory | ALEA',
+			'desc'  => 'Modular kitchens for Chandigarh homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware and a 10-year written warranty.',
 		),
 		'/locations/mohali/' => array(
 			'file'  => 'page-city.php',
 			'args'  => array( 'city' => 'mohali' ),
-			'title' => 'Modular Kitchens in Mohali — Made in Our Own Factory | ALEA Modular',
-			'desc'  => 'Modular kitchens for Mohali homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+			'title' => 'Modular Kitchens in Mohali — Made in Our Own Factory | ALEA',
+			'desc'  => 'Modular kitchens for Mohali homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware and a 10-year written warranty.',
 		),
 		'/locations/zirakpur/' => array(
 			'file'  => 'page-city.php',
 			'args'  => array( 'city' => 'zirakpur' ),
-			'title' => 'Modular Kitchens in Zirakpur — Made in Our Own Factory | ALEA Modular',
-			'desc'  => 'Modular kitchens for Zirakpur homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware, 10-year written warranty, and the same published price bands as everywhere else we serve.',
+			'title' => 'Modular Kitchens in Zirakpur — Made in Our Own Factory | ALEA',
+			'desc'  => 'Modular kitchens for Zirakpur homes, made in our own factory at Raipur Rani, Panchkula district. Hettich & Blum hardware and a 10-year written warranty.',
 		),
 	) );
 }
@@ -1074,6 +1009,31 @@ add_action( 'template_redirect', function () {
 	// Our map is authoritative for the paths it owns.
 	remove_action( 'template_redirect', 'redirect_canonical' );
 	add_filter( 'redirect_canonical', '__return_false', 99 );
+
+	/*
+	 * ONE 200 PER PAGE. alea_current_path() normalises the trailing slash, so
+	 * /about and /about/ both resolve to the same entry — and because the
+	 * pre_handle_404 preempt above means neither is ever a 404, WP's own
+	 * redirect_canonical (which we have just removed anyway) never got the
+	 * chance to add the missing slash. Every route therefore answered 200 at
+	 * two URLs. Send the unslashed form to the canonical one instead, so the
+	 * URL that ranks is the URL rel=canonical already names.
+	 *
+	 * The target is derived from home_url(), so a subdirectory install compares
+	 * like with like and cannot redirect to itself.
+	 */
+	$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : 'GET';
+	if ( 'GET' === $method || 'HEAD' === $method ) {
+		$req  = wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/', PHP_URL_PATH );
+		$req  = is_string( $req ) && '' !== $req ? $req : '/';
+		$want = wp_parse_url( home_url( $e['path'] ), PHP_URL_PATH );
+		$want = is_string( $want ) && '' !== $want ? $want : '/';
+		if ( $req !== $want ) {
+			$qs = isset( $_SERVER['QUERY_STRING'] ) ? (string) wp_unslash( $_SERVER['QUERY_STRING'] ) : '';
+			wp_safe_redirect( home_url( $e['path'] ) . ( '' !== $qs ? '?' . $qs : '' ), 301 );
+			exit;
+		}
+	}
 	if ( is_404() ) {
 		global $wp_query;
 		$wp_query->is_404 = false;

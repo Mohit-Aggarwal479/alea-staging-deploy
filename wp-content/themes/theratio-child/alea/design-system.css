@@ -24,6 +24,14 @@
      flash). 3.5:1 on chalk -- legal for graphics, ILLEGAL for text.
    - Every number is mono + tabular. The single exception is the big price
      figure, which is the display serif. That exception is the signature.
+   - NO `rem` ANYWHERE -- not here, not in a page's <style data-no-optimize>.
+     theratio's bootstrap.css sets `html { font-size: 10px }`, so every rem
+     resolves at 62.5% and the whole kit renders two-thirds size. Scoping to
+     .ax-root cannot help: rem always resolves against <html>. We cannot reset
+     html either -- theratio's own chrome, footer and Elementor content are
+     authored against that 10px base, and these pages still call get_header()
+     and get_footer(). So every length is px (16px base) or a relative unit
+     that ignores the root: em, ch, %, vw/vh. Use the --sp-* / --fs-* tokens.
    ========================================================================== */
 
 
@@ -73,27 +81,27 @@
   --lh-body: 1.65;          /* -> 1.7  from 768px */
   --measure: 68ch;
 
-  --fs-h1:    clamp(1.75rem, 4vw + 0.85rem, 3.5rem);
-  --fs-h2:    clamp(1.5rem, 2.6vw + 0.7rem, 2.5rem);
-  --fs-h3:    clamp(1.1875rem, 1.2vw + 0.8rem, 1.5rem);
-  --fs-lead:  clamp(1.0625rem, 0.6vw + 0.95rem, 1.1875rem);
-  --fs-price: clamp(1.75rem, 6.5vw, 2.75rem);
-  --fs-micro: 0.6875rem;    /* 11px mono labels  */
-  --fs-nano:  0.625rem;     /* 10px mono kickers */
-  --fs-small: 0.8125rem;    /* 13px mono values  */
+  --fs-h1:    clamp(28px, 4vw + 13.6px, 56px);
+  --fs-h2:    clamp(24px, 2.6vw + 11.2px, 40px);
+  --fs-h3:    clamp(19px, 1.2vw + 12.8px, 24px);
+  --fs-lead:  clamp(17px, 0.6vw + 15.2px, 19px);
+  --fs-price: clamp(28px, 6.5vw, 44px);
+  --fs-micro: 11px;    /* 11px mono labels  */
+  --fs-nano:  10px;     /* 10px mono kickers */
+  --fs-small: 13px;    /* 13px mono values  */
 
   --ls-display: -0.015em;
   --ls-mono:    0.08em;
   --ls-mono-wide: 0.14em;
 
   /* ---- Space (4px base, editorial jumps) ---- */
-  --sp-1: 0.25rem; --sp-2: 0.5rem;  --sp-3: 0.75rem; --sp-4: 1rem;
-  --sp-5: 1.5rem;  --sp-6: 2rem;    --sp-7: 3rem;    --sp-8: 4rem;
-  --sp-9: 6rem;
+  --sp-1: 4px; --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px;  --sp-6: 32px;    --sp-7: 48px;    --sp-8: 64px;
+  --sp-9: 96px;
 
   --gutter: 20px;           /* -> 28 / 32 / 40 upward */
   --wrap: 1180px;
-  --section-y: clamp(2.75rem, 9vw, 5.5rem);
+  --section-y: clamp(44px, 9vw, 88px);
 
   /* ---- Shape, hit targets, motion ---- */
   --radius: 2px;            /* spec sheet, not app store */
@@ -257,8 +265,8 @@
    ========================================================================== */
 
 .ax-section { position: relative; padding-block: var(--section-y); }
-.ax-section--tight { padding-block: clamp(1.75rem, 6vw, 3rem); }
-.ax-section--xl    { padding-block: clamp(3.5rem, 11vw, var(--sp-9)); }
+.ax-section--tight { padding-block: clamp(28px, 6vw, 48px); }
+.ax-section--xl    { padding-block: clamp(56px, 11vw, var(--sp-9)); }
 .ax-section--flush { padding-block: 0; }
 .ax-section--flush-top    { padding-top: 0; }
 .ax-section--flush-bottom { padding-bottom: 0; }
@@ -398,8 +406,8 @@
 .ax-prose > * + * { margin-top: var(--sp-4); }
 .ax-prose > * + .ax-h2, .ax-prose > * + h2 { margin-top: var(--sp-7); }
 .ax-prose > * + .ax-h3, .ax-prose > * + h3 { margin-top: var(--sp-6); }
-.ax-prose h2 { font-family: var(--font-display); font-size: 1.5rem; }
-.ax-prose h3 { font-family: var(--font-display); font-size: 1.25rem; }
+.ax-prose h2 { font-family: var(--font-display); font-size: 24px; }
+.ax-prose h3 { font-family: var(--font-display); font-size: 20px; }
 /* Links carry an ink underline. Oxblood is reserved for conversions. */
 .ax-prose a {
   color: var(--ax-fg);
@@ -426,7 +434,7 @@
   position: absolute;
   left: 0; top: 0.18em;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 12px;
   letter-spacing: 0.06em;
   color: var(--ax-fg-muted);
   font-variant-numeric: tabular-nums;
@@ -472,9 +480,9 @@
   justify-content: center;
   gap: var(--sp-2);
   min-height: var(--tap);
-  padding: 0.8125rem 1.375rem;
+  padding: 13px 22px;
   font-family: var(--font-text);
-  font-size: 0.9375rem;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.01em;
@@ -534,7 +542,7 @@
 /* Quiet mono text button. */
 .ax-btn--link {
   min-height: 0;
-  padding: 0.25rem 0;
+  padding: 4px 0;
   border: 0;
   border-bottom: 1px solid var(--ax-fg);
   border-radius: 0;
@@ -548,8 +556,8 @@
 }
 .ax-btn--link:hover { transform: none; }
 
-.ax-btn--lg { min-height: var(--tap-lg); padding: 1rem 1.75rem; font-size: 1rem; }
-.ax-btn--sm { min-height: var(--tap); padding: 0.625rem 1rem; font-size: 0.8125rem; }
+.ax-btn--lg { min-height: var(--tap-lg); padding: 16px 28px; font-size: 16px; }
+.ax-btn--sm { min-height: var(--tap); padding: 10px 16px; font-size: 13px; }
 .ax-btn--block { display: flex; width: 100%; }
 /* Full width on phones, auto width from 480px (section 7). */
 .ax-btn--block-sm { display: flex; width: 100%; }
@@ -572,6 +580,15 @@
   letter-spacing: var(--ls-mono);
   text-transform: uppercase;
   color: var(--ax-fg-muted);
+}
+/* A link inside that caption still needs a real hit area: at 11px mono the
+   inline box is ~8px tall. Lifted out of page-faqs.php, which carried its own
+   copy for .axp-cities. inline-flex keeps it in the sentence flow. */
+.ax-btn-note a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: 0.25em;
 }
 
 /* Inline text link with a heavier underline. */
@@ -620,7 +637,7 @@
 .ax-specstrip__value {
   display: block;
   font-family: var(--font-mono);
-  font-size: 1.0625rem;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: 0.01em;
@@ -700,7 +717,7 @@
   max-width: 16ch;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-size: clamp(32px, 8vw, 56px);
   line-height: 1.05;
   letter-spacing: var(--ls-display);
   color: #FFFFFF;
@@ -721,6 +738,27 @@
   margin-top: var(--sp-5);
 }
 .ax-hero__actions .ax-btn { width: 100%; }
+/* Secondary CTA under the hero buttons: "or book a free visit — no obligation".
+   NEW class, additive: nothing else in the kit or on any page uses this name,
+   so adding it cannot change an existing page.
+   Two things it fixes over the per-page copies it replaces:
+   - the anchor is a real tap target (min-height: var(--tap)) instead of a 13px
+     inline fragment, which is what the hero's SECOND call to action was;
+   - the colour comes from the block's own --ax-fg-muted (.ax-hero sets it to
+     #D6D3CE) rather than a hardcoded light hex, so the same class stays legible
+     if this ever sits on chalk, sheet or ink. */
+.ax-hero__alt {
+  margin-top: var(--sp-3);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ax-fg-muted);
+}
+.ax-hero__alt a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: inherit;
+}
 /* Mono credit line: "3BHK / KHARADI / INSTALLED IN 11 DAYS" */
 .ax-hero__credit {
   margin-top: var(--sp-5);
@@ -763,12 +801,12 @@
 .ax-card--pad-0 { padding: 0; }
 .ax-card__title {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 20px;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
-.ax-card__body { margin-top: var(--sp-3); font-size: 0.9375rem; line-height: 1.6; color: var(--graphite); }
+.ax-card__body { margin-top: var(--sp-3); font-size: 15px; line-height: 1.6; color: var(--graphite); }
 
 /* Collection card: photo -> serif name -> italic character line -> mono band */
 .ax-card--collection { padding: 0; }
@@ -789,7 +827,7 @@
 .ax-card__inner { flex: 1 1 auto; padding: var(--sp-5); }
 .ax-card__name {
   font-family: var(--font-display);
-  font-size: 1.375rem;
+  font-size: 22px;
   line-height: 1.15;
   letter-spacing: -0.012em;
   color: var(--ink);
@@ -799,7 +837,7 @@
   max-width: 34ch;
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--graphite);
   text-wrap: pretty;
@@ -831,7 +869,7 @@
   color: var(--graphite);
 }
 .ax-card__price-value {
-  font-size: 0.9375rem;
+  font-size: 15px;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
@@ -871,7 +909,7 @@
 }
 .ax-spectable th,
 .ax-spectable td {
-  padding: 0.8125rem var(--sp-3);
+  padding: 13px var(--sp-3);
   border-bottom: 1px solid var(--ax-rule);
   text-align: left;
   vertical-align: baseline;
@@ -932,7 +970,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-4);
-  padding: 0.8125rem 0;
+  padding: 13px 0;
   border-bottom: 1px solid var(--ax-rule);
   font-family: var(--font-mono);
   font-size: var(--fs-small);
@@ -953,6 +991,26 @@
   font-feature-settings: "tnum" 1;
 }
 
+/* Row-as-tap-target: sibling-page navigation rendered as spec rows, so the whole
+   row is the hit area instead of an 11px inline link. Both modifiers are opt-in,
+   so adding them cannot change an existing row.
+   --tap  gives a row the navigation height; put it on the plain "you are here"
+          row too, or it sits shorter than the links beside it.
+   --link is the anchor itself. Apply both to a linked row.
+   Lifted out of page-city.php / page-collection.php / page-wardrobe-type.php,
+   which each carried their own copy; two of them had drifted to a --tap-lg
+   fallback of 56px against the real token's 52px. No fallback here: --tap-lg is
+   defined on :root above, so there is nothing to fall back to. */
+.ax-spectable__row--tap { min-height: var(--tap-lg); align-items: center; }
+.ax-spectable__row--link { text-decoration: none; color: inherit; }
+.ax-spectable__row--link .ax-spectable__key {
+  color: var(--ax-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--ax-rule);
+  text-underline-offset: 0.22em;
+}
+.ax-spectable__row--link:hover .ax-spectable__key { text-decoration-color: var(--ax-fg); }
+
 
 /* --------------------------------------------------------------------------
    5.6 .ax-proof -- a claim with an olive tick + optional negative clause.
@@ -961,13 +1019,13 @@
 .ax-prooflist { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; border-top: 1px solid var(--ax-rule); }
 .ax-proof {
   display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr);
+  grid-template-columns: 20px minmax(0, 1fr);
   gap: var(--sp-3);
   align-items: start;
   padding: var(--sp-4) 0;
   border-bottom: 1px solid var(--ax-rule);
 }
-.ax-proof__tick { position: relative; width: 1.25rem; height: 1.25rem; margin-top: 0.15em; }
+.ax-proof__tick { position: relative; width: 20px; height: 20px; margin-top: 0.15em; }
 .ax-proof__tick::before {
   content: "";
   position: absolute;
@@ -978,7 +1036,7 @@
   border-left: 0;
   transform: rotate(42deg);
 }
-.ax-proof__text { min-width: 0; font-size: 0.9375rem; line-height: 1.55; color: var(--ax-fg); text-wrap: pretty; }
+.ax-proof__text { min-width: 0; font-size: 15px; line-height: 1.55; color: var(--ax-fg); text-wrap: pretty; }
 /* The negative clause -- "NEVER OUTSOURCED" -- mono, so it reads as fact. */
 .ax-proof__never {
   display: block;
@@ -1000,7 +1058,7 @@
 .ax-step {
   counter-increment: ax-step;
   display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr);
+  grid-template-columns: 44px minmax(0, 1fr);
   gap: var(--sp-4);
   padding: var(--sp-5) 0;
   border-bottom: 1px solid var(--ax-rule);
@@ -1021,7 +1079,7 @@
 .ax-step__body { min-width: 0; }
 .ax-step__title {
   font-family: var(--font-display);
-  font-size: 1.1875rem;
+  font-size: 19px;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--ax-fg);
@@ -1029,7 +1087,7 @@
 .ax-step__text {
   margin-top: var(--sp-2);
   max-width: 56ch;
-  font-size: 0.9375rem;
+  font-size: 15px;
   line-height: 1.6;
   color: var(--ax-fg-muted);
   text-wrap: pretty;
@@ -1037,7 +1095,7 @@
 .ax-step__time {
   display: inline-block;
   margin-top: var(--sp-3);
-  padding: 0.3rem 0.5rem;
+  padding: 4.8px 8px;
   border: 1px solid var(--ax-rule);
   border-radius: var(--radius);
   font-family: var(--font-mono);
@@ -1068,7 +1126,7 @@
 .ax-estimator__head { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--rule); }
 .ax-estimator__title {
   font-family: var(--font-display);
-  font-size: 1.375rem;
+  font-size: 22px;
   line-height: 1.15;
   letter-spacing: -0.012em;
   color: var(--ink);
@@ -1118,7 +1176,7 @@
   justify-content: center;
   gap: var(--sp-2);
   min-height: var(--tap-md);
-  padding: 0.625rem 0.9375rem;
+  padding: 10px 15px;
   font-family: var(--font-mono);
   font-size: var(--fs-small);
   font-weight: 500;
@@ -1194,7 +1252,7 @@
   width: var(--tap-md);
   min-height: var(--tap-md);
   font-family: var(--font-mono);
-  font-size: 1.125rem;
+  font-size: 18px;
   line-height: 1;
   color: var(--ink);
   background: transparent;
@@ -1205,11 +1263,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 5.5rem;
+  min-width: 88px;
   padding-inline: var(--sp-2);
   border-inline: 1px solid var(--rule);
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
@@ -1232,7 +1290,7 @@
   background: var(--sheet);
   border-top: 2px solid var(--ink);
 }
-.ax-price__body { flex: 1 1 11rem; min-width: 0; }
+.ax-price__body { flex: 1 1 176px; min-width: 0; }
 .ax-price__label {
   display: block;
   margin-bottom: var(--sp-1);
@@ -1300,8 +1358,8 @@
   text-transform: uppercase;
   color: var(--graphite);
 }
-.ax-included__list { font-size: 0.875rem; line-height: 1.5; }
-.ax-included__list li { position: relative; padding-left: 1.5rem; padding-block: 0.375rem; color: var(--ink); }
+.ax-included__list { font-size: 14px; line-height: 1.5; }
+.ax-included__list li { position: relative; padding-left: 24px; padding-block: 6px; color: var(--ink); }
 .ax-included__list li + li { border-top: 1px solid var(--rule); }
 /* Included: the olive tick (the second and last olive on the page). */
 .ax-included--in .ax-included__list li::before {
@@ -1341,7 +1399,7 @@
 .ax-form__title {
   margin-bottom: var(--sp-2);
   font-family: var(--font-display);
-  font-size: 1.375rem;
+  font-size: 22px;
   line-height: 1.15;
   letter-spacing: -0.012em;
   color: var(--ink);
@@ -1404,7 +1462,7 @@
   width: 100%;
   max-width: 100%;
   min-height: var(--tap-lg);
-  padding: 0.75rem 0.875rem;
+  padding: 12px 14px;
   font-family: var(--font-text);
   font-size: 16px;              /* load-bearing: stops iOS/Android zoom */
   line-height: 1.4;
@@ -1458,14 +1516,14 @@
 
 .ax-textarea,
 .ax-root .ax-field textarea,
-.ax-root textarea.wpcf7-form-control { min-height: 7rem; line-height: 1.55; resize: vertical; }
+.ax-root textarea.wpcf7-form-control { min-height: 112px; line-height: 1.55; resize: vertical; }
 
 /* Select caret drawn with gradients -- no image request, no icon font. */
 .ax-select,
 .ax-root .ax-field select,
 .ax-root select.wpcf7-select,
 .ax-root select.wpcf7-form-control {
-  padding-right: 2.5rem;
+  padding-right: 40px;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--graphite) 50%),
     linear-gradient(135deg, var(--graphite) 50%, transparent 50%);
@@ -1497,7 +1555,7 @@
 .ax-root .wpcf7-not-valid-tip {
   display: flex;
   align-items: flex-start;
-  gap: 0.375rem;
+  gap: 6px;
   margin-top: var(--sp-2);
   padding-left: var(--sp-3);
   border-left: 2px solid var(--alert);
@@ -1527,7 +1585,7 @@
   border-left-color: var(--ink);
   border-radius: var(--radius);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 12px;
   line-height: 1.6;
   letter-spacing: 0.03em;
   color: var(--ink);
@@ -1543,7 +1601,7 @@
 .ax-root .wpcf7-spinner { display: inline-block; margin-left: var(--sp-3); }
 .ax-root .wpcf7-list-item { margin: 0 var(--sp-4) var(--sp-2) 0; }
 .ax-root .wpcf7-list-item input[type="checkbox"],
-.ax-root .wpcf7-list-item input[type="radio"] { width: 1.25rem; height: 1.25rem; accent-color: var(--ink); }
+.ax-root .wpcf7-list-item input[type="radio"] { width: 20px; height: 20px; accent-color: var(--ink); }
 
 /* CF7 submit inherits the primary CTA exactly. Must come after the generic
    control rule so equal-specificity selectors resolve in its favour. */
@@ -1555,9 +1613,9 @@
   align-items: center;
   justify-content: center;
   min-height: var(--tap-lg);
-  padding: 1rem 1.75rem;
+  padding: 16px 28px;
   font-family: var(--font-text);
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.01em;
@@ -1577,18 +1635,18 @@
 /* Consent / checkbox row -- 44px tall so it is a legal hit target. */
 .ax-check {
   display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr);
+  grid-template-columns: 20px minmax(0, 1fr);
   gap: var(--sp-3);
   align-items: start;
   min-height: var(--tap);
   padding-block: var(--sp-2);
-  font-size: 0.8125rem;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--graphite);
   cursor: pointer;
 }
 .ax-check input[type="checkbox"] {
-  width: 1.25rem; height: 1.25rem;
+  width: 20px; height: 20px;
   margin-top: 0.1em;
   accent-color: var(--ink);
   cursor: pointer;
@@ -1616,7 +1674,7 @@
 .ax-quote__text {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: clamp(1.25rem, 3.4vw, 1.75rem);
+  font-size: clamp(20px, 3.4vw, 28px);
   line-height: 1.35;
   letter-spacing: -0.008em;
   color: var(--ax-fg);
@@ -1656,7 +1714,7 @@
   list-style: none;
   cursor: pointer;
   font-family: var(--font-text);
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.45;
   color: var(--ax-fg);
@@ -1683,8 +1741,8 @@
 }
 .ax-faq__a {
   max-width: var(--measure);
-  padding: 0 2.5rem var(--sp-5) 0;
-  font-size: 0.9375rem;
+  padding: 0 40px var(--sp-5) 0;
+  font-size: 15px;
   line-height: 1.65;
   color: var(--ax-fg-muted);
   text-wrap: pretty;
@@ -1707,7 +1765,7 @@
 }
 .ax-rating__figure {
   font-family: var(--font-mono);
-  font-size: clamp(2rem, 7vw, 2.75rem);
+  font-size: clamp(32px, 7vw, 44px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -1717,7 +1775,7 @@
 }
 .ax-rating__meta { min-width: 0; }
 .ax-rating__stars {
-  font-size: 0.9375rem;
+  font-size: 15px;
   line-height: 1.2;
   letter-spacing: 0.14em;
   color: var(--ax-fg);
@@ -1764,10 +1822,10 @@
   justify-content: center;
   gap: var(--sp-2);
   min-height: var(--bar-h);
-  padding: 0.75rem 0.5rem;
+  padding: 12px 8px;
   border: 0;
   font-family: var(--font-text);
-  font-size: 0.9375rem;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
   text-decoration: none;
@@ -1777,7 +1835,7 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-.ax-stickybar__btn .ax-btn__icon { width: 1.125rem; height: 1.125rem; }
+.ax-stickybar__btn .ax-btn__icon { width: 18px; height: 18px; }
 /* Call is a conversion, so it may wear the oxblood. */
 .ax-stickybar__btn--call { background: var(--oxblood); color: #FFFFFF; }
 .ax-stickybar__btn--call:active { background: var(--oxblood-deep); }
@@ -1796,7 +1854,7 @@
   justify-content: space-between;
   gap: var(--sp-3);
   min-height: var(--strip-h);
-  padding: 0.375rem var(--gutter);
+  padding: 6px var(--gutter);
   background: var(--ink);
   color: var(--chalk);
   border-top: 1px solid var(--chalk-a24);
@@ -1810,7 +1868,7 @@
 .ax-pricestrip.is-hidden { transform: translateY(200%); }
 .ax-pricestrip__label { color: #B9B6B0; min-width: 0; }
 .ax-pricestrip__value {
-  font-size: 0.9375rem;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -1823,7 +1881,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-  padding-inline: 0.75rem;
+  padding-inline: 12px;
   margin-right: calc(var(--gutter) * -0.5);
   font-weight: 700;
   color: #FFFFFF;
@@ -1893,7 +1951,7 @@ body:has(.ax-root.ax-has-pricestrip) {
 .ax-media__tag {
   position: absolute;
   left: 0; bottom: 0;
-  padding: 0.375rem 0.625rem;
+  padding: 6px 10px;
   background: var(--ink-a86);
   color: var(--chalk);
   font-family: var(--font-mono);
@@ -2058,7 +2116,7 @@ body:has(.ax-root.ax-has-pricestrip) {
 
   .ax-specstrip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ax-specstrip__item { padding: var(--sp-5) var(--sp-4); }
-  .ax-specstrip__value { font-size: 1.25rem; }
+  .ax-specstrip__value { font-size: 20px; }
 
   .ax-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ax-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -2080,7 +2138,7 @@ body:has(.ax-root.ax-has-pricestrip) {
   .ax-root button.wpcf7-submit,
   .ax-root .ax-form__submit { display: inline-flex; width: auto; }
 
-  .ax-rating__figure { font-size: 3rem; }
+  .ax-rating__figure { font-size: 48px; }
 
   /* Phone-only furniture retires; the dock returns to the container bottom. */
   .ax-stickybar, .ax-pricestrip { display: none; }
@@ -2105,7 +2163,7 @@ body:has(.ax-root.ax-has-pricestrip) {
 
 /* ---- >= 1024px: desktop ---- */
 @media (min-width: 1024px) {
-  .ax-root { --gutter: 40px; --section-y: clamp(4rem, 6vw, 7rem); }
+  .ax-root { --gutter: 40px; --section-y: clamp(64px, 6vw, 112px); }
 
   .ax-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   /* The signature spread: photograph one side, mono facts the other. */
@@ -2138,17 +2196,22 @@ body:has(.ax-root.ax-has-pricestrip) {
     border-top: 0;
     border-bottom: 2px solid var(--ink);
   }
-  .ax-estimator--split .ax-price__figure { font-size: 2.75rem; }
+  .ax-estimator--split .ax-price__figure { font-size: 44px; }
   .ax-estimator--split .ax-price__cta { margin-top: var(--sp-4); }
   .ax-estimator--split .ax-price__cta .ax-btn { display: flex; width: 100%; }
 
-  .ax-step { grid-template-columns: 3.5rem minmax(0, 1fr) 12rem; column-gap: var(--sp-6); }
-  .ax-step__time { margin-top: 0; justify-self: end; align-self: start; text-align: right; }
+  /* Two tracks only. Every page nests .ax-step__time inside .ax-step__body,
+     so a third track was reserved and never occupied. The right-hand rules
+     below are scoped to a real grid item -- a .ax-step__time that IS a direct
+     child -- so the nested chip keeps its own margin-top instead of losing it.
+     Lifted out of page-customer-process.php, which patched exactly this. */
+  .ax-step { grid-template-columns: 56px minmax(0, 1fr); column-gap: var(--sp-6); }
+  .ax-step > .ax-step__time { margin-top: 0; justify-self: end; align-self: start; text-align: right; }
 
   .ax-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .ax-spectable { font-size: 0.875rem; }
-  .ax-faq__q { font-size: 1.0625rem; padding-block: var(--sp-5); }
-  .ax-card__name { font-size: 1.5rem; }
+  .ax-spectable { font-size: 14px; }
+  .ax-faq__q { font-size: 17px; padding-block: var(--sp-5); }
+  .ax-card__name { font-size: 24px; }
 }
 @supports (min-height: 1svh) {
   @media (min-width: 1024px) { .ax-hero { min-height: 82svh; } }
@@ -2157,7 +2220,7 @@ body:has(.ax-root.ax-has-pricestrip) {
 /* ---- >= 1280px ---- */
 @media (min-width: 1280px) {
   .ax-grid--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .ax-quote__text { font-size: 2rem; }
+  .ax-quote__text { font-size: 32px; }
 }
 
 /* ---- Short landscape viewports: never let the hero eat the whole screen.

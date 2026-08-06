@@ -104,7 +104,8 @@ function alea_sequence_count() {
  * @return string
  */
 function alea_sequence_count_word( $n ) {
-	$words = array( 1 => 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten' );
-	$n     = (int) $n;
-	return isset( $words[ $n ] ) ? $words[ $n ] : (string) $n;
+	/* One spelling table for the whole site, in facts.php: the number-in-prose
+	   rule is not specific to the sequence, and two copies of the list is how
+	   "Six stages" and "6 layouts" ended up on neighbouring pages. */
+	return alea_num_word( $n, true );
 }

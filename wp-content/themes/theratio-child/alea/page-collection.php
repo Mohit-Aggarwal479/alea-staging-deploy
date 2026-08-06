@@ -97,7 +97,12 @@ $presentation = array(
 	'atelier'   => array(
 		'img_key' => 'kitchen-wide',
 		'desc' => array(
-			'Atelier is the top of our published range: our top-tier finishes and bespoke elements, made without compromise, for the kitchen you intend to keep for twenty years.',
+			/* Was: "...made without compromise, for the kitchen you intend to keep
+			   for twenty years." Dropped — it implied a service life twice the
+			   written warranty and was not checkable. This now says the same thing
+			   as the 'character' line in facts.php, which the hero above already
+			   renders. */
+			'Atelier is the top of our published range: the widest choice of finishes and fittings we make, and our most involved cabinetry.',
 			sprintf(
 				'Like every ALEA kitchen it is made in our own %1$s sq ft factory at %2$s and carries a %3$d-year written warranty. What goes furthest at this level is the finish and the bespoke work — and all of it, fitting by fitting, is itemised in your quotation.',
 				$f['factory_sqft'],
@@ -179,7 +184,7 @@ foreach ( $faq as $item ) {
 	/* Page-specific: the guide-price mono block only. */
 	.axp-band{border-top:2px solid var(--ax-fg);padding-top:var(--sp-4)}
 	.axp-band__label{display:block;margin-bottom:var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-nano);letter-spacing:var(--ls-mono-wide);text-transform:uppercase;color:var(--ax-fg-muted)}
-	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(1.375rem,4.5vw,2rem);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
+	.axp-band__value{display:block;font-family:var(--font-mono);font-weight:600;font-size:clamp(22px,4.5vw,32px);line-height:1.15;letter-spacing:.01em;color:var(--ax-fg);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;overflow-wrap:anywhere}
 	.axp-band__note{margin-top:var(--sp-3);font-family:var(--font-mono);font-size:var(--fs-micro);line-height:1.6;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--ax-fg-muted)}
 	/* Sibling-collection rows: the whole row is the tap target, not the label. */
 	.axp-sibrow{min-height:var(--tap-lg,56px);align-items:center}
@@ -204,6 +209,13 @@ foreach ( $faq as $item ) {
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $calc_pre ); ?>">Get my <?php echo esc_html( $col_name ); ?> price</a>
 			</div>
+			<?php /* Second call to action, the one this page was missing: the copy
+			         invites a free visit in three places and the booking form sits at
+			         the foot of the page, but nothing linked to it. Same pattern and
+			         same anchor as the sibling /modular-kitchen/ pages
+			         (page-layout.php, page-kitchens.php); the kit's own
+			         .ax-hero__alt is used rather than another per-page copy of it. */ ?>
+			<p class="ax-hero__alt">or <a href="#alea-book">book a free design visit</a> &mdash; free, no obligation</p>
 			<p class="ax-hero__credit">
 				GUIDE PRICE <?php echo esc_html( $band ); ?>
 				/ <?php echo (int) $f['warranty_years']; ?>-YEAR WRITTEN WARRANTY
@@ -212,7 +224,38 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 2. GUIDE PRICE ============ -->
+	<!-- ============ 2. SPEC STRIP ============ -->
+	<!-- The flush hairline band every other /modular-kitchen/ page opens on
+	     (page-layout.php, page-kitchens.php, page-wardrobe-type.php), so the
+	     three collection pages keep the same vertical rhythm as their siblings.
+	     Four company-wide facts, each read straight from facts.php. The guide
+	     band is deliberately NOT one of them: it is already the hero credit line
+	     and the full mono block in the very next section, and the siblings pick
+	     per-page facts for this strip rather than repeat what sits beside it. -->
+	<section class="ax-section ax-section--flush" aria-label="ALEA key facts">
+		<div class="ax-wrap ax-wrap--flush">
+			<div class="ax-specstrip">
+				<div class="ax-specstrip__item">
+					<span class="ax-specstrip__label">Our own factory</span>
+					<span class="ax-specstrip__value"><?php echo esc_html( $f['factory_sqft'] ); ?><span class="ax-specstrip__unit">sq ft</span></span>
+				</div>
+				<div class="ax-specstrip__item">
+					<span class="ax-specstrip__label">Hardware</span>
+					<span class="ax-specstrip__value"><?php echo esc_html( implode( ' & ', $f['hardware_brands'] ) ); ?></span>
+				</div>
+				<div class="ax-specstrip__item">
+					<span class="ax-specstrip__label">Written warranty</span>
+					<span class="ax-specstrip__value"><?php echo (int) $f['warranty_years']; ?><span class="ax-specstrip__unit">years</span></span>
+				</div>
+				<div class="ax-specstrip__item">
+					<span class="ax-specstrip__label">Installation</span>
+					<span class="ax-specstrip__value"><?php echo (int) $f['install_days']; ?><span class="ax-specstrip__unit">days</span></span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ 3. GUIDE PRICE ============ -->
 	<section class="ax-section ax-section--ruled-b">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
@@ -235,7 +278,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 3. THE COLLECTION, HONESTLY ============ -->
+	<!-- ============ 4. THE COLLECTION, HONESTLY ============ -->
 	<section class="ax-section">
 		<div class="ax-wrap ax-wrap--narrow">
 			<div class="ax-head ax-reveal">
@@ -255,7 +298,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 4. WHAT IT COSTS AT YOUR LENGTH ============ -->
+	<!-- ============ 5. WHAT IT COSTS AT YOUR LENGTH ============ -->
 	<section class="ax-section ax-section--ruled">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
@@ -302,7 +345,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 5. STANDARD AT EVERY TIER ============ -->
+	<!-- ============ 6. STANDARD AT EVERY TIER ============ -->
 	<section class="ax-section ax-section--ruled">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
@@ -327,6 +370,12 @@ foreach ( $faq as $item ) {
 							<b>open and close the fittings yourself on a free visit</b>
 						</figcaption>
 					</figure>
+					<?php /* The caption above invites the visit; this is the thing to
+					         click. Same ghost button and same anchor as the sibling
+					         hub page (page-kitchens.php). */ ?>
+					<div class="ax-btnrow ax-mt-5">
+						<a class="ax-btn ax-btn--ghost" href="#alea-book">Book a free design visit &mdash; see it in person</a>
+					</div>
 				</div>
 				<ul class="ax-prooflist ax-reveal">
 					<li class="ax-proof">
@@ -363,7 +412,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 6. ESTIMATOR CTA ============ -->
+	<!-- ============ 7. ESTIMATOR CTA ============ -->
 	<!-- id="estimate": landing anchor for the theme's site-wide sticky mobile
 	     bar (.aleac-mbar "Free Estimate" button in functions.php). -->
 	<section class="ax-section ax-section--ink" id="estimate">
@@ -384,7 +433,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 7. THE REST OF THE RANGE ============ -->
+	<!-- ============ 8. THE REST OF THE RANGE ============ -->
 	<section class="ax-section">
 		<div class="ax-wrap ax-wrap--narrow">
 			<div class="ax-head ax-reveal">
@@ -417,7 +466,7 @@ foreach ( $faq as $item ) {
 		</div>
 	</section>
 
-	<!-- ============ 8. FAQ ============ -->
+	<!-- ============ 9. FAQ ============ -->
 	<section class="ax-section ax-section--ruled">
 		<div class="ax-wrap ax-wrap--narrow">
 			<div class="ax-head ax-reveal">
@@ -436,12 +485,12 @@ foreach ( $faq as $item ) {
 	</section>
 	<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?></script>
 
-	<!-- ============ 9. FINAL CTA BAND ============ -->
+	<!-- ============ 10. FINAL CTA BAND ============ -->
 	<section class="ax-section ax-section--ruled" id="alea-book">
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">See <?php echo esc_html( $col_name ); ?> in person, then get your itemised number.</h2>
 					<p class="ax-lead ax-mt-4">
 						Both are free and carry no obligation: a site visit and measurement at your home,

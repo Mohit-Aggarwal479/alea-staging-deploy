@@ -40,9 +40,13 @@ $ax_band_all = '₹' . alea_inr( $ax_min ) . '–' . alea_inr( $ax_max );
 /* Worked examples — running feet -> sq ft -> ₹, via alea_kitchen_total().
    The rft-to-sqft assumption comes from facts.php (sqft_per_rft). */
 $ax_sqft_rft = (int) alea_fact( 'sqft_per_rft' );
+/* The Signature length is NOT a literal: it is the site-wide reference kitchen
+   from facts.php, because the homepage works the same Signature example under
+   the same "Per month" heading and the two lengths had drifted apart. The
+   Essential and Atelier lengths are illustrative only and appear nowhere else. */
 $ax_ex_defs  = array(
 	array( 'essential', 10 ),
-	array( 'signature', 12 ),
+	array( 'signature', (int) alea_fact( 'example_rft', 12 ) ),
 	array( 'atelier', 14 ),
 );
 $ax_examples = array();
@@ -65,7 +69,7 @@ foreach ( $ax_ex_defs as $ax_i => $ax_d ) {
 /* EMI translation of the Signature example (index 1). Simple division —
    the assumptions are stated in the visible text beside the figure. */
 $ax_sig_ex     = $ax_examples[1];
-$ax_emi_months = 36;
+$ax_emi_months = (int) alea_fact( 'emi_months', 36 ); // shared with the homepage — see facts.php
 $ax_sig_mid    = (int) round( ( $ax_sig_ex['low'] + $ax_sig_ex['high'] ) / 2 );
 $ax_emi        = (int) round( $ax_sig_mid / $ax_emi_months );
 
@@ -140,7 +144,7 @@ foreach ( $ax_faqs as $ax_q ) {
 			<p class="ax-hero__sub">Every ALEA kitchen is built in our own <span class="ax-mono"><?php echo esc_html( $ax_sqft ); ?></span> sq ft factory at <?php echo esc_html( $ax_place ); ?> — and priced in public, from <span class="ax-mono"><?php echo esc_html( $ax_band_all ); ?></span> per sq ft of cabinetry.</p>
 			<div class="ax-hero__actions">
 				<a class="ax-btn ax-btn--primary ax-btn--lg" href="<?php echo esc_url( $ax_calc ); ?>">Get my price in 60 seconds</a>
-				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $ax_visit ); ?>">Book a free site visit</a>
+				<a class="ax-btn ax-btn--ghost ax-btn--lg" href="<?php echo esc_url( $ax_visit ); ?>">Book a free design visit</a>
 			</div>
 			<p class="ax-hero__credit">ALEA since <?php echo esc_html( $ax_since ); ?> / furniture makers since <?php echo esc_html( $ax_est ); ?> / <?php echo esc_html( $ax_sqft ); ?> sq ft / <?php echo esc_html( $ax_place ); ?></p>
 		</div>
@@ -242,10 +246,14 @@ foreach ( $ax_faqs as $ax_q ) {
 						<p class="ax-card__character"><?php echo esc_html( $ax_cols['signature']['character'] ); ?></p>
 						<div class="ax-included--in ax-mt-4">
 							<ul class="ax-included__list">
-								<li>Everything the Essential is built with</li>
+								<li>Everything Essential includes</li>
 								<li>A wider choice of shutter finishes and colours</li>
 								<li>More internal fittings and organiser options</li>
 								<li><?php echo esc_html( $ax_brands ); ?> soft-close hardware</li>
+								<?php /* The three cards are read side by side, so the warranty is named on
+								         each. Without this line the middle column reads as the one tier
+								         without a warranty, which is the opposite of what the lead says. */ ?>
+								<li><span class="ax-mono"><?php echo esc_html( $ax_wyrs ); ?></span>-year written warranty</li>
 							</ul>
 						</div>
 					</div>
@@ -263,8 +271,13 @@ foreach ( $ax_faqs as $ax_q ) {
 						<p class="ax-card__character"><?php echo esc_html( $ax_cols['atelier']['character'] ); ?></p>
 						<div class="ax-included--in ax-mt-4">
 							<ul class="ax-included__list">
-								<li>The widest finish and fitting choices we make</li>
-								<li>Our most involved cabinetry, made without compromise</li>
+								<?php /* The card's lead paragraph is the 'character' line from facts.php,
+								         which now states the breadth and the cabinetry itself. These two
+								         bullets say it at the level the other two cards use — shutter
+								         finishes, and internal fittings — instead of repeating the
+								         sentence directly above them word for word. */ ?>
+								<li>The widest choice of shutter finishes and colours we offer</li>
+								<li>The fullest range of internal fittings and organiser options</li>
 								<li><?php echo esc_html( $ax_brands ); ?> soft-close hardware</li>
 								<li><span class="ax-mono"><?php echo esc_html( $ax_wyrs ); ?></span>-year written warranty</li>
 							</ul>
@@ -289,26 +302,25 @@ foreach ( $ax_faqs as $ax_q ) {
 				<h2 class="ax-h2">What the band includes — and what it does not.</h2>
 				<p class="ax-lead">The same list our calculator uses. Everything excluded is named here and itemised separately on your quotation, so nothing appears later.</p>
 			</header>
+			<?php /* Both columns come from facts.php via alea_scope(), because the lead
+			         above promises this is the same list the calculator shows. It was
+			         not: the calculator's copy had lost the faucet. $ax_mono_wrap only
+			         sets the numerals in mono — it does not change the words. */ ?>
 			<div class="ax-included">
 				<div class="ax-included__col ax-included--in">
 					<h3 class="ax-included__title">Included in the per-sq-ft price</h3>
 					<ul class="ax-included__list">
-						<li>Cabinet carcasses and shutters, factory-built</li>
-						<li>Machine edge banding on every panel</li>
-						<li><?php echo esc_html( $ax_brands ); ?> soft-close hinges and runners</li>
-						<li>Delivery across <?php echo esc_html( $ax_areas ); ?></li>
-						<li>Installation by our own factory team</li>
-						<li><span class="ax-mono"><?php echo esc_html( $ax_wyrs ); ?></span>-year written warranty</li>
+						<?php foreach ( alea_scope( 'included' ) as $ax_line ) : ?>
+						<li><?php echo $ax_mono_wrap( $ax_line ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped inside the wrapper. ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 				<div class="ax-included__col ax-included--out">
 					<h3 class="ax-included__title">Not included — itemised separately</h3>
 					<ul class="ax-included__list">
-						<li>Countertop — priced by material and run</li>
-						<li>Chimney and hob</li>
-						<li>Sink and faucet</li>
-						<li>Appliances</li>
-						<li>Civil work — tiling, plumbing, electrical</li>
+						<?php foreach ( alea_scope( 'excluded' ) as $ax_line ) : ?>
+						<li><?php echo esc_html( $ax_line ); ?></li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 			</div>
@@ -452,7 +464,7 @@ foreach ( $ax_faqs as $ax_q ) {
 		<div class="ax-wrap">
 			<div class="ax-grid ax-grid--split">
 				<div class="ax-reveal">
-					<p class="ax-eyebrow">Book a free visit</p>
+					<p class="ax-eyebrow">Book a free design visit</p>
 					<h2 class="ax-h2">Have us measure it, and the range becomes a quotation.</h2>
 					<p class="ax-lead ax-mt-4">
 						The bands above price the cabinetry. A free measurement at your home turns them into an
